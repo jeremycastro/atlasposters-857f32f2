@@ -72,9 +72,8 @@ const Index = () => {
           <img 
             src={heroImage} 
             alt="Vintage travel posters gallery wall" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-transparent to-transparent" />
         </div>
         
         <div className="container max-w-5xl text-center space-y-8 relative">
