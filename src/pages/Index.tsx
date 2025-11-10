@@ -215,7 +215,7 @@ const Index = () => {
         <div className="container max-w-4xl">
           <div className="text-center space-y-6">
             <h2 className="text-4xl md:text-5xl font-bold">
-              Let's Build Something Beautiful Together and Give Walls Around the World a Voice!
+              Join Us and Let's Give Walls Around the World a Voice!
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               We're partnering with artists, photographers, brands, and IP holders who share our vision.
