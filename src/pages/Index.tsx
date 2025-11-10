@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Mountain, Palette, Users, Compass, ArrowRight } from "lucide-react";
 import atlasLogo from "@/assets/atlas-logo-horizontal.png";
-import heroImage from "@/assets/hero-posters.webp";
+import heroImage from "@/assets/hero-posters.jpg";
 const Index = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
