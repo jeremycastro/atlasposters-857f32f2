@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Mountain, Palette, Users, Compass, ArrowRight } from "lucide-react";
 import atlasLogo from "@/assets/atlas-logo-horizontal.png";
+import heroImage from "@/assets/hero-posters.webp";
 const Index = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -65,13 +66,16 @@ const Index = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative flex-1 flex items-center justify-center px-4 py-16 md:py-24">
-        {/* Subtle background pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-atlas-cream via-background to-atlas-ocean/5 -z-10" />
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-        backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
-        backgroundSize: '32px 32px'
-      }} />
+      <section className="relative flex-1 flex items-center justify-center px-4 py-16 md:py-24 overflow-hidden">
+        {/* Hero Image Background */}
+        <div className="absolute inset-0 -z-10">
+          <img 
+            src={heroImage} 
+            alt="Vintage travel posters gallery wall" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/60" />
+        </div>
         
         <div className="container max-w-5xl text-center space-y-8 relative">
           {/* Logo */}
