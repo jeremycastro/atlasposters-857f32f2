@@ -7,37 +7,37 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Mountain, Palette, Users, Compass, ArrowRight } from "lucide-react";
 import atlasLogo from "@/assets/atlas-logo-horizontal.png";
-
 const Index = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!email) {
       toast({
         title: "Email required",
         description: "Please enter your email address",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setIsSubmitting(true);
-
     try {
-      const { error } = await supabase
-        .from('email_signups')
-        .insert([{ email, name: name || null, source: 'coming_soon' }]);
-
+      const {
+        error
+      } = await supabase.from('email_signups').insert([{
+        email,
+        name: name || null,
+        source: 'coming_soon'
+      }]);
       if (error) {
         if (error.code === '23505') {
           toast({
             title: "Already signed up!",
-            description: "This email is already on our list. We'll keep you posted!",
+            description: "This email is already on our list. We'll keep you posted!"
           });
         } else {
           throw error;
@@ -45,7 +45,7 @@ const Index = () => {
       } else {
         toast({
           title: "Welcome aboard! 🎉",
-          description: "You're now on the list. We'll share our journey with you soon.",
+          description: "You're now on the list. We'll share our journey with you soon."
         });
         setEmail("");
         setName("");
@@ -55,15 +55,13 @@ const Index = () => {
       toast({
         title: "Something went wrong",
         description: "Please try again later.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  return (
-    <div className="min-h-screen flex flex-col bg-background">
+  return <div className="min-h-screen flex flex-col bg-background">
       <Navigation />
       
       {/* Hero Section */}
@@ -71,18 +69,14 @@ const Index = () => {
         {/* Subtle background pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-atlas-cream via-background to-atlas-ocean/5 -z-10" />
         <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
-          backgroundSize: '32px 32px'
-        }} />
+        backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
+        backgroundSize: '32px 32px'
+      }} />
         
         <div className="container max-w-5xl text-center space-y-8 relative">
           {/* Logo */}
           <div className="flex justify-center mb-6">
-            <img 
-              src={atlasLogo} 
-              alt="Atlas Posters" 
-              className="h-20 md:h-28 w-auto"
-            />
+            
           </div>
 
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight text-foreground">
@@ -100,31 +94,13 @@ const Index = () => {
           {/* Email Signup Form */}
           <form onSubmit={handleEmailSignup} className="max-w-md mx-auto space-y-3 pt-6">
             <div className="flex flex-col sm:flex-row gap-3">
-              <Input
-                type="email"
-                placeholder="Your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 h-12"
-                required
-              />
-              <Button 
-                type="submit" 
-                size="lg"
-                disabled={isSubmitting}
-                className="gap-2 h-12 px-8 bg-atlas-gold hover:bg-atlas-gold/90 text-atlas-charcoal font-semibold"
-              >
+              <Input type="email" placeholder="Your email" value={email} onChange={e => setEmail(e.target.value)} className="flex-1 h-12" required />
+              <Button type="submit" size="lg" disabled={isSubmitting} className="gap-2 h-12 px-8 bg-atlas-gold hover:bg-atlas-gold/90 text-atlas-charcoal font-semibold">
                 {isSubmitting ? "Joining..." : "Join Waitlist"}
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </div>
-            <Input
-              type="text"
-              placeholder="Your name (optional)"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full"
-            />
+            <Input type="text" placeholder="Your name (optional)" value={name} onChange={e => setName(e.target.value)} className="w-full" />
           </form>
 
           <p className="text-sm text-muted-foreground pt-2">
@@ -270,8 +246,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
