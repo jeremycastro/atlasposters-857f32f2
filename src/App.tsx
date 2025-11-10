@@ -8,6 +8,9 @@ import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import Collection from "./pages/Collection";
 import About from "./pages/About";
+import Roadmap from "./pages/Roadmap";
+import Changelog from "./pages/Changelog";
+import TechStack from "./pages/TechStack";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +27,9 @@ const App = () => (
           <Route path="/product/:handle" element={<ProductDetail />} />
           <Route path="/collections/:handle" element={<Collection />} />
           <Route path="/about" element={<About />} />
+          <Route path="/roadmap" element={<Roadmap />} />
+          <Route path="/changelog" element={<Changelog />} />
+          <Route path="/techstack" element={<TechStack />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
