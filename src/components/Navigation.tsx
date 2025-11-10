@@ -18,15 +18,12 @@ export const Navigation = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
-          <Link to="/products" className="text-sm font-medium hover:text-accent transition-colors">
-            Shop
-          </Link>
-          <Link to="/collections" className="text-sm font-medium hover:text-accent transition-colors">
-            Collections
-          </Link>
-          <Link to="/about" className="text-sm font-medium hover:text-accent transition-colors">
-            About
-          </Link>
+          <a href="/#why-atlas" className="text-sm font-medium hover:text-accent transition-colors">
+            Why Atlas
+          </a>
+          <a href="/#partner" className="text-sm font-medium hover:text-accent transition-colors">
+            Become a Partner
+          </a>
         </div>
 
         <div className="flex items-center gap-4">
@@ -48,27 +45,20 @@ export const Navigation = () => {
       {mobileMenuOpen && (
         <div className="md:hidden border-t bg-background">
           <div className="container py-4 flex flex-col space-y-4">
-            <Link
-              to="/products"
+            <a
+              href="/#why-atlas"
               className="text-sm font-medium hover:text-accent transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Shop
-            </Link>
-            <Link
-              to="/collections"
+              Why Atlas
+            </a>
+            <a
+              href="/#partner"
               className="text-sm font-medium hover:text-accent transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Collections
-            </Link>
-            <Link
-              to="/about"
-              className="text-sm font-medium hover:text-accent transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              About
-            </Link>
+              Become a Partner
+            </a>
           </div>
         </div>
       )}

@@ -142,7 +142,7 @@ const Index = () => {
       </section>
 
       {/* Features Grid */}
-      <section className="py-24 bg-muted/30">
+      <section id="why-atlas" className="py-24 bg-muted/30">
         <div className="container max-w-7xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Why Atlas Posters?</h2>
@@ -196,7 +196,7 @@ const Index = () => {
       </section>
 
       {/* Partner CTA Section */}
-      <section className="py-24">
+      <section id="partner" className="py-24">
         <div className="container max-w-5xl">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-atlas-charcoal via-atlas-charcoal to-atlas-charcoal/90 p-12 md:p-16">
             {/* Glow effects */}
