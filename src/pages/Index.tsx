@@ -196,56 +196,19 @@ const Index = () => {
       </section>
 
       {/* Partner CTA Section */}
-      <section id="partner" className="py-24">
-        <div className="container max-w-5xl">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-atlas-charcoal via-atlas-charcoal to-atlas-charcoal/90 p-12 md:p-16">
-            {/* Glow effects */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-atlas-gold/20 rounded-full blur-3xl opacity-50" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-atlas-ocean/20 rounded-full blur-3xl opacity-50" />
-
-            <div className="relative z-10 text-white">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Let's Build Something Beautiful Together
-              </h2>
-              <p className="text-lg text-white/80 leading-relaxed mb-8 max-w-3xl">
-                We're partnering with artists, photographers, brands, and IP holders who share our vision.
-                If you create work that celebrates{" "}
-                <strong className="text-atlas-gold">adventure, travel, sport, nature, or culture</strong>, we want
-                to help you reach an audience that truly appreciates it.
-              </p>
-
-              <div className="grid md:grid-cols-3 gap-6 mb-10">
-                <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-atlas-gold/30 flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-atlas-gold text-sm font-bold">✓</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Full Creative Control</p>
-                    <p className="text-sm text-white/70">You maintain all rights. We're here to amplify, not own.</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-atlas-gold/30 flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-atlas-gold text-sm font-bold">✓</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Fair Revenue Sharing</p>
-                    <p className="text-sm text-white/70">Transparent terms. Artists and partners come first.</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-atlas-gold/30 flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-atlas-gold text-sm font-bold">✓</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Your Brand, Your Space</p>
-                    <p className="text-sm text-white/70">Dedicated partner pages that honor your identity.</p>
-                  </div>
-                </div>
-              </div>
-
+      <section id="partner" className="py-24 bg-muted/30">
+        <div className="container max-w-4xl">
+          <div className="text-center space-y-6">
+            <h2 className="text-4xl md:text-5xl font-bold">
+              Let's Build Something Beautiful Together
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              We're partnering with artists, photographers, brands, and IP holders who share our vision.
+              If you create work that celebrates{" "}
+              <strong className="text-foreground">adventure, travel, sport, nature, or culture</strong>, we want
+              to help you reach an audience that truly appreciates it.
+            </p>
+            <div className="pt-4">
               <Button
                 size="lg"
                 className="bg-atlas-gold hover:bg-atlas-gold/90 text-atlas-charcoal font-semibold h-12 px-8"
