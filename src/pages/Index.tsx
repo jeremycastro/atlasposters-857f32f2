@@ -103,7 +103,7 @@ const Index = () => {
               Coming Soon
             </div>
 
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1]">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] drop-shadow-2xl">
               Every Story
               <br />
               <span className="bg-gradient-to-r from-atlas-gold via-atlas-ocean to-atlas-gold bg-clip-text text-transparent">
