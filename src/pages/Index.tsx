@@ -6,6 +6,7 @@ import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Mountain, Palette, Users, Compass, ArrowRight, Sparkles } from "lucide-react";
+import heroImage from "@/assets/hero-001.jpg";
 
 const Index = () => {
   const [email, setEmail] = useState("");
@@ -67,12 +68,16 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Navigation />
 
-      {/* Hero Section - Gradient Design */}
+      {/* Hero Section - Image Background */}
       <section className="relative flex-1 flex items-center justify-center px-4 py-20 md:py-32 overflow-hidden">
-        {/* Animated gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-atlas-gold/10 via-background to-atlas-ocean/10" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--atlas-gold)/0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,hsl(var(--atlas-ocean)/0.15),transparent_50%)]" />
+        {/* Hero background image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${heroImage})` }}
+        />
+        {/* Overlay for text readability */}
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-atlas-gold/10 via-transparent to-atlas-ocean/10" />
 
         <div className="container max-w-6xl relative z-10">
           <div className="text-center space-y-8 mb-12">
