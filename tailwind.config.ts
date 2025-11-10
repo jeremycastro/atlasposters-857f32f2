@@ -47,10 +47,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        gallery: {
-          gray: "hsl(var(--gallery-gray))",
-          gold: "hsl(var(--gallery-gold))",
-          charcoal: "hsl(var(--gallery-charcoal))",
+        atlas: {
+          "deep-blue": "hsl(var(--atlas-deep-blue))",
+          ocean: "hsl(var(--atlas-ocean))",
+          sand: "hsl(var(--atlas-sand))",
+          charcoal: "hsl(var(--atlas-charcoal))",
+          "soft-gray": "hsl(var(--atlas-soft-gray))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
