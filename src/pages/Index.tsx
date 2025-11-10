@@ -6,7 +6,21 @@ import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Mountain, Palette, Users, Compass, ArrowRight, Sparkles } from "lucide-react";
+import { z } from "zod";
 import heroImage from "@/assets/hero-001.jpg";
+
+const signupSchema = z.object({
+  email: z.string()
+    .trim()
+    .email({ message: "Please enter a valid email address" })
+    .max(255, { message: "Email must be less than 255 characters" })
+    .toLowerCase(),
+  name: z.string()
+    .trim()
+    .max(100, { message: "Name must be less than 100 characters" })
+    .optional()
+    .or(z.literal(''))
+});
 
 const Index = () => {
   const [email, setEmail] = useState("");
@@ -16,10 +30,13 @@ const Index = () => {
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) {
+
+    // Validate inputs with Zod
+    const validation = signupSchema.safeParse({ email, name });
+    if (!validation.success) {
       toast({
-        title: "Email required",
-        description: "Please enter your email address",
+        title: "Invalid input",
+        description: validation.error.errors[0].message,
         variant: "destructive",
       });
       return;
@@ -29,8 +46,8 @@ const Index = () => {
     try {
       const { error } = await supabase.from("email_signups").insert([
         {
-          email,
-          name: name || null,
+          email: validation.data.email,
+          name: validation.data.name || null,
           source: "coming_soon",
         },
       ]);
