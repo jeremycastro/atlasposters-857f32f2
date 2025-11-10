@@ -3,7 +3,7 @@ import { toast } from "sonner";
 const SHOPIFY_API_VERSION = '2025-07';
 const SHOPIFY_STORE_PERMANENT_DOMAIN = 'atlasposters-z1qa3.myshopify.com';
 const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
-const SHOPIFY_STOREFRONT_TOKEN = '2b8e92fff56df1fddf9a929a4f4a3b43';
+const SHOPIFY_STOREFRONT_TOKEN = 'b4ddcc32179c321084477e67df85ca38';
 
 export interface ShopifyProduct {
   node: {
