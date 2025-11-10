@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Mountain, Palette, Users, Compass, ArrowRight } from "lucide-react";
 import atlasLogo from "@/assets/atlas-logo-horizontal.png";
-import heroImage from "@/assets/hero-posters.jpg";
+import heroImage from "@/assets/hero-001.jpg";
 const Index = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -72,8 +72,9 @@ const Index = () => {
           <img 
             src={heroImage} 
             alt="Vintage travel posters gallery wall" 
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover opacity-20"
           />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/90" />
         </div>
         
         <div className="container max-w-5xl text-center space-y-8 relative">
