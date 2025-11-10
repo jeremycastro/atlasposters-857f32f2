@@ -15,6 +15,44 @@ interface ChangelogEntry {
 
 const changelogData: ChangelogEntry[] = [
   {
+    version: "0.002",
+    date: "2025-01-11",
+    changes: [
+      {
+        type: "added",
+        description: "Custom favicon with Atlas branding (atlasposters-logo-04.png)",
+      },
+      {
+        type: "changed",
+        description: "Social media preview metadata - Updated title to 'Atlas Posters' with brand tagline",
+      },
+      {
+        type: "added",
+        description: "Custom hero image for social sharing (og-image.webp)",
+      },
+      {
+        type: "added",
+        description: "Email signup functionality with form validation",
+      },
+      {
+        type: "added",
+        description: "Coming soon page with hero section and brand positioning",
+      },
+      {
+        type: "added",
+        description: "'Why Atlas Posters?' features grid showcasing value proposition",
+      },
+      {
+        type: "added",
+        description: "Partner CTA section inviting brand collaborations",
+      },
+      {
+        type: "fixed",
+        description: "Improved form validation and error handling for better UX",
+      },
+    ],
+  },
+  {
     version: "0.001",
     date: "2025-01-10",
     changes: [
