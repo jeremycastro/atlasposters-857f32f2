@@ -1,6 +1,7 @@
 import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
+import { RoleSwitcher } from '@/components/RoleSwitcher';
 import { LayoutDashboard, CheckSquare, Users, LogOut } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -14,6 +15,8 @@ export default function AdminLayout() {
           <h2 className="text-lg font-bold">Atlas Admin</h2>
           <p className="text-sm text-muted-foreground">Role: {activeRole}</p>
         </div>
+
+        <RoleSwitcher className="mx-4 mb-4" />
         
         <nav className="space-y-2 px-4">
           <Link to="/admin/dashboard">

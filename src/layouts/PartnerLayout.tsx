@@ -1,6 +1,7 @@
 import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
+import { RoleSwitcher } from '@/components/RoleSwitcher';
 import { LayoutDashboard, LogOut } from 'lucide-react';
 
 export default function PartnerLayout() {
@@ -14,6 +15,8 @@ export default function PartnerLayout() {
           <h2 className="text-lg font-bold">Partner Portal</h2>
           <p className="text-sm text-muted-foreground">{profile?.partner_company_name}</p>
         </div>
+
+        <RoleSwitcher className="mx-4 mb-4" />
         
         <nav className="space-y-2 px-4">
           <Link to="/partner/dashboard">

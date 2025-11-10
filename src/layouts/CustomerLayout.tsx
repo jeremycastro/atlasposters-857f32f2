@@ -1,6 +1,7 @@
 import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
+import { RoleSwitcher } from '@/components/RoleSwitcher';
 import { LayoutDashboard, ShoppingBag, Heart, User, LogOut } from 'lucide-react';
 
 export default function CustomerLayout() {
@@ -14,6 +15,8 @@ export default function CustomerLayout() {
           <h2 className="text-lg font-bold">My Account</h2>
           <p className="text-sm text-muted-foreground">Customer Portal</p>
         </div>
+
+        <RoleSwitcher className="mx-4 mb-4" />
         
         <nav className="space-y-2 px-4">
           <Link to="/customer/dashboard">
