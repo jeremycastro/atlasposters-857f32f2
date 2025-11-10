@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Compass, Mountain, Palette, Users, Mail, ArrowRight } from "lucide-react";
+import { Mountain, Palette, Users, Mail, ArrowRight } from "lucide-react";
+import atlasLogoWithTagline from "@/assets/atlas-logo-with-tagline.png";
 
 const Index = () => {
   const [email, setEmail] = useState("");
@@ -70,14 +71,16 @@ const Index = () => {
         <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10" />
         
         <div className="container max-w-5xl text-center space-y-8">
-          {/* Logo Placeholder */}
+          {/* Logo */}
           <div className="flex justify-center mb-8">
-            <div className="w-24 h-24 rounded-full bg-accent/10 flex items-center justify-center border-2 border-accent/20">
-              <Compass className="w-12 h-12 text-accent" />
-            </div>
+            <img 
+              src={atlasLogoWithTagline} 
+              alt="Atlas Posters - Memories That Last" 
+              className="h-32 md:h-40 w-auto"
+            />
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
             Every Story<br />
             <span className="text-accent">Deserves a Wall</span>
           </h1>

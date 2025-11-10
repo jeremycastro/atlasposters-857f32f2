@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartDrawer } from "@/components/CartDrawer";
+import atlasIcon from "@/assets/atlas-icon.png";
 
 export const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -10,8 +11,9 @@ export const Navigation = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <nav className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
-          <h1 className="text-2xl font-bold">Atlas Posters</h1>
+        <Link to="/" className="flex items-center space-x-3">
+          <img src={atlasIcon} alt="Atlas Posters" className="h-10 w-10" />
+          <h1 className="text-xl font-bold">Atlas Posters</h1>
         </Link>
 
         {/* Desktop Navigation */}
