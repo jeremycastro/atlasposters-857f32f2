@@ -13,7 +13,7 @@ export const Navigation = () => {
       <nav className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center space-x-3">
           <img src={atlasIcon} alt="Atlas Posters" className="h-10 w-10" />
-          <h1 className="text-xl font-bold">Atlas Posters</h1>
+          <h1 className="text-xl font-atlas">Atlas Posters</h1>
         </Link>
 
         {/* Desktop Navigation */}

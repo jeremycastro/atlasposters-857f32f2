@@ -6,7 +6,7 @@ import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Mountain, Palette, Users, Mail, ArrowRight } from "lucide-react";
-import atlasLogoWithTagline from "@/assets/atlas-logo-with-tagline.png";
+import atlasLogo from "@/assets/atlas-logo-horizontal.png";
 
 const Index = () => {
   const [email, setEmail] = useState("");
@@ -74,9 +74,9 @@ const Index = () => {
           {/* Logo */}
           <div className="flex justify-center mb-8">
             <img 
-              src={atlasLogoWithTagline} 
-              alt="Atlas Posters - Memories That Last" 
-              className="h-32 md:h-40 w-auto"
+              src={atlasLogo} 
+              alt="Atlas Posters" 
+              className="h-24 md:h-32 w-auto"
             />
           </div>
 
