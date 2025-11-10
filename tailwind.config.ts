@@ -48,11 +48,11 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         atlas: {
-          "deep-blue": "hsl(var(--atlas-deep-blue))",
+          gold: "hsl(var(--atlas-gold))",
           ocean: "hsl(var(--atlas-ocean))",
-          sand: "hsl(var(--atlas-sand))",
           charcoal: "hsl(var(--atlas-charcoal))",
-          "soft-gray": "hsl(var(--atlas-soft-gray))",
+          "warm-gray": "hsl(var(--atlas-warm-gray))",
+          cream: "hsl(var(--atlas-cream))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
