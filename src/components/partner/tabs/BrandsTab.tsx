@@ -375,35 +375,35 @@ export function BrandsTab({
             {/* Basic Information */}
             <div className="space-y-4">
               <h4 className="font-medium text-sm text-muted-foreground">Basic Information</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Brand Name *</Label>
-                  <Input value={formData.brand_name} onChange={e => setFormData({
-                  ...formData,
-                  brand_name: e.target.value
-                })} required />
-                </div>
-                <div className="space-y-2">
-                  <Label>Tagline</Label>
-                  <Input value={formData.tagline} onChange={e => setFormData({
-                  ...formData,
-                  tagline: e.target.value
-                })} placeholder="Short brand tagline" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Description</Label>
-                <Textarea value={formData.description} onChange={e => setFormData({
-                ...formData,
-                description: e.target.value
-              })} rows={2} placeholder="Brief description" />
-              </div>
-              <div className="space-y-2">
-                <Label>Brand Story</Label>
-                <Textarea value={formData.brand_story} onChange={e => setFormData({
-                ...formData,
-                brand_story: e.target.value
-              })} rows={3} placeholder="Detailed brand story for landing pages" />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Brand Name *</Label>
+          <Input value={formData.brand_name} onChange={e => setFormData(prev => ({
+          ...prev,
+          brand_name: e.target.value
+        }))} required />
+        </div>
+        <div className="space-y-2">
+          <Label>Tagline</Label>
+          <Input value={formData.tagline} onChange={e => setFormData(prev => ({
+          ...prev,
+          tagline: e.target.value
+        }))} placeholder="Short brand tagline" />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label>Description</Label>
+        <Textarea value={formData.description} onChange={e => setFormData(prev => ({
+        ...prev,
+        description: e.target.value
+      }))} rows={2} placeholder="Brief description" />
+      </div>
+      <div className="space-y-2">
+        <Label>Brand Story</Label>
+        <Textarea value={formData.brand_story} onChange={e => setFormData(prev => ({
+        ...prev,
+        brand_story: e.target.value
+      }))} rows={3} placeholder="Detailed brand story for landing pages" />
               </div>
             </div>
 
@@ -417,40 +417,40 @@ export function BrandsTab({
                 <div className="space-y-2">
                   <Label>Primary Color</Label>
                   <div className="flex gap-2">
-                    <Input type="color" value={formData.primary_color} onChange={e => setFormData({
-                    ...formData,
+                    <Input type="color" value={formData.primary_color} onChange={e => setFormData(prev => ({
+                    ...prev,
                     primary_color: e.target.value
-                  })} className="w-16 h-10 p-1" />
-                    <Input type="text" value={formData.primary_color} onChange={e => setFormData({
-                    ...formData,
+                  }))} className="w-16 h-10 p-1" />
+                    <Input type="text" value={formData.primary_color} onChange={e => setFormData(prev => ({
+                    ...prev,
                     primary_color: e.target.value
-                  })} placeholder="#000000" />
+                  }))} placeholder="#000000" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Secondary Color</Label>
                   <div className="flex gap-2">
-                    <Input type="color" value={formData.secondary_color} onChange={e => setFormData({
-                    ...formData,
+                    <Input type="color" value={formData.secondary_color} onChange={e => setFormData(prev => ({
+                    ...prev,
                     secondary_color: e.target.value
-                  })} className="w-16 h-10 p-1" />
-                    <Input type="text" value={formData.secondary_color} onChange={e => setFormData({
-                    ...formData,
+                  }))} className="w-16 h-10 p-1" />
+                    <Input type="text" value={formData.secondary_color} onChange={e => setFormData(prev => ({
+                    ...prev,
                     secondary_color: e.target.value
-                  })} placeholder="#666666" />
+                  }))} placeholder="#666666" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Accent Color</Label>
                   <div className="flex gap-2">
-                    <Input type="color" value={formData.accent_color} onChange={e => setFormData({
-                    ...formData,
+                    <Input type="color" value={formData.accent_color} onChange={e => setFormData(prev => ({
+                    ...prev,
                     accent_color: e.target.value
-                  })} className="w-16 h-10 p-1" />
-                    <Input type="text" value={formData.accent_color} onChange={e => setFormData({
-                    ...formData,
+                  }))} className="w-16 h-10 p-1" />
+                    <Input type="text" value={formData.accent_color} onChange={e => setFormData(prev => ({
+                    ...prev,
                     accent_color: e.target.value
-                  })} placeholder="#FF6B6B" />
+                  }))} placeholder="#FF6B6B" />
                   </div>
                 </div>
               </div>
@@ -464,61 +464,61 @@ export function BrandsTab({
               </h4>
               <div className="space-y-2">
                 <Label>Website URL</Label>
-                <Input type="url" value={formData.website_url} onChange={e => setFormData({
-                ...formData,
+                <Input type="url" value={formData.website_url} onChange={e => setFormData(prev => ({
+                ...prev,
                 website_url: e.target.value
-              })} placeholder="https://brand.com" />
+              }))} placeholder="https://brand.com" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Instagram</Label>
-                  <Input value={formData.social_links.instagram} onChange={e => setFormData({
-                  ...formData,
+                  <Input value={formData.social_links.instagram} onChange={e => setFormData(prev => ({
+                  ...prev,
                   social_links: {
-                    ...formData.social_links,
+                    ...prev.social_links,
                     instagram: e.target.value
                   }
-                })} placeholder="@brandname or full URL" />
+                }))} placeholder="@brandname or full URL" />
                 </div>
                 <div className="space-y-2">
                   <Label>Facebook</Label>
-                  <Input value={formData.social_links.facebook} onChange={e => setFormData({
-                  ...formData,
+                  <Input value={formData.social_links.facebook} onChange={e => setFormData(prev => ({
+                  ...prev,
                   social_links: {
-                    ...formData.social_links,
+                    ...prev.social_links,
                     facebook: e.target.value
                   }
-                })} placeholder="facebook.com/brandname" />
+                }))} placeholder="facebook.com/brandname" />
                 </div>
                 <div className="space-y-2">
                   <Label>Twitter/X</Label>
-                  <Input value={formData.social_links.twitter} onChange={e => setFormData({
-                  ...formData,
+                  <Input value={formData.social_links.twitter} onChange={e => setFormData(prev => ({
+                  ...prev,
                   social_links: {
-                    ...formData.social_links,
+                    ...prev.social_links,
                     twitter: e.target.value
                   }
-                })} placeholder="@brandname" />
+                }))} placeholder="@brandname" />
                 </div>
                 <div className="space-y-2">
                   <Label>LinkedIn</Label>
-                  <Input value={formData.social_links.linkedin} onChange={e => setFormData({
-                  ...formData,
+                  <Input value={formData.social_links.linkedin} onChange={e => setFormData(prev => ({
+                  ...prev,
                   social_links: {
-                    ...formData.social_links,
+                    ...prev.social_links,
                     linkedin: e.target.value
                   }
-                })} placeholder="linkedin.com/company/brand" />
+                }))} placeholder="linkedin.com/company/brand" />
                 </div>
                 <div className="space-y-2">
                   <Label>Pinterest</Label>
-                  <Input value={formData.social_links.pinterest} onChange={e => setFormData({
-                  ...formData,
+                  <Input value={formData.social_links.pinterest} onChange={e => setFormData(prev => ({
+                  ...prev,
                   social_links: {
-                    ...formData.social_links,
+                    ...prev.social_links,
                     pinterest: e.target.value
                   }
-                })} placeholder="pinterest.com/brandname" />
+                }))} placeholder="pinterest.com/brandname" />
                 </div>
               </div>
             </div>
@@ -528,10 +528,10 @@ export function BrandsTab({
               <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">Brand Files<Palette className="h-4 w-4" />
                 Brand Logo
               </h4>
-              {editingBrand && <BrandLogoUpload brandId={editingBrand.id} currentLogoUrl={formData.logo_url} onLogoChange={url => setFormData({
-              ...formData,
+              {editingBrand && <BrandLogoUpload brandId={editingBrand.id} currentLogoUrl={formData.logo_url} onLogoChange={url => setFormData(prev => ({
+              ...prev,
               logo_url: url
-            })} />}
+            }))} />}
               {!editingBrand && <p className="text-sm text-muted-foreground">
                   Save the brand first to upload a logo
                 </p>}
