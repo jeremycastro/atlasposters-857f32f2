@@ -21,6 +21,7 @@ import AdminLayout from "./layouts/AdminLayout";
 import PartnerLayout from "./layouts/PartnerLayout";
 import CustomerLayout from "./layouts/CustomerLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
+import UserManagement from "./pages/admin/UserManagement";
 import PartnerDashboard from "./pages/partner/Dashboard";
 import CustomerDashboard from "./pages/customer/Dashboard";
 
@@ -61,7 +62,7 @@ const App = () => (
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="tasks" element={<div className="p-8"><h1 className="text-3xl font-bold">Task Manager</h1><p className="text-muted-foreground">Coming soon</p></div>} />
-              <Route path="users" element={<div className="p-8"><h1 className="text-3xl font-bold">User Management</h1><p className="text-muted-foreground">Coming soon</p></div>} />
+              <Route path="users" element={<UserManagement />} />
             </Route>
             
             {/* Partner routes */}
