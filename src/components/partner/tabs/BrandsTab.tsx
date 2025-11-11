@@ -29,17 +29,7 @@ interface BrandFormData {
     pinterest: string;
   };
 }
-interface BrandFormProps {
-  formData: BrandFormData;
-  setFormData: (data: BrandFormData) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  onCancel: () => void;
-  submitLabel: string;
-  isSubmitting: boolean;
-  partnerId: string;
-  brandId?: string;
-}
-const BrandForm = ({
+const BrandForm_UNUSED = ({
   formData,
   setFormData,
   onSubmit,
@@ -48,7 +38,7 @@ const BrandForm = ({
   isSubmitting,
   partnerId,
   brandId
-}: BrandFormProps) => <form onSubmit={onSubmit} className="space-y-6">
+}) => <form onSubmit={onSubmit} className="space-y-6">
     {/* Basic Information */}
     <div className="space-y-4">
       <h4 className="font-medium text-sm text-muted-foreground">Basic Information</h4>
@@ -216,10 +206,10 @@ const BrandForm = ({
         <Palette className="h-4 w-4" />
         Brand Logo
       </h4>
-      {brandId && <BrandLogoUpload brandId={brandId} currentLogoUrl={formData.logo_url} onLogoChange={url => setFormData({
-      ...formData,
+      {brandId && <BrandLogoUpload brandId={brandId} currentLogoUrl={formData.logo_url} onLogoChange={url => setFormData((prev: BrandFormData) => ({
+      ...prev,
       logo_url: url
-    })} />}
+    }))} />}
       {!brandId && <p className="text-sm text-muted-foreground">
           Save the brand first to upload a logo
         </p>}

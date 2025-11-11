@@ -191,6 +191,14 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
       listAssets.mutate(brandId, {
         onSuccess: (files) => {
           setUploadedFiles(files);
+          // Auto-set first uploaded image as logo if no logo exists
+          if (!currentLogoUrl && files.length > 0 && onLogoChange) {
+            const firstImage = files.find(f => f.metadata?.mimetype?.startsWith('image/'));
+            if (firstImage) {
+              onLogoChange(firstImage.publicUrl);
+              toast.success("Logo set automatically");
+            }
+          }
         },
       });
     } catch (error) {
