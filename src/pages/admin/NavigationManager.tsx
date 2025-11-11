@@ -184,56 +184,71 @@ export default function NavigationManager() {
 
     // We're dragging an item
     const activeItem = data.items.find(item => item.id === activeId);
-    const overItem = data.items.find(item => item.id === overId);
-
     if (!activeItem) return;
 
-    // Determine target group - either from the item we're hovering over, or from the group container
-    let targetGroup = overItem?.group_name || activeItem.group_name;
-    
-    // Check if we're over a group container
-    const overElement = document.elementFromPoint(event.activatorEvent.clientX, event.activatorEvent.clientY);
-    const groupContainer = overElement?.closest('[data-group]');
-    if (groupContainer) {
-      targetGroup = groupContainer.getAttribute('data-group');
-    }
+    // Determine target group
+    let targetGroup = activeItem.group_name;
+    let targetIndex = data.items.findIndex(item => item.id === activeId);
 
-    const oldIndex = data.items.findIndex(item => item.id === activeId);
-    let newIndex = overItem ? data.items.findIndex(item => item.id === overId) : oldIndex;
-
-    // If moving to a different group, append to the end of that group
-    if (activeItem.group_name !== targetGroup) {
+    // Check if we dropped on a group (not an item)
+    if (overId.toString().startsWith('group-')) {
+      // Dropped on a group card - extract group name
+      targetGroup = overId.replace('group-', '');
+      
+      // Find the last item in the target group to place it there
       const targetGroupItems = data.items.filter(item => item.group_name === targetGroup);
-      newIndex = data.items.findIndex(item => item.id === targetGroupItems[targetGroupItems.length - 1]?.id);
-      if (newIndex === -1) {
-        // Empty group - find the position where this group should be
-        newIndex = data.items.length;
+      if (targetGroupItems.length > 0) {
+        targetIndex = data.items.findIndex(item => item.id === targetGroupItems[targetGroupItems.length - 1].id) + 1;
+      } else {
+        // Empty group - find where this group should be positioned
+        const groupKeys = Object.keys(data.grouped);
+        const targetGroupIndex = groupKeys.indexOf(targetGroup);
+        if (targetGroupIndex > 0) {
+          const previousGroup = groupKeys[targetGroupIndex - 1];
+          const previousGroupItems = data.items.filter(item => item.group_name === previousGroup);
+          targetIndex = data.items.findIndex(item => item.id === previousGroupItems[previousGroupItems.length - 1].id) + 1;
+        } else {
+          targetIndex = 0;
+        }
+      }
+    } else {
+      // Dropped on another item
+      const overItem = data.items.find(item => item.id === overId);
+      if (overItem) {
+        targetGroup = overItem.group_name;
+        targetIndex = data.items.findIndex(item => item.id === overId);
       }
     }
 
-    if (oldIndex === newIndex && activeItem.group_name === targetGroup) return;
+    // Get current position
+    const oldIndex = data.items.findIndex(item => item.id === activeId);
 
-    const reorderedItems = arrayMove(data.items, oldIndex, newIndex);
+    // If nothing changed, return
+    if (oldIndex === targetIndex && activeItem.group_name === targetGroup) {
+      return;
+    }
+
+    // Reorder items
+    let reorderedItems = [...data.items];
     
-    // Update the moved item's group
-    const updatedItems = reorderedItems.map((item, index) => {
-      if (item.id === activeId) {
-        return {
-          id: item.id,
-          order_index: index + 1,
-          group_name: targetGroup,
-          group_order: item.group_order,
-        };
-      }
-      return {
-        id: item.id,
-        order_index: index + 1,
-        group_name: item.group_name,
-        group_order: item.group_order,
-      };
-    });
+    // Remove from old position
+    reorderedItems.splice(oldIndex, 1);
+    
+    // Insert at new position
+    if (targetIndex > oldIndex) {
+      targetIndex--; // Adjust for removal
+    }
+    reorderedItems.splice(targetIndex, 0, activeItem);
 
-    reorderNavItems.mutate(updatedItems);
+    // Update all items with new order and group
+    const updates = reorderedItems.map((item, index) => ({
+      id: item.id,
+      order_index: index + 1,
+      group_name: item.id === activeId ? targetGroup : item.group_name,
+      group_order: item.group_order,
+    }));
+
+    reorderNavItems.mutate(updates);
   };
 
   const handleGroupDragEnd = (event: any) => {
