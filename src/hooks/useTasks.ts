@@ -36,6 +36,7 @@ export const useTasks = (filters?: TaskFilters) => {
           assigned_to_profile:profiles!project_tasks_assigned_to_fkey(id, full_name, avatar_url),
           created_by_profile:profiles!project_tasks_created_by_fkey(id, full_name)
         `)
+        .order("order_index", { ascending: true, nullsFirst: false })
         .order("created_at", { ascending: false });
 
       if (filters?.status && filters.status.length > 0) {

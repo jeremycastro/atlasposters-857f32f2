@@ -139,6 +139,7 @@ export type Database = {
           milestone: string | null
           milestone_id: string | null
           notes: string | null
+          order_index: number | null
           phase: string | null
           phase_id: string | null
           priority: Database["public"]["Enums"]["task_priority"] | null
@@ -164,6 +165,7 @@ export type Database = {
           milestone?: string | null
           milestone_id?: string | null
           notes?: string | null
+          order_index?: number | null
           phase?: string | null
           phase_id?: string | null
           priority?: Database["public"]["Enums"]["task_priority"] | null
@@ -189,6 +191,7 @@ export type Database = {
           milestone?: string | null
           milestone_id?: string | null
           notes?: string | null
+          order_index?: number | null
           phase?: string | null
           phase_id?: string | null
           priority?: Database["public"]["Enums"]["task_priority"] | null

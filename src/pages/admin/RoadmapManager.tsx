@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRoadmapVersions, useRoadmapWithProgress, useRoadmapMutations } from "@/hooks/useRoadmap";
 import { useTasks } from "@/hooks/useTasks";
+import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,8 +11,82 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CheckCircle2, Circle, Clock, AlertCircle, ChevronDown, ChevronRight } from "lucide-react";
+import { CheckCircle2, Circle, Clock, AlertCircle, ChevronDown, ChevronRight, GripVertical } from "lucide-react";
 import { TaskDetailDialog } from "@/components/tasks/TaskDetailDialog";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+// Sortable Row Component
+const SortableTaskRow = ({ task, getStatusBadge, handleTaskClick }: any) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <TableRow
+      ref={setNodeRef}
+      style={style}
+      onClick={() => handleTaskClick(task.id)}
+      className="cursor-pointer hover:bg-muted/50"
+    >
+      <TableCell>
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing hover:text-primary"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <GripVertical className="h-4 w-4" />
+        </div>
+      </TableCell>
+      <TableCell>{getStatusBadge(task.status)}</TableCell>
+      <TableCell className="font-medium">{task.title}</TableCell>
+      <TableCell>
+        <Badge
+          variant={
+            task.priority === "urgent"
+              ? "destructive"
+              : task.priority === "high"
+              ? "default"
+              : task.priority === "medium"
+              ? "secondary"
+              : "outline"
+          }
+        >
+          {task.priority}
+        </Badge>
+      </TableCell>
+      <TableCell>{task.assigned_to_profile?.full_name || "Unassigned"}</TableCell>
+      <TableCell className="text-right">{task.estimated_hours || "-"}</TableCell>
+    </TableRow>
+  );
+};
 
 const RoadmapManager = () => {
   const { data: versions, isLoading: versionsLoading } = useRoadmapVersions();
@@ -20,6 +95,14 @@ const RoadmapManager = () => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const { toggleDeliverable } = useRoadmapMutations();
+  const { reorderTasks } = useTaskMutations();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
   
   const { data: phasesWithProgress, isLoading: progressLoading } = useRoadmapWithProgress(
     selectedVersionId || versions?.[0]?.id
@@ -62,6 +145,28 @@ const RoadmapManager = () => {
       default:
         return <Circle className="h-4 w-4 text-muted-foreground" />;
     }
+  };
+
+  const handleDragEnd = (event: DragEndEvent, milestoneId: string) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const milestoneTasks = allTasks?.filter((task) => task.milestone_id === milestoneId) || [];
+    const oldIndex = milestoneTasks.findIndex((task) => task.id === active.id);
+    const newIndex = milestoneTasks.findIndex((task) => task.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reorderedTasks = arrayMove(milestoneTasks, oldIndex, newIndex);
+
+    // Update order_index for all affected tasks
+    const tasksToUpdate = reorderedTasks.map((task, index) => ({
+      id: task.id,
+      order_index: index + 1,
+    }));
+
+    reorderTasks.mutate({ tasks: tasksToUpdate });
   };
 
   const getStatusBadge = (status: string) => {
@@ -236,49 +341,39 @@ const RoadmapManager = () => {
                         {isExpanded && (
                           <div className="mt-4 border-t pt-4">
                             {milestoneTasks.length > 0 ? (
-                              <Table>
-                                <TableHeader>
-                                  <TableRow>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Task</TableHead>
-                                    <TableHead>Priority</TableHead>
-                                    <TableHead>Assigned To</TableHead>
-                                    <TableHead className="text-right">Est. Hours</TableHead>
-                                  </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                  {milestoneTasks.map((task) => (
-                                    <TableRow 
-                                      key={task.id}
-                                      onClick={() => handleTaskClick(task.id)}
-                                      className="cursor-pointer hover:bg-muted/50"
-                                    >
-                                      <TableCell>
-                                        {getStatusBadge(task.status)}
-                                      </TableCell>
-                                      <TableCell className="font-medium">
-                                        {task.title}
-                                      </TableCell>
-                                      <TableCell>
-                                        <Badge variant={
-                                          task.priority === 'urgent' ? 'destructive' :
-                                          task.priority === 'high' ? 'default' :
-                                          task.priority === 'medium' ? 'secondary' :
-                                          'outline'
-                                        }>
-                                          {task.priority}
-                                        </Badge>
-                                      </TableCell>
-                                      <TableCell>
-                                        {task.assigned_to_profile?.full_name || 'Unassigned'}
-                                      </TableCell>
-                                      <TableCell className="text-right">
-                                        {task.estimated_hours || '-'}
-                                      </TableCell>
+                              <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={(event) => handleDragEnd(event, milestone.id)}
+                              >
+                                <Table>
+                                  <TableHeader>
+                                    <TableRow>
+                                      <TableHead className="w-12"></TableHead>
+                                      <TableHead>Status</TableHead>
+                                      <TableHead>Task</TableHead>
+                                      <TableHead>Priority</TableHead>
+                                      <TableHead>Assigned To</TableHead>
+                                      <TableHead className="text-right">Est. Hours</TableHead>
                                     </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
+                                  </TableHeader>
+                                  <SortableContext
+                                    items={milestoneTasks.map((task) => task.id)}
+                                    strategy={verticalListSortingStrategy}
+                                  >
+                                    <TableBody>
+                                      {milestoneTasks.map((task) => (
+                                        <SortableTaskRow
+                                          key={task.id}
+                                          task={task}
+                                          getStatusBadge={getStatusBadge}
+                                          handleTaskClick={handleTaskClick}
+                                        />
+                                      ))}
+                                    </TableBody>
+                                  </SortableContext>
+                                </Table>
+                              </DndContext>
                             ) : (
                               <p className="text-sm text-muted-foreground text-center py-4">
                                 No tasks assigned to this milestone yet

@@ -144,9 +144,48 @@ export const useTaskMutations = () => {
     },
   });
 
+  const reorderTasks = useMutation({
+    mutationFn: async ({
+      tasks,
+    }: {
+      tasks: { id: string; order_index: number }[];
+    }) => {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) throw new Error("Not authenticated");
+
+      // Update all tasks in a single transaction
+      const updates = tasks.map((task) =>
+        supabase
+          .from("project_tasks")
+          .update({ order_index: task.order_index, updated_at: new Date().toISOString() })
+          .eq("id", task.id)
+      );
+
+      const results = await Promise.all(updates);
+      const errors = results.filter((r) => r.error);
+      
+      if (errors.length > 0) {
+        throw new Error("Failed to reorder tasks");
+      }
+
+      return results;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to reorder tasks: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     createTask,
     updateTask,
     deleteTask,
+    reorderTasks,
   };
 };
