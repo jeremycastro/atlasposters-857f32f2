@@ -25,6 +25,7 @@ export default function AdminLayout() {
         <div className="p-6 border-b">
           <h2 className="text-lg font-bold">Atlas Admin</h2>
           <p className="text-sm text-muted-foreground">Role: {activeRole}</p>
+          <p className="text-xs text-muted-foreground italic">v1.1.0</p>
         </div>
 
         <RoleSwitcher className="mx-4 my-4" />
