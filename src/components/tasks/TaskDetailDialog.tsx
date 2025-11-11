@@ -348,9 +348,14 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
               </Button>
             </>
           ) : (
-            <Button size="sm" onClick={() => setEditMode(true)}>
-              Edit
-            </Button>
+            <>
+              <Button size="sm" variant="outline" onClick={() => onOpenChange(false)}>
+                Close
+              </Button>
+              <Button size="sm" onClick={() => setEditMode(true)}>
+                Edit
+              </Button>
+            </>
           )}
         </div>
       </DialogContent>
