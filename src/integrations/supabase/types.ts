@@ -14,6 +14,214 @@ export type Database = {
   }
   public: {
     Tables: {
+      artwork_files: {
+        Row: {
+          artwork_id: string
+          color_profile: string | null
+          dimensions: string | null
+          dpi: number | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          file_type: string
+          id: string
+          is_primary: boolean | null
+          metadata: Json | null
+          mime_type: string | null
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          artwork_id: string
+          color_profile?: string | null
+          dimensions?: string | null
+          dpi?: number | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          is_primary?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          artwork_id?: string
+          color_profile?: string | null
+          dimensions?: string | null
+          dpi?: number | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          is_primary?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artwork_files_artwork_id_fkey"
+            columns: ["artwork_id"]
+            isOneToOne: false
+            referencedRelation: "artworks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artwork_files_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      artworks: {
+        Row: {
+          art_medium: string | null
+          artist_name: string | null
+          asc_code: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_exclusive: boolean | null
+          metadata: Json | null
+          original_dimensions: string | null
+          partner_id: string
+          rights_end_date: string | null
+          rights_start_date: string | null
+          sequence_number: number
+          status: Database["public"]["Enums"]["artwork_status"] | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          year_created: number | null
+        }
+        Insert: {
+          art_medium?: string | null
+          artist_name?: string | null
+          asc_code: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_exclusive?: boolean | null
+          metadata?: Json | null
+          original_dimensions?: string | null
+          partner_id: string
+          rights_end_date?: string | null
+          rights_start_date?: string | null
+          sequence_number: number
+          status?: Database["public"]["Enums"]["artwork_status"] | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          year_created?: number | null
+        }
+        Update: {
+          art_medium?: string | null
+          artist_name?: string | null
+          asc_code?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_exclusive?: boolean | null
+          metadata?: Json | null
+          original_dimensions?: string | null
+          partner_id?: string
+          rights_end_date?: string | null
+          rights_start_date?: string | null
+          sequence_number?: number
+          status?: Database["public"]["Enums"]["artwork_status"] | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          year_created?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artworks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artworks_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      asc_history: {
+        Row: {
+          artwork_id: string | null
+          asc_code: string
+          assigned_at: string | null
+          assigned_by: string | null
+          id: string
+          notes: string | null
+          status: Database["public"]["Enums"]["asc_history_status"]
+          void_reason: string | null
+          voided_at: string | null
+          voided_by: string | null
+        }
+        Insert: {
+          artwork_id?: string | null
+          asc_code: string
+          assigned_at?: string | null
+          assigned_by?: string | null
+          id?: string
+          notes?: string | null
+          status: Database["public"]["Enums"]["asc_history_status"]
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Update: {
+          artwork_id?: string | null
+          asc_code?: string
+          assigned_at?: string | null
+          assigned_by?: string | null
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["asc_history_status"]
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asc_history_artwork_id_fkey"
+            columns: ["artwork_id"]
+            isOneToOne: false
+            referencedRelation: "artworks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asc_history_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asc_history_voided_by_fkey"
+            columns: ["voided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_signups: {
         Row: {
           created_at: string | null
@@ -37,6 +245,354 @@ export type Database = {
           source?: string | null
         }
         Relationships: []
+      }
+      financial_agreements: {
+        Row: {
+          agreement_type: string
+          commission_rate: number | null
+          created_at: string | null
+          created_by: string | null
+          effective_date: string
+          expiration_date: string | null
+          id: string
+          is_active: boolean | null
+          minimum_order_value: number | null
+          partner_id: string
+          payment_terms: string | null
+          terms: Json | null
+          updated_at: string | null
+          wholesale_discount_rate: number | null
+        }
+        Insert: {
+          agreement_type: string
+          commission_rate?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          effective_date: string
+          expiration_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          minimum_order_value?: number | null
+          partner_id: string
+          payment_terms?: string | null
+          terms?: Json | null
+          updated_at?: string | null
+          wholesale_discount_rate?: number | null
+        }
+        Update: {
+          agreement_type?: string
+          commission_rate?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          effective_date?: string
+          expiration_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          minimum_order_value?: number | null
+          partner_id?: string
+          payment_terms?: string | null
+          terms?: Json | null
+          updated_at?: string | null
+          wholesale_discount_rate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_agreements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_agreements_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_queue: {
+        Row: {
+          id: string
+          import_method: Database["public"]["Enums"]["import_method"]
+          import_status: Database["public"]["Enums"]["import_status"] | null
+          imported_artwork_id: string | null
+          imported_product_id: string | null
+          mapping_data: Json | null
+          notes: string | null
+          partner_id: string
+          processed_at: string | null
+          processed_by: string | null
+          queued_at: string | null
+          shopify_product_id: string
+          suggested_asc_code: string | null
+          suggested_product_type_id: string | null
+          suggested_variant_codes: Json | null
+          validation_errors: Json | null
+        }
+        Insert: {
+          id?: string
+          import_method: Database["public"]["Enums"]["import_method"]
+          import_status?: Database["public"]["Enums"]["import_status"] | null
+          imported_artwork_id?: string | null
+          imported_product_id?: string | null
+          mapping_data?: Json | null
+          notes?: string | null
+          partner_id: string
+          processed_at?: string | null
+          processed_by?: string | null
+          queued_at?: string | null
+          shopify_product_id: string
+          suggested_asc_code?: string | null
+          suggested_product_type_id?: string | null
+          suggested_variant_codes?: Json | null
+          validation_errors?: Json | null
+        }
+        Update: {
+          id?: string
+          import_method?: Database["public"]["Enums"]["import_method"]
+          import_status?: Database["public"]["Enums"]["import_status"] | null
+          imported_artwork_id?: string | null
+          imported_product_id?: string | null
+          mapping_data?: Json | null
+          notes?: string | null
+          partner_id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          queued_at?: string | null
+          shopify_product_id?: string
+          suggested_asc_code?: string | null
+          suggested_product_type_id?: string | null
+          suggested_variant_codes?: Json | null
+          validation_errors?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_queue_imported_artwork_id_fkey"
+            columns: ["imported_artwork_id"]
+            isOneToOne: false
+            referencedRelation: "artworks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_queue_imported_product_id_fkey"
+            columns: ["imported_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_queue_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_queue_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_queue_shopify_product_id_fkey"
+            columns: ["shopify_product_id"]
+            isOneToOne: false
+            referencedRelation: "shopify_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_queue_suggested_product_type_id_fkey"
+            columns: ["suggested_product_type_id"]
+            isOneToOne: false
+            referencedRelation: "product_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_types: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          sort_order: number
+          type_code: string
+          type_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number
+          type_code: string
+          type_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number
+          type_code?: string
+          type_name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_types_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_variants: {
+        Row: {
+          barcode: string | null
+          cost_price: number | null
+          created_at: string | null
+          full_sku: string
+          id: string
+          inventory_qty: number | null
+          is_active: boolean | null
+          metadata: Json | null
+          product_id: string
+          reorder_point: number | null
+          reserved_qty: number | null
+          retail_price: number | null
+          updated_at: string | null
+          variant_code: string
+          variant_name: string | null
+          weight_oz: number | null
+          wholesale_price: number | null
+        }
+        Insert: {
+          barcode?: string | null
+          cost_price?: number | null
+          created_at?: string | null
+          full_sku: string
+          id?: string
+          inventory_qty?: number | null
+          is_active?: boolean | null
+          metadata?: Json | null
+          product_id: string
+          reorder_point?: number | null
+          reserved_qty?: number | null
+          retail_price?: number | null
+          updated_at?: string | null
+          variant_code: string
+          variant_name?: string | null
+          weight_oz?: number | null
+          wholesale_price?: number | null
+        }
+        Update: {
+          barcode?: string | null
+          cost_price?: number | null
+          created_at?: string | null
+          full_sku?: string
+          id?: string
+          inventory_qty?: number | null
+          is_active?: boolean | null
+          metadata?: Json | null
+          product_id?: string
+          reorder_point?: number | null
+          reserved_qty?: number | null
+          retail_price?: number | null
+          updated_at?: string | null
+          variant_code?: string
+          variant_name?: string | null
+          weight_oz?: number | null
+          wholesale_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          artwork_id: string
+          base_sku: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          discontinue_date: string | null
+          id: string
+          is_active: boolean | null
+          launch_date: string | null
+          metadata: Json | null
+          product_name: string
+          product_type_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          artwork_id: string
+          base_sku: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discontinue_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          launch_date?: string | null
+          metadata?: Json | null
+          product_name: string
+          product_type_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          artwork_id?: string
+          base_sku?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discontinue_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          launch_date?: string | null
+          metadata?: Json | null
+          product_name?: string
+          product_type_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_artwork_id_fkey"
+            columns: ["artwork_id"]
+            isOneToOne: false
+            referencedRelation: "artworks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_product_type_id_fkey"
+            columns: ["product_type_id"]
+            isOneToOne: false
+            referencedRelation: "product_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -384,6 +940,293 @@ export type Database = {
         }
         Relationships: []
       }
+      shopify_products: {
+        Row: {
+          handle: string | null
+          id: string
+          is_active: boolean | null
+          last_synced_at: string | null
+          product_type: string | null
+          raw_data: Json | null
+          shopify_product_id: string
+          shopify_store_id: string
+          shopify_variant_id: string | null
+          tags: string[] | null
+          title: string
+          vendor: string | null
+        }
+        Insert: {
+          handle?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_synced_at?: string | null
+          product_type?: string | null
+          raw_data?: Json | null
+          shopify_product_id: string
+          shopify_store_id: string
+          shopify_variant_id?: string | null
+          tags?: string[] | null
+          title: string
+          vendor?: string | null
+        }
+        Update: {
+          handle?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_synced_at?: string | null
+          product_type?: string | null
+          raw_data?: Json | null
+          shopify_product_id?: string
+          shopify_store_id?: string
+          shopify_variant_id?: string | null
+          tags?: string[] | null
+          title?: string
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_products_shopify_store_id_fkey"
+            columns: ["shopify_store_id"]
+            isOneToOne: false
+            referencedRelation: "shopify_stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shopify_stores: {
+        Row: {
+          access_token_encrypted: string | null
+          connected_at: string | null
+          connected_by: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          metadata: Json | null
+          partner_id: string
+          shop_name: string | null
+          shopify_store_id: string | null
+          store_domain: string
+          store_type: Database["public"]["Enums"]["store_type"] | null
+          sync_settings: Json | null
+        }
+        Insert: {
+          access_token_encrypted?: string | null
+          connected_at?: string | null
+          connected_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          metadata?: Json | null
+          partner_id: string
+          shop_name?: string | null
+          shopify_store_id?: string | null
+          store_domain: string
+          store_type?: Database["public"]["Enums"]["store_type"] | null
+          sync_settings?: Json | null
+        }
+        Update: {
+          access_token_encrypted?: string | null
+          connected_at?: string | null
+          connected_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          metadata?: Json | null
+          partner_id?: string
+          shop_name?: string | null
+          shopify_store_id?: string | null
+          store_domain?: string
+          store_type?: Database["public"]["Enums"]["store_type"] | null
+          sync_settings?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_stores_connected_by_fkey"
+            columns: ["connected_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopify_stores_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shopify_sync_map: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_sync_at: string | null
+          last_sync_error: string | null
+          shopify_product_id: string
+          shopify_store_id: string
+          shopify_variant_id: string
+          sync_direction: Database["public"]["Enums"]["sync_direction"] | null
+          sync_settings: Json | null
+          sync_status: Database["public"]["Enums"]["sync_status"] | null
+          variant_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_sync_at?: string | null
+          last_sync_error?: string | null
+          shopify_product_id: string
+          shopify_store_id: string
+          shopify_variant_id: string
+          sync_direction?: Database["public"]["Enums"]["sync_direction"] | null
+          sync_settings?: Json | null
+          sync_status?: Database["public"]["Enums"]["sync_status"] | null
+          variant_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_sync_at?: string | null
+          last_sync_error?: string | null
+          shopify_product_id?: string
+          shopify_store_id?: string
+          shopify_variant_id?: string
+          sync_direction?: Database["public"]["Enums"]["sync_direction"] | null
+          sync_settings?: Json | null
+          sync_status?: Database["public"]["Enums"]["sync_status"] | null
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_sync_map_shopify_store_id_fkey"
+            columns: ["shopify_store_id"]
+            isOneToOne: false
+            referencedRelation: "shopify_stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopify_sync_map_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sku_history: {
+        Row: {
+          action: string
+          changed_at: string | null
+          changed_by: string | null
+          changes: Json | null
+          id: string
+          ip_address: unknown
+          reason: string | null
+          sku: string
+          user_agent: string | null
+          variant_id: string | null
+        }
+        Insert: {
+          action: string
+          changed_at?: string | null
+          changed_by?: string | null
+          changes?: Json | null
+          id?: string
+          ip_address?: unknown
+          reason?: string | null
+          sku: string
+          user_agent?: string | null
+          variant_id?: string | null
+        }
+        Update: {
+          action?: string
+          changed_at?: string | null
+          changed_by?: string | null
+          changes?: Json | null
+          id?: string
+          ip_address?: unknown
+          reason?: string | null
+          sku?: string
+          user_agent?: string | null
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sku_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sku_history_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sync_log: {
+        Row: {
+          duration_ms: number | null
+          error_code: string | null
+          error_message: string | null
+          id: string
+          operation: string
+          response_data: Json | null
+          status: string
+          sync_map_id: string | null
+          sync_payload: Json | null
+          sync_type: string
+          synced_at: string | null
+          synced_by: string | null
+        }
+        Insert: {
+          duration_ms?: number | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          operation: string
+          response_data?: Json | null
+          status: string
+          sync_map_id?: string | null
+          sync_payload?: Json | null
+          sync_type: string
+          synced_at?: string | null
+          synced_by?: string | null
+        }
+        Update: {
+          duration_ms?: number | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          operation?: string
+          response_data?: Json | null
+          status?: string
+          sync_map_id?: string | null
+          sync_payload?: Json | null
+          sync_type?: string
+          synced_at?: string | null
+          synced_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sync_log_sync_map_id_fkey"
+            columns: ["sync_map_id"]
+            isOneToOne: false
+            referencedRelation: "shopify_sync_map"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sync_log_synced_by_fkey"
+            columns: ["synced_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_activity: {
         Row: {
           action: string
@@ -548,11 +1391,213 @@ export type Database = {
           },
         ]
       }
+      variant_attributes: {
+        Row: {
+          created_at: string | null
+          id: string
+          position: number | null
+          variant_code_id: string
+          variant_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          position?: number | null
+          variant_code_id: string
+          variant_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          position?: number | null
+          variant_code_id?: string
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "variant_attributes_variant_code_id_fkey"
+            columns: ["variant_code_id"]
+            isOneToOne: false
+            referencedRelation: "variant_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "variant_attributes_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      variant_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          display_value: string
+          id: string
+          is_active: boolean | null
+          metadata: Json | null
+          updated_at: string | null
+          variant_group_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          display_value: string
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          updated_at?: string | null
+          variant_group_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          display_value?: string
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          updated_at?: string | null
+          variant_group_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "variant_codes_variant_group_id_fkey"
+            columns: ["variant_group_id"]
+            isOneToOne: false
+            referencedRelation: "variant_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      variant_files: {
+        Row: {
+          file_name: string
+          file_path: string
+          file_size: number | null
+          file_type: string
+          id: string
+          is_primary: boolean | null
+          metadata: Json | null
+          mime_type: string | null
+          sort_order: number | null
+          uploaded_at: string | null
+          uploaded_by: string | null
+          variant_id: string
+        }
+        Insert: {
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          is_primary?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          sort_order?: number | null
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+          variant_id: string
+        }
+        Update: {
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          is_primary?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          sort_order?: number | null
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "variant_files_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "variant_files_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      variant_groups: {
+        Row: {
+          allow_multiple: boolean | null
+          created_at: string | null
+          description: string | null
+          group_name: string
+          id: string
+          is_active: boolean | null
+          is_required: boolean | null
+          product_type_id: string
+          sort_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          allow_multiple?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          group_name: string
+          id?: string
+          is_active?: boolean | null
+          is_required?: boolean | null
+          product_type_id: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Update: {
+          allow_multiple?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          group_name?: string
+          id?: string
+          is_active?: boolean | null
+          is_required?: boolean | null
+          product_type_id?: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "variant_groups_product_type_id_fkey"
+            columns: ["product_type_id"]
+            isOneToOne: false
+            referencedRelation: "product_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      build_full_sku: {
+        Args: {
+          p_asc_code: string
+          p_product_type_code: string
+          p_variant_code: string
+        }
+        Returns: string
+      }
+      generate_next_asc: { Args: never; Returns: string }
       get_active_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -571,6 +1616,10 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "editor" | "viewer" | "partner" | "customer"
+      artwork_status: "draft" | "active" | "archived" | "discontinued"
+      asc_history_status: "assigned" | "voided" | "transferred"
+      import_method: "csv" | "syncio" | "api" | "manual"
+      import_status: "pending" | "mapped" | "imported" | "error" | "skipped"
       roadmap_milestone_status:
         | "not_started"
         | "in_progress"
@@ -578,6 +1627,9 @@ export type Database = {
         | "blocked"
       roadmap_phase_status: "planned" | "in_progress" | "completed" | "on_hold"
       roadmap_version_status: "draft" | "current" | "archived"
+      store_type: "atlas_managed" | "partner_owned"
+      sync_direction: "atlas_to_shopify" | "shopify_to_atlas" | "bidirectional"
+      sync_status: "synced" | "pending" | "error" | "conflict"
       task_priority: "low" | "medium" | "high" | "urgent"
       task_status:
         | "backlog"
@@ -715,6 +1767,10 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "editor", "viewer", "partner", "customer"],
+      artwork_status: ["draft", "active", "archived", "discontinued"],
+      asc_history_status: ["assigned", "voided", "transferred"],
+      import_method: ["csv", "syncio", "api", "manual"],
+      import_status: ["pending", "mapped", "imported", "error", "skipped"],
       roadmap_milestone_status: [
         "not_started",
         "in_progress",
@@ -723,6 +1779,9 @@ export const Constants = {
       ],
       roadmap_phase_status: ["planned", "in_progress", "completed", "on_hold"],
       roadmap_version_status: ["draft", "current", "archived"],
+      store_type: ["atlas_managed", "partner_owned"],
+      sync_direction: ["atlas_to_shopify", "shopify_to_atlas", "bidirectional"],
+      sync_status: ["synced", "pending", "error", "conflict"],
       task_priority: ["low", "medium", "high", "urgent"],
       task_status: [
         "backlog",
