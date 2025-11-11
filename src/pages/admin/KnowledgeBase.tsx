@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Search, Filter, Calendar } from "lucide-react";
+import { BookOpen, Search, Filter, Calendar, ArrowRight } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { knowledgeArticles, KnowledgeCategory } from "@/types/knowledge";
 import {
@@ -14,6 +14,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const KnowledgeBase = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -143,56 +151,80 @@ const KnowledgeBase = () => {
           </p>
         </div>
 
-        {/* Articles Grid - Grouped by Category */}
+        {/* Articles Table - Grouped by Category */}
         {Object.entries(groupedArticles).map(([category, articles]) => (
           <div key={category} className="mb-8">
             <h2 className="text-2xl font-bold mb-4 text-foreground">{category}</h2>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {articles.map(article => {
-                const IconComponent = (LucideIcons as any)[article.icon] || LucideIcons.BookOpen;
-                
-                return (
-                  <Link key={article.id} to={article.route}>
-                    <Card className="p-6 h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-primary">
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className="p-3 bg-primary/10 rounded-lg">
-                          <IconComponent className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg mb-1">{article.title}</h3>
-                          <Badge variant="outline" className="text-xs">
-                            {article.category}
-                          </Badge>
-                        </div>
-                      </div>
-                      
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                        {article.description}
-                      </p>
-                      
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {article.tags.slice(0, 3).map(tag => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                        {article.tags.length > 3 && (
-                          <Badge variant="secondary" className="text-xs">
-                            +{article.tags.length - 3}
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center text-xs text-muted-foreground pt-4 border-t">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        Updated {article.lastUpdated}
-                      </div>
-                    </Card>
-                  </Link>
-                );
-              })}
-            </div>
+            <Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[60px]">Icon</TableHead>
+                    <TableHead className="min-w-[200px]">Title</TableHead>
+                    <TableHead className="hidden lg:table-cell">Description</TableHead>
+                    <TableHead className="hidden md:table-cell w-[200px]">Tags</TableHead>
+                    <TableHead className="w-[120px]">Updated</TableHead>
+                    <TableHead className="w-[60px]"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {articles.map(article => {
+                    const IconComponent = (LucideIcons as any)[article.icon] || LucideIcons.BookOpen;
+                    
+                    return (
+                      <TableRow 
+                        key={article.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => window.location.href = article.route}
+                      >
+                        <TableCell>
+                          <div className="p-2 bg-primary/10 rounded-lg w-fit">
+                            <IconComponent className="h-5 w-5 text-primary" />
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-1">
+                            <span className="font-semibold">{article.title}</span>
+                            <Badge variant="outline" className="text-xs w-fit">
+                              {article.category}
+                            </Badge>
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {article.description}
+                          </p>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          <div className="flex flex-wrap gap-1">
+                            {article.tags.slice(0, 2).map(tag => (
+                              <Badge key={tag} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {article.tags.length > 2 && (
+                              <Badge variant="secondary" className="text-xs">
+                                +{article.tags.length - 2}
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3 mr-1" />
+                            {article.lastUpdated}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </Card>
           </div>
         ))}
 
