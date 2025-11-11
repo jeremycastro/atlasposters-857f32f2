@@ -46,8 +46,18 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
     e.stopPropagation();
     setDragActive(false);
 
-    const files = Array.from(e.dataTransfer.files).filter(file =>
-      file.type.startsWith('image/')
+    const allowedTypes = [
+      'image/',
+      'application/pdf',
+      'application/postscript', // .ai, .eps
+      'image/vnd.adobe.photoshop', // .psd
+      'image/tiff',
+      'application/octet-stream' // .fig files
+    ];
+
+    const files = Array.from(e.dataTransfer.files).filter(file => 
+      allowedTypes.some(type => file.type.startsWith(type)) || 
+      ['.ai', '.psd', '.pdf', '.tif', '.tiff', '.fig'].some(ext => file.name.toLowerCase().endsWith(ext))
     );
 
     if (files.length > 0) {
@@ -57,8 +67,18 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const files = Array.from(e.target.files).filter(file =>
-        file.type.startsWith('image/')
+      const allowedTypes = [
+        'image/',
+        'application/pdf',
+        'application/postscript',
+        'image/vnd.adobe.photoshop',
+        'image/tiff',
+        'application/octet-stream'
+      ];
+
+      const files = Array.from(e.target.files).filter(file => 
+        allowedTypes.some(type => file.type.startsWith(type)) || 
+        ['.ai', '.psd', '.pdf', '.tif', '.tiff', '.fig'].some(ext => file.name.toLowerCase().endsWith(ext))
       );
       handleUpload(files);
     }
@@ -141,7 +161,7 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
                 id="file-upload"
                 className="hidden"
                 multiple
-                accept="image/*"
+                accept="image/*,.pdf,.ai,.psd,.tif,.tiff,.fig"
                 onChange={handleFileInput}
               />
               <label htmlFor="file-upload">
@@ -150,7 +170,7 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
                 </Button>
               </label>
               <p className="text-xs text-muted-foreground mt-4">
-                Supports: JPG, PNG, WEBP, SVG (max 5MB each)
+                Supports: JPG, PNG, WEBP, SVG, PDF, AI, PSD, TIF, Figma (max 100MB each)
               </p>
             </>
           )}

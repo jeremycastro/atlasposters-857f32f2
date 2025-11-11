@@ -26,6 +26,7 @@ interface BrandFormData {
     facebook: string;
     twitter: string;
     linkedin: string;
+    figma: string;
     pinterest: string;
   };
 }
@@ -205,19 +206,30 @@ const BrandForm = ({ formData, setFormData, onSubmit, onCancel, submitLabel, isS
             placeholder="linkedin.com/company/brand"
           />
         </div>
-        <div className="space-y-2">
-          <Label>Pinterest</Label>
-          <Input
-            value={formData.social_links.pinterest}
-            onChange={(e) => setFormData({ 
-              ...formData, 
-              social_links: { ...formData.social_links, pinterest: e.target.value }
-            })}
-            placeholder="pinterest.com/brandname"
-          />
-        </div>
-      </div>
-    </div>
+                <div className="space-y-2">
+                  <Label>Figma</Label>
+                  <Input
+                    value={formData.social_links.figma}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      social_links: { ...formData.social_links, figma: e.target.value }
+                    })}
+                    placeholder="figma.com/file/..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Pinterest</Label>
+                  <Input
+                    value={formData.social_links.pinterest}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      social_links: { ...formData.social_links, pinterest: e.target.value }
+                    })}
+                    placeholder="pinterest.com/brandname"
+                  />
+                </div>
+              </div>
+            </div>
 
     {/* Brand Logo Upload */}
     <div className="space-y-4">
@@ -277,6 +289,7 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
       facebook: "",
       twitter: "",
       linkedin: "",
+      figma: "",
       pinterest: "",
     },
   });
@@ -301,6 +314,7 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
         facebook: "",
         twitter: "",
         linkedin: "",
+        figma: "",
         pinterest: "",
       },
     });
@@ -351,6 +365,7 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
           facebook: brand.social_links?.facebook || "",
           twitter: brand.social_links?.twitter || "",
           linkedin: brand.social_links?.linkedin || "",
+          figma: brand.social_links?.figma || "",
           pinterest: brand.social_links?.pinterest || "",
         },
       });
