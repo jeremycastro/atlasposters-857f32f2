@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { useBrandAssetUpload, useDeleteBrandAsset, useListBrandAssets } from "@/hooks/useBrandAssetUpload";
 import { useUpdateBrand } from "@/hooks/usePartnerMutations";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,13 @@ interface BrandLogoUploadProps {
 export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: BrandLogoUploadProps) => {
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{
+    fileName: string;
+    progress: number;
+    uploadedMB: number;
+    totalMB: number;
+    status: 'uploading' | 'complete' | 'error';
+  }[]>([]);
   const uploadAssets = useBrandAssetUpload();
   const deleteAsset = useDeleteBrandAsset();
   const listAssets = useListBrandAssets();
@@ -123,20 +131,60 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
     }
   }, [brandId]);
 
-  const handleUpload = (files: File[]) => {
-    uploadAssets.mutate(
-      { brandId, files },
-      {
-        onSuccess: (uploadedFiles) => {
-          // Refresh the list
-          listAssets.mutate(brandId, {
-            onSuccess: (files) => {
-              setUploadedFiles(files);
-            },
-          });
+  const handleUpload = async (filesToUpload: File[]) => {
+    if (filesToUpload.length === 0) return;
+
+    console.log(`Preparing to upload ${filesToUpload.length} file(s)`);
+
+    // Initialize progress tracking
+    const initialProgress = filesToUpload.map(file => ({
+      fileName: file.name,
+      progress: 0,
+      uploadedMB: 0,
+      totalMB: file.size / 1024 / 1024,
+      status: 'uploading' as const,
+    }));
+    setUploadProgress(initialProgress);
+
+    try {
+      await uploadAssets.mutateAsync({
+        brandId,
+        files: filesToUpload,
+        onProgress: (fileName, progress, uploadedMB, totalMB) => {
+          setUploadProgress(prev => 
+            prev.map(item => 
+              item.fileName === fileName
+                ? {
+                    ...item,
+                    progress: progress === -1 ? item.progress : progress,
+                    uploadedMB,
+                    totalMB,
+                    status: progress === -1 ? 'error' : progress === 100 ? 'complete' : 'uploading'
+                  }
+                : item
+            )
+          );
         },
-      }
-    );
+      });
+
+      // Clear progress after 2 seconds
+      setTimeout(() => {
+        setUploadProgress([]);
+      }, 2000);
+
+      // Refresh the list after successful upload
+      listAssets.mutate(brandId, {
+        onSuccess: (files) => {
+          setUploadedFiles(files);
+        },
+      });
+    } catch (error) {
+      console.error("Upload failed:", error);
+      // Mark all as error
+      setUploadProgress(prev =>
+        prev.map(item => ({ ...item, status: 'error' as const }))
+      );
+    }
   };
 
   const handleSetAsLogo = (publicUrl: string) => {
@@ -215,6 +263,41 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
           )}
         </CardContent>
       </Card>
+
+      {/* Upload Progress */}
+      {uploadProgress.length > 0 && (
+        <Card>
+          <CardContent className="p-4 space-y-3">
+            <h4 className="text-sm font-semibold">Upload Progress</h4>
+            {uploadProgress.map((item) => (
+              <div key={item.fileName} className="space-y-1.5">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="truncate max-w-[300px]" title={item.fileName}>
+                    {item.fileName}
+                  </span>
+                  <span className="text-muted-foreground text-xs whitespace-nowrap ml-2">
+                    {item.status === 'error' ? (
+                      <span className="text-destructive">Failed</span>
+                    ) : item.status === 'complete' ? (
+                      <span className="text-green-600">Complete</span>
+                    ) : (
+                      `${item.uploadedMB.toFixed(1)} / ${item.totalMB.toFixed(1)} MB (${Math.round(item.progress)}%)`
+                    )}
+                  </span>
+                </div>
+                <Progress 
+                  value={item.progress} 
+                  className={cn(
+                    "h-2",
+                    item.status === 'error' && "[&>*]:bg-destructive",
+                    item.status === 'complete' && "[&>*]:bg-green-600"
+                  )}
+                />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Uploaded Files Gallery */}
       {uploadedFiles.length > 0 && (

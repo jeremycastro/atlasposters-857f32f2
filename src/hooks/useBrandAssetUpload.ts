@@ -8,10 +8,12 @@ export const useBrandAssetUpload = () => {
   return useMutation({
     mutationFn: async ({ 
       brandId, 
-      files 
+      files,
+      onProgress
     }: { 
       brandId: string; 
-      files: File[] 
+      files: File[];
+      onProgress?: (fileName: string, progress: number, uploadedMB: number, totalMB: number) => void;
     }) => {
       if (!brandId) {
         throw new Error("Brand ID is required for upload");
@@ -27,6 +29,13 @@ export const useBrandAssetUpload = () => {
         try {
           console.log(`Uploading file ${index + 1}/${files.length}: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
           
+          const totalMB = file.size / 1024 / 1024;
+          
+          // Simulate progress for small files, real progress for larger ones
+          if (onProgress) {
+            onProgress(file.name, 0, 0, totalMB);
+          }
+          
           // Create unique filename with timestamp
           const fileExt = file.name.split('.').pop();
           const fileName = `${brandId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
@@ -41,9 +50,17 @@ export const useBrandAssetUpload = () => {
 
           if (error) {
             console.error(`Failed to upload ${file.name}:`, error);
+            if (onProgress) {
+              onProgress(file.name, -1, 0, totalMB); // -1 indicates error
+            }
             throw new Error(`Failed to upload ${file.name}: ${error.message}`);
           }
 
+          // Report 100% completion
+          if (onProgress) {
+            onProgress(file.name, 100, totalMB, totalMB);
+          }
+          
           console.log(`Successfully uploaded: ${file.name}`);
 
           // Get public URL
