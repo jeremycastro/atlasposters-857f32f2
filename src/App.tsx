@@ -24,6 +24,7 @@ import UserManagement from "./pages/admin/UserManagement";
 import TaskManager from "./pages/admin/TaskManager";
 import RoadmapManager from "./pages/admin/RoadmapManager";
 import PartnerDashboard from "./pages/partner/Dashboard";
+import ArtworkCatalog from "./pages/partner/ArtworkCatalog";
 import CustomerDashboard from "./pages/customer/Dashboard";
 
 const queryClient = new QueryClient();
@@ -77,6 +78,7 @@ const App = () => (
             >
               <Route index element={<Navigate to="/partner/dashboard" replace />} />
               <Route path="dashboard" element={<PartnerDashboard />} />
+              <Route path="artworks" element={<ArtworkCatalog />} />
             </Route>
             
             {/* Customer routes */}

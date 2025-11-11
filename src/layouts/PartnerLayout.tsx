@@ -2,7 +2,7 @@ import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { RoleSwitcher } from '@/components/RoleSwitcher';
-import { LayoutDashboard, LogOut } from 'lucide-react';
+import { LayoutDashboard, LogOut, Image } from 'lucide-react';
 
 export default function PartnerLayout() {
   const { profile, signOut } = useAuth();
@@ -23,6 +23,12 @@ export default function PartnerLayout() {
             <Button variant="ghost" className="w-full justify-start">
               <LayoutDashboard className="mr-2 h-4 w-4" />
               Dashboard
+            </Button>
+          </Link>
+          <Link to="/partner/artworks">
+            <Button variant="ghost" className="w-full justify-start">
+              <Image className="mr-2 h-4 w-4" />
+              Artwork Catalog
             </Button>
           </Link>
         </nav>
