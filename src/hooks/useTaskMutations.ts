@@ -96,7 +96,30 @@ export const useTaskMutations = () => {
 
       if (error) throw error;
 
-      await logActivity(id, userData.user.id, "updated", oldData, data);
+      // Only log fields that were actually updated, excluding system and joined fields
+      const systemFields = ['id', 'created_at', 'updated_at', 'created_by', 'order_index'];
+      const fieldsToLog: Record<string, any> = {};
+      const oldValuesToLog: Record<string, any> = {};
+      
+      Object.keys(validColumnFields).forEach((key) => {
+        if (!systemFields.includes(key) && !joinedFields.includes(key)) {
+          fieldsToLog[key] = data[key as keyof typeof data];
+          if (oldData) {
+            oldValuesToLog[key] = oldData[key];
+          }
+        }
+      });
+
+      // Only log if there are actual field changes
+      if (Object.keys(fieldsToLog).length > 0) {
+        await logActivity(
+          id, 
+          userData.user.id, 
+          "updated", 
+          oldData ? oldValuesToLog : null, 
+          fieldsToLog
+        );
+      }
 
       return data;
     },
