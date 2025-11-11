@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TaskComments } from "./TaskComments";
 import { TaskActivityLog } from "./TaskActivityLog";
@@ -76,7 +76,7 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Task Details</span>
@@ -99,14 +99,34 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
-            <TabsTrigger value="comments">Comments</TabsTrigger>
-          </TabsList>
+        {/* Sticky Navigation */}
+        <nav className="sticky top-0 z-10 bg-background border-b -mx-6 px-6 py-3">
+          <div className="flex gap-6">
+            <a 
+              href="#details" 
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Details
+            </a>
+            <a 
+              href="#activity" 
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Activity
+            </a>
+            <a 
+              href="#comments" 
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Comments
+            </a>
+          </div>
+        </nav>
 
-          <TabsContent value="details" className="space-y-4 mt-4">
+        {/* Scrollable Content */}
+        <div className="overflow-y-auto -mx-6 px-6 space-y-8 scroll-smooth">
+          {/* Details Section */}
+          <section id="details" className="space-y-4 pt-4">
             <div>
               <Label>Title</Label>
               {editMode ? (
@@ -216,7 +236,7 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
                       setFormData({ 
                         ...formData, 
                         phase_id: value || null,
-                        milestone_id: null // Clear milestone when phase changes
+                        milestone_id: null
                       });
                     }}
                   >
@@ -296,16 +316,24 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
                 </div>
               </div>
             )}
-          </TabsContent>
+          </section>
 
-          <TabsContent value="activity">
+          <Separator />
+
+          {/* Activity Section */}
+          <section id="activity" className="space-y-4">
+            <h3 className="text-lg font-semibold">Activity Log</h3>
             <TaskActivityLog taskId={taskId || ""} />
-          </TabsContent>
+          </section>
 
-          <TabsContent value="comments">
+          <Separator />
+
+          {/* Comments Section */}
+          <section id="comments" className="space-y-4 pb-4">
+            <h3 className="text-lg font-semibold">Comments</h3>
             <TaskComments taskId={taskId || ""} />
-          </TabsContent>
-        </Tabs>
+          </section>
+        </div>
       </DialogContent>
     </Dialog>
   );
