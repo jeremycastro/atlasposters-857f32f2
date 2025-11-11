@@ -36,9 +36,8 @@ export const useBrandAssetUpload = () => {
             onProgress(file.name, 0, 0, totalMB);
           }
           
-          // Create unique filename with timestamp
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${brandId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+          // Create unique filename with timestamp but keep original name
+          const fileName = `${brandId}/${Date.now()}-${file.name}`;
 
           // Upload to storage
           const { data, error } = await supabase.storage

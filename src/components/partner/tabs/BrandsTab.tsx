@@ -366,7 +366,7 @@ export function BrandsTab({
   };
   if (showForm) {
     return <div className="flex flex-col h-full">
-        <div className="flex-1 overflow-y-auto space-y-4 pb-20">
+        <div className="flex-1 space-y-4 pb-20">
           <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
             ← Back to Brands
           </Button>

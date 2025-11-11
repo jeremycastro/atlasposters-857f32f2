@@ -304,49 +304,61 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
         <div>
           <h4 className="text-sm font-medium mb-3">Uploaded Assets ({uploadedFiles.length})</h4>
           <div className="grid grid-cols-3 gap-3">
-            {uploadedFiles.map((file) => (
-              <Card key={file.name} className="relative group overflow-hidden">
-                <CardContent className="p-2">
-                  <div className="aspect-square relative bg-muted rounded-md overflow-hidden">
-                    <img
-                      src={file.publicUrl}
-                      alt={file.name}
-                      className="w-full h-full object-contain"
-                    />
-                    {currentLogoUrl === file.publicUrl && (
-                      <div className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
-                        Active Logo
-                      </div>
-                    )}
-                  </div>
-                  <div className="mt-2 space-y-2">
-                    <p className="text-xs truncate" title={file.name}>
-                      {file.name}
-                    </p>
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 h-7 text-xs"
-                        onClick={() => handleSetAsLogo(file.publicUrl)}
-                        disabled={currentLogoUrl === file.publicUrl || updateBrand.isPending}
-                      >
-                        {currentLogoUrl === file.publicUrl ? "Current" : "Set as Logo"}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 w-7 p-0"
-                        onClick={() => handleDelete(file.fullPath)}
-                        disabled={deleteAsset.isPending}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
+            {uploadedFiles.map((file) => {
+              const isImage = file.metadata?.mimetype?.startsWith('image/');
+              const displayName = file.name.replace(/^\d+-/, ''); // Remove timestamp prefix
+              
+              return (
+                <Card key={file.name} className="relative group overflow-hidden">
+                  <CardContent className="p-2">
+                    <div className="aspect-square relative bg-muted rounded-md overflow-hidden flex items-center justify-center">
+                      {isImage ? (
+                        <img
+                          src={file.publicUrl}
+                          alt={displayName}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                          <ImageIcon className="h-8 w-8" />
+                          <span className="text-xs">{file.name.split('.').pop()?.toUpperCase()}</span>
+                        </div>
+                      )}
+                      {currentLogoUrl === file.publicUrl && (
+                        <div className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
+                          Active Logo
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <div className="mt-2 space-y-2">
+                      <p className="text-xs truncate" title={displayName}>
+                        {displayName}
+                      </p>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 h-7 text-xs"
+                          onClick={() => handleSetAsLogo(file.publicUrl)}
+                          disabled={currentLogoUrl === file.publicUrl || updateBrand.isPending}
+                        >
+                          {currentLogoUrl === file.publicUrl ? "Current" : "Set as Logo"}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 w-7 p-0"
+                          onClick={() => handleDelete(file.fullPath)}
+                          disabled={deleteAsset.isPending}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}
