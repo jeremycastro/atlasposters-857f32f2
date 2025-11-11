@@ -102,7 +102,18 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
     if (rejectedFiles.length > 0) {
       console.log('Rejected files:', rejectedFiles);
       rejectedFiles.forEach(({ name, reason }) => {
-        toast.error(`${name}: ${reason}`);
+        const errorMsg = `${name}: ${reason}`;
+        toast.error(errorMsg, {
+          duration: Infinity,
+          action: {
+            label: "Copy",
+            onClick: () => {
+              navigator.clipboard.writeText(errorMsg);
+              toast.success("Error copied to clipboard");
+            },
+          },
+          dismissible: true,
+        });
       });
     }
 

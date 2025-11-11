@@ -36,8 +36,13 @@ export const useBrandAssetUpload = () => {
             onProgress(file.name, 0, 0, totalMB);
           }
           
-          // Create unique filename with timestamp but keep original name
-          const fileName = `${brandId}/${Date.now()}-${file.name}`;
+          // Sanitize filename: remove special characters and spaces
+          const sanitizedName = file.name
+            .replace(/[^\w\s.-]/g, '') // Remove special chars except spaces, dots, dashes
+            .replace(/\s+/g, '-') // Replace spaces with dashes
+            .replace(/-+/g, '-'); // Replace multiple dashes with single dash
+          
+          const fileName = `${brandId}/${Date.now()}-${sanitizedName}`;
 
           // Upload to storage
           const { data, error } = await supabase.storage
@@ -91,7 +96,17 @@ export const useBrandAssetUpload = () => {
     },
     onError: (error: Error) => {
       console.error("Upload error:", error);
-      toast.error(`Upload failed: ${error.message}`);
+      toast.error(`Upload failed: ${error.message}`, {
+        duration: Infinity,
+        action: {
+          label: "Copy",
+          onClick: () => {
+            navigator.clipboard.writeText(error.message);
+            toast.success("Error copied to clipboard");
+          },
+        },
+        dismissible: true,
+      });
     },
   });
 };
@@ -113,7 +128,17 @@ export const useDeleteBrandAsset = () => {
       toast.success("File deleted successfully");
     },
     onError: (error: Error) => {
-      toast.error(`Failed to delete file: ${error.message}`);
+      toast.error(`Failed to delete file: ${error.message}`, {
+        duration: Infinity,
+        action: {
+          label: "Copy",
+          onClick: () => {
+            navigator.clipboard.writeText(error.message);
+            toast.success("Error copied to clipboard");
+          },
+        },
+        dismissible: true,
+      });
     },
   });
 };
