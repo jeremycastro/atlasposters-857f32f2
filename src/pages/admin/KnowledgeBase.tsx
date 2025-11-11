@@ -163,7 +163,6 @@ const KnowledgeBase = () => {
                     <TableHead className="w-[60px]">Icon</TableHead>
                     <TableHead className="min-w-[200px]">Title</TableHead>
                     <TableHead className="hidden lg:table-cell">Description</TableHead>
-                    <TableHead className="hidden md:table-cell w-[200px]">Tags</TableHead>
                     <TableHead className="w-[120px]">Updated</TableHead>
                     <TableHead className="w-[60px]"></TableHead>
                   </TableRow>
@@ -190,20 +189,6 @@ const KnowledgeBase = () => {
                           <p className="text-sm text-muted-foreground line-clamp-1">
                             {article.description}
                           </p>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell py-3">
-                          <div className="flex flex-wrap gap-1">
-                            {article.tags.slice(0, 2).map(tag => (
-                              <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0">
-                                {tag}
-                              </Badge>
-                            ))}
-                            {article.tags.length > 2 && (
-                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                                +{article.tags.length - 2}
-                              </Badge>
-                            )}
-                          </div>
                         </TableCell>
                         <TableCell className="py-3">
                           <div className="flex items-center text-xs text-muted-foreground whitespace-nowrap">
