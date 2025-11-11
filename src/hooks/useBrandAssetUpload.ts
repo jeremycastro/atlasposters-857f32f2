@@ -13,36 +13,59 @@ export const useBrandAssetUpload = () => {
       brandId: string; 
       files: File[] 
     }) => {
-      const uploadPromises = files.map(async (file) => {
-        // Create unique filename with timestamp
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${brandId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      if (!brandId) {
+        throw new Error("Brand ID is required for upload");
+      }
 
-        // Upload to storage
-        const { data, error } = await supabase.storage
-          .from('brand-assets')
-          .upload(fileName, file, {
-            cacheControl: '3600',
-            upsert: false,
-          });
+      if (!files || files.length === 0) {
+        throw new Error("No files provided for upload");
+      }
 
-        if (error) throw error;
+      console.log(`Starting upload of ${files.length} file(s) to brand ${brandId}`);
 
-        // Get public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('brand-assets')
-          .getPublicUrl(fileName);
+      const uploadPromises = files.map(async (file, index) => {
+        try {
+          console.log(`Uploading file ${index + 1}/${files.length}: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+          
+          // Create unique filename with timestamp
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${brandId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-        return {
-          path: data.path,
-          publicUrl,
-          fileName: file.name,
-          size: file.size,
-          mimeType: file.type,
-        };
+          // Upload to storage
+          const { data, error } = await supabase.storage
+            .from('brand-assets')
+            .upload(fileName, file, {
+              cacheControl: '3600',
+              upsert: false,
+            });
+
+          if (error) {
+            console.error(`Failed to upload ${file.name}:`, error);
+            throw new Error(`Failed to upload ${file.name}: ${error.message}`);
+          }
+
+          console.log(`Successfully uploaded: ${file.name}`);
+
+          // Get public URL
+          const { data: { publicUrl } } = supabase.storage
+            .from('brand-assets')
+            .getPublicUrl(fileName);
+
+          return {
+            path: data.path,
+            publicUrl,
+            fileName: file.name,
+            size: file.size,
+            mimeType: file.type,
+          };
+        } catch (error) {
+          console.error(`Error uploading ${file.name}:`, error);
+          throw error;
+        }
       });
 
       const uploadedFiles = await Promise.all(uploadPromises);
+      console.log(`Successfully uploaded ${uploadedFiles.length} file(s)`);
       return uploadedFiles;
     },
     onSuccess: (data) => {
@@ -51,7 +74,8 @@ export const useBrandAssetUpload = () => {
       toast.success(`Successfully uploaded ${data.length} file${data.length > 1 ? 's' : ''}`);
     },
     onError: (error: Error) => {
-      toast.error(`Failed to upload files: ${error.message}`);
+      console.error("Upload error:", error);
+      toast.error(`Upload failed: ${error.message}`);
     },
   });
 };

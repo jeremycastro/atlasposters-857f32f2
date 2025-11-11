@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useBrandAssetUpload, useDeleteBrandAsset, useListBrandAssets } from "@/hooks/useBrandAssetUpload";
 import { useUpdateBrand } from "@/hooks/usePartnerMutations";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface BrandLogoUploadProps {
   brandId: string;
@@ -46,41 +47,79 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
     e.stopPropagation();
     setDragActive(false);
 
-    const allowedTypes = [
-      'image/',
-      'application/pdf',
-      'application/postscript', // .ai, .eps
-      'image/vnd.adobe.photoshop', // .psd
-      'image/tiff',
-      'application/octet-stream' // .fig files
-    ];
+    const allFiles = Array.from(e.dataTransfer.files);
+    console.log('Files dropped:', allFiles.map(f => ({ name: f.name, type: f.type, size: f.size })));
+    
+    if (!brandId) {
+      toast.error("Brand ID is missing. Please save the brand first.");
+      return;
+    }
 
-    const files = Array.from(e.dataTransfer.files).filter(file => 
-      allowedTypes.some(type => file.type.startsWith(type)) || 
-      ['.ai', '.psd', '.pdf', '.tif', '.tiff', '.fig'].some(ext => file.name.toLowerCase().endsWith(ext))
-    );
-
-    if (files.length > 0) {
-      handleUpload(files);
+    const validFiles = filterAndValidateFiles(allFiles);
+    
+    if (validFiles.length > 0) {
+      handleUpload(validFiles);
     }
   }, [brandId]);
 
+  const filterAndValidateFiles = (files: File[]) => {
+    const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif', '.ai', '.psd', '.pdf', '.tif', '.tiff', '.fig'];
+    
+    const validFiles: File[] = [];
+    const rejectedFiles: { name: string; reason: string }[] = [];
+
+    files.forEach(file => {
+      const fileExt = '.' + file.name.split('.').pop()?.toLowerCase();
+      
+      // Check file extension
+      if (!allowedExtensions.includes(fileExt)) {
+        rejectedFiles.push({ name: file.name, reason: 'Unsupported file type' });
+        return;
+      }
+
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+        rejectedFiles.push({ 
+          name: file.name, 
+          reason: `File too large (${(file.size / 1024 / 1024).toFixed(1)}MB, max 100MB)` 
+        });
+        return;
+      }
+
+      validFiles.push(file);
+    });
+
+    // Show feedback for rejected files
+    if (rejectedFiles.length > 0) {
+      console.log('Rejected files:', rejectedFiles);
+      rejectedFiles.forEach(({ name, reason }) => {
+        toast.error(`${name}: ${reason}`);
+      });
+    }
+
+    console.log('Valid files for upload:', validFiles.map(f => ({ name: f.name, size: f.size })));
+    
+    return validFiles;
+  };
+
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const allowedTypes = [
-        'image/',
-        'application/pdf',
-        'application/postscript',
-        'image/vnd.adobe.photoshop',
-        'image/tiff',
-        'application/octet-stream'
-      ];
+      const allFiles = Array.from(e.target.files);
+      console.log('Files selected:', allFiles.map(f => ({ name: f.name, type: f.type, size: f.size })));
+      
+      if (!brandId) {
+        toast.error("Brand ID is missing. Please save the brand first.");
+        return;
+      }
 
-      const files = Array.from(e.target.files).filter(file => 
-        allowedTypes.some(type => file.type.startsWith(type)) || 
-        ['.ai', '.psd', '.pdf', '.tif', '.tiff', '.fig'].some(ext => file.name.toLowerCase().endsWith(ext))
-      );
-      handleUpload(files);
+      const validFiles = filterAndValidateFiles(allFiles);
+      
+      if (validFiles.length > 0) {
+        handleUpload(validFiles);
+      } else if (allFiles.length > 0) {
+        toast.error("No valid files to upload");
+      }
     }
   }, [brandId]);
 
