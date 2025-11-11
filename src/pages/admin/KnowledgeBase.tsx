@@ -175,48 +175,43 @@ const KnowledgeBase = () => {
                     return (
                       <TableRow 
                         key={article.id}
-                        className="cursor-pointer hover:bg-muted/50"
+                        className="cursor-pointer hover:bg-muted/50 h-16"
                         onClick={() => window.location.href = article.route}
                       >
-                        <TableCell>
+                        <TableCell className="py-3">
                           <div className="p-2 bg-primary/10 rounded-lg w-fit">
                             <IconComponent className="h-5 w-5 text-primary" />
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <div className="flex flex-col gap-1">
-                            <span className="font-semibold">{article.title}</span>
-                            <Badge variant="outline" className="text-xs w-fit">
-                              {article.category}
-                            </Badge>
-                          </div>
+                        <TableCell className="py-3">
+                          <span className="font-semibold">{article.title}</span>
                         </TableCell>
-                        <TableCell className="hidden lg:table-cell">
-                          <p className="text-sm text-muted-foreground line-clamp-2">
+                        <TableCell className="hidden lg:table-cell py-3">
+                          <p className="text-sm text-muted-foreground line-clamp-1">
                             {article.description}
                           </p>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell">
+                        <TableCell className="hidden md:table-cell py-3">
                           <div className="flex flex-wrap gap-1">
                             {article.tags.slice(0, 2).map(tag => (
-                              <Badge key={tag} variant="secondary" className="text-xs">
+                              <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0">
                                 {tag}
                               </Badge>
                             ))}
                             {article.tags.length > 2 && (
-                              <Badge variant="secondary" className="text-xs">
+                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                                 +{article.tags.length - 2}
                               </Badge>
                             )}
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <div className="flex items-center text-xs text-muted-foreground">
+                        <TableCell className="py-3">
+                          <div className="flex items-center text-xs text-muted-foreground whitespace-nowrap">
                             <Calendar className="h-3 w-3 mr-1" />
                             {article.lastUpdated}
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-3">
                           <ArrowRight className="h-4 w-4 text-muted-foreground" />
                         </TableCell>
                       </TableRow>
