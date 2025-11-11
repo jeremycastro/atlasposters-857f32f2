@@ -245,6 +245,9 @@ const Index = () => {
               <Link to="/about" className="text-muted-foreground hover:text-atlas-ocean transition-colors font-medium">
                 About
               </Link>
+              <Link to="/admin" className="text-muted-foreground hover:text-atlas-gold transition-colors font-medium">
+                Admin
+              </Link>
             </div>
           </div>
         </div>
