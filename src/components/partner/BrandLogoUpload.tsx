@@ -9,6 +9,7 @@ import { useUpdateBrand } from "@/hooks/usePartnerMutations";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { FilePreviewDialog } from "./FilePreviewDialog";
 
 interface BrandLogoUploadProps {
   brandId: string;
@@ -19,6 +20,7 @@ interface BrandLogoUploadProps {
 export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: BrandLogoUploadProps) => {
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+  const [previewFile, setPreviewFile] = useState<any | null>(null);
   const [uploadProgress, setUploadProgress] = useState<{
     fileName: string;
     progress: number;
@@ -262,8 +264,8 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
     }
   };
 
-  const handleView = (publicUrl: string) => {
-    window.open(publicUrl, '_blank');
+  const handleView = (file: any) => {
+    setPreviewFile(file);
   };
 
   const getFileIcon = (mimetype?: string) => {
@@ -281,6 +283,12 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
 
   return (
     <div className="space-y-4">
+      <FilePreviewDialog
+        open={!!previewFile}
+        onOpenChange={(open) => !open && setPreviewFile(null)}
+        file={previewFile}
+        onDownload={() => previewFile && handleDownload(previewFile)}
+      />
       {/* Upload Area */}
       <Card
         className={cn(
@@ -426,7 +434,7 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
                             size="sm"
                             variant="ghost"
                             className="h-8 w-8 p-0"
-                            onClick={() => handleView(file.publicUrl)}
+                            onClick={() => handleView(file)}
                             title="View"
                           >
                             <ExternalLink className="h-4 w-4" />
