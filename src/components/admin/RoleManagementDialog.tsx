@@ -94,19 +94,20 @@ export function RoleManagementDialog({
       const rolesToAdd = Array.from(selectedRoles).filter(role => !currentRoles.has(role));
       const rolesToRemove = Array.from(currentRoles).filter(role => !selectedRoles.has(role));
 
-      // Add new roles
+      // Add new roles (or reactivate existing ones)
       if (rolesToAdd.length > 0) {
-        const { error: insertError } = await supabase
+        const { error: upsertError } = await supabase
           .from('user_roles')
-          .insert(
+          .upsert(
             rolesToAdd.map(role => ({
               user_id: user.id,
               role,
               is_active: true,
-            }))
+            })),
+            { onConflict: 'user_id,role' }
           );
 
-        if (insertError) throw insertError;
+        if (upsertError) throw upsertError;
       }
 
       // Remove roles by updating is_active to false
