@@ -91,16 +91,16 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
               Details
             </a>
             <a 
-              href="#activity" 
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Activity
-            </a>
-            <a 
               href="#comments" 
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Comments
+            </a>
+            <a 
+              href="#activity" 
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Activity
             </a>
           </div>
         </nav>
@@ -321,18 +321,18 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
 
           <Separator />
 
-          {/* Activity Section */}
-          <section id="activity" className="space-y-4">
-            <h3 className="text-lg font-semibold">Activity Log</h3>
-            <TaskActivityLog taskId={taskId || ""} />
+          {/* Comments Section */}
+          <section id="comments" className="space-y-4">
+            <h3 className="text-lg font-semibold">Comments</h3>
+            <TaskComments taskId={taskId || ""} />
           </section>
 
           <Separator />
 
-          {/* Comments Section */}
-          <section id="comments" className="space-y-4 pb-4">
-            <h3 className="text-lg font-semibold">Comments</h3>
-            <TaskComments taskId={taskId || ""} />
+          {/* Activity Section */}
+          <section id="activity" className="space-y-4 pb-4">
+            <h3 className="text-lg font-semibold">Activity Log</h3>
+            <TaskActivityLog taskId={taskId || ""} />
           </section>
         </div>
 
