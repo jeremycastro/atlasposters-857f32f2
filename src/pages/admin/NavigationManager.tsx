@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAllNavigation } from '@/hooks/useNavigation';
 import { useNavigationMutations } from '@/hooks/useNavigationMutations';
 import { NavigationItemDialog } from '@/components/admin/NavigationItemDialog';
+import { RenameGroupDialog } from '@/components/admin/RenameGroupDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Edit, Trash2, GripVertical, Eye, EyeOff, GripHorizontal } from 'lucide-react';
+import { Plus, Edit, Trash2, GripVertical, Eye, EyeOff, GripHorizontal, Pencil } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -75,12 +76,14 @@ const SortableGroupCard = ({
   groupName, 
   items, 
   onEdit, 
-  onDelete 
+  onDelete,
+  onRename,
 }: { 
   groupName: string; 
   items: NavigationItem[]; 
   onEdit: (item: NavigationItem) => void;
   onDelete: (item: NavigationItem) => void;
+  onRename: (groupName: string) => void;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ 
     id: `group-${groupName}` 
@@ -114,7 +117,17 @@ const SortableGroupCard = ({
             <GripHorizontal className="h-5 w-5 text-muted-foreground" />
           </div>
           <div className="flex-1">
-            <CardTitle>{groupName}</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>{groupName}</CardTitle>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6"
+                onClick={() => onRename(groupName)}
+              >
+                <Pencil className="h-3 w-3" />
+              </Button>
+            </div>
             <CardDescription>
               {items.length} {items.length === 1 ? 'item' : 'items'}
             </CardDescription>
@@ -143,11 +156,13 @@ const SortableGroupCard = ({
 
 export default function NavigationManager() {
   const { data, isLoading } = useAllNavigation();
-  const { reorderNavItems, reorderGroups, deleteNavItem } = useNavigationMutations();
+  const { reorderNavItems, reorderGroups, deleteNavItem, renameGroup } = useNavigationMutations();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<NavigationItem | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<NavigationItem | null>(null);
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [groupToRename, setGroupToRename] = useState<string>('');
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -223,6 +238,17 @@ export default function NavigationManager() {
     }
   };
 
+  const handleRenameGroup = (groupName: string) => {
+    setGroupToRename(groupName);
+    setRenameDialogOpen(true);
+  };
+
+  const confirmRename = async (newName: string) => {
+    if (groupToRename && newName !== groupToRename) {
+      await renameGroup.mutateAsync({ oldName: groupToRename, newName });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="container py-6">
@@ -260,6 +286,7 @@ export default function NavigationManager() {
               items={items}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onRename={handleRenameGroup}
             />
           ))}
         </SortableContext>
@@ -269,6 +296,13 @@ export default function NavigationManager() {
         item={selectedItem}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+      />
+
+      <RenameGroupDialog
+        open={renameDialogOpen}
+        onOpenChange={setRenameDialogOpen}
+        currentName={groupToRename}
+        onRename={confirmRename}
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

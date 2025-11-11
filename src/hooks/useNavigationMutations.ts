@@ -171,11 +171,39 @@ export const useNavigationMutations = () => {
     },
   });
 
+  const renameGroup = useMutation({
+    mutationFn: async ({ oldName, newName }: { oldName: string; newName: string }) => {
+      // Update group_name for all items in the group
+      const { error } = await supabase
+        .from('admin_navigation')
+        .update({ group_name: newName })
+        .eq('group_name', oldName);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-navigation'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-navigation-all'] });
+      toast({
+        title: 'Group renamed',
+        description: 'All items in the group have been updated',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error renaming group',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
   return {
     createNavItem,
     updateNavItem,
     deleteNavItem,
     reorderNavItems,
     reorderGroups,
+    renameGroup,
   };
 };
