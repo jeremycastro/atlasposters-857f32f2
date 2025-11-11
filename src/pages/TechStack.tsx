@@ -153,10 +153,10 @@ const TechStack = () => {
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <div className="mb-8">
-          <Link to="/roadmap">
+          <Link to="/">
             <Button variant="ghost" className="gap-2 mb-4">
               <ArrowLeft className="w-4 h-4" />
-              Back to Roadmap
+              Back to Home
             </Button>
           </Link>
           

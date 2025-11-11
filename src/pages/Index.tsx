@@ -236,30 +236,20 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Roadmap CTA */}
-      <section className="py-16 border-t bg-muted/20">
-        <div className="container text-center">
-          <h3 className="text-2xl font-bold mb-4">Want to see our progress?</h3>
-          <Button asChild variant="ghost" className="text-atlas-ocean hover:text-atlas-gold hover:bg-atlas-gold/10">
-            <Link to="/roadmap">View Development Roadmap →</Link>
-          </Button>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="border-t py-12 bg-muted/30">
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-sm text-muted-foreground">© 2025 Atlas Posters. Coming Soon.</p>
             <div className="flex gap-8 text-sm">
-              <Link to="/roadmap" className="text-muted-foreground hover:text-atlas-gold transition-colors font-medium">
-                Roadmap
-              </Link>
               <Link to="/about" className="text-muted-foreground hover:text-atlas-ocean transition-colors font-medium">
                 About
               </Link>
               <Link to="/techstack" className="text-muted-foreground hover:text-atlas-gold transition-colors font-medium">
                 Tech Stack
+              </Link>
+              <Link to="/changelog" className="text-muted-foreground hover:text-atlas-gold transition-colors font-medium">
+                Changelog
               </Link>
             </div>
           </div>
