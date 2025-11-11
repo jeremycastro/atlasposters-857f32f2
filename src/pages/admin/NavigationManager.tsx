@@ -95,20 +95,6 @@ const SortableGroupCard = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  const handleItemDragEnd = (event: any) => {
-    const { active, over } = event;
-    if (active.id !== over.id) {
-      // This will be handled by the parent component
-    }
-  };
-
   return (
     <Card ref={setNodeRef} style={style}>
       <CardHeader className="pb-3">
@@ -135,20 +121,21 @@ const SortableGroupCard = ({
         </div>
       </CardHeader>
       <CardContent>
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleItemDragEnd}>
-          <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
-            <div className="space-y-2">
-              {items.map(item => (
-                <SortableNavItem
-                  key={item.id}
-                  item={item}
-                  onEdit={() => onEdit(item)}
-                  onDelete={() => onDelete(item)}
-                />
-              ))}
+        <div className="space-y-2 min-h-[50px]" data-group={groupName}>
+          {items.map(item => (
+            <SortableNavItem
+              key={item.id}
+              item={item}
+              onEdit={() => onEdit(item)}
+              onDelete={() => onDelete(item)}
+            />
+          ))}
+          {items.length === 0 && (
+            <div className="text-sm text-muted-foreground text-center py-4">
+              Drag items here
             </div>
-          </SortableContext>
-        </DndContext>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
@@ -163,13 +150,91 @@ export default function NavigationManager() {
   const [itemToDelete, setItemToDelete] = useState<NavigationItem | null>(null);
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [groupToRename, setGroupToRename] = useState<string>('');
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px movement required before drag starts
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const handleDragStart = (event: any) => {
+    setActiveId(event.active.id);
+  };
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (!over || !data?.items) return;
+
+    const activeId = active.id;
+    const overId = over.id;
+
+    // Check if we're dragging a group
+    if (activeId.toString().startsWith('group-')) {
+      handleGroupDragEnd(event);
+      return;
+    }
+
+    // We're dragging an item
+    const activeItem = data.items.find(item => item.id === activeId);
+    const overItem = data.items.find(item => item.id === overId);
+
+    if (!activeItem) return;
+
+    // Determine target group - either from the item we're hovering over, or from the group container
+    let targetGroup = overItem?.group_name || activeItem.group_name;
+    
+    // Check if we're over a group container
+    const overElement = document.elementFromPoint(event.activatorEvent.clientX, event.activatorEvent.clientY);
+    const groupContainer = overElement?.closest('[data-group]');
+    if (groupContainer) {
+      targetGroup = groupContainer.getAttribute('data-group');
+    }
+
+    const oldIndex = data.items.findIndex(item => item.id === activeId);
+    let newIndex = overItem ? data.items.findIndex(item => item.id === overId) : oldIndex;
+
+    // If moving to a different group, append to the end of that group
+    if (activeItem.group_name !== targetGroup) {
+      const targetGroupItems = data.items.filter(item => item.group_name === targetGroup);
+      newIndex = data.items.findIndex(item => item.id === targetGroupItems[targetGroupItems.length - 1]?.id);
+      if (newIndex === -1) {
+        // Empty group - find the position where this group should be
+        newIndex = data.items.length;
+      }
+    }
+
+    if (oldIndex === newIndex && activeItem.group_name === targetGroup) return;
+
+    const reorderedItems = arrayMove(data.items, oldIndex, newIndex);
+    
+    // Update the moved item's group
+    const updatedItems = reorderedItems.map((item, index) => {
+      if (item.id === activeId) {
+        return {
+          id: item.id,
+          order_index: index + 1,
+          group_name: targetGroup,
+          group_order: item.group_order,
+        };
+      }
+      return {
+        id: item.id,
+        order_index: index + 1,
+        group_name: item.group_name,
+        group_order: item.group_order,
+      };
+    });
+
+    reorderNavItems.mutate(updatedItems);
+  };
 
   const handleGroupDragEnd = (event: any) => {
     const { active, over } = event;
@@ -192,26 +257,6 @@ export default function NavigationManager() {
       }));
 
       reorderGroups.mutate(updates);
-    }
-  };
-
-  const handleItemDragEnd = (event: any) => {
-    const { active, over } = event;
-
-    if (active.id !== over.id && data?.items) {
-      const oldIndex = data.items.findIndex(item => item.id === active.id);
-      const newIndex = data.items.findIndex(item => item.id === over.id);
-
-      const reorderedItems = arrayMove(data.items, oldIndex, newIndex);
-      
-      // Update order_index for all items
-      const updates = reorderedItems.map((item, index) => ({
-        id: item.id,
-        order_index: index + 1,
-        group_name: item.group_name,
-      }));
-
-      reorderNavItems.mutate(updates);
     }
   };
 
@@ -274,9 +319,17 @@ export default function NavigationManager() {
         </Button>
       </div>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleGroupDragEnd}>
+      <DndContext 
+        sensors={sensors} 
+        collisionDetection={closestCenter} 
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
         <SortableContext 
-          items={data?.grouped ? Object.keys(data.grouped).map(name => `group-${name}`) : []} 
+          items={[
+            ...(data?.grouped ? Object.keys(data.grouped).map(name => `group-${name}`) : []),
+            ...(data?.items.map(item => item.id) || [])
+          ]} 
           strategy={verticalListSortingStrategy}
         >
           {data?.grouped && Object.entries(data.grouped).map(([groupName, items]) => (
