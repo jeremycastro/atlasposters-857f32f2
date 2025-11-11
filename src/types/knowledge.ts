@@ -55,5 +55,15 @@ export const knowledgeArticles: KnowledgeArticle[] = [
     icon: "CheckSquare",
     lastUpdated: "2024-11-10",
     tags: ["Tasks", "Projects", "Kanban", "Collaboration", "Workflows"]
+  },
+  {
+    id: "artwork-catalog",
+    title: "Artwork Catalog Architecture",
+    description: "Complete architecture documentation for the Artwork Catalog module including database schema, frontend components, and ASC code system",
+    category: "Technical Documentation",
+    route: "/admin/knowledge/artwork-catalog",
+    icon: "Image",
+    lastUpdated: "2025-11-11",
+    tags: ["Artworks", "ASC", "Database", "Architecture", "Components"]
   }
 ];
