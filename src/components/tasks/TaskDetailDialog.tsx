@@ -155,27 +155,46 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Status</Label>
-                {editMode ? (
-                  <Select
-                    value={formData.status || ""}
-                    onValueChange={(value: any) => setFormData({ ...formData, status: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="backlog">Backlog</SelectItem>
-                      <SelectItem value="todo">To Do</SelectItem>
-                      <SelectItem value="in_progress">In Progress</SelectItem>
-                      <SelectItem value="in_review">In Review</SelectItem>
-                      <SelectItem value="blocked">Blocked</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <Badge variant="outline">{task.status}</Badge>
-                )}
+                <Select
+                  value={formData.status || ""}
+                  onValueChange={(value: any) => {
+                    const newFormData = { ...formData, status: value };
+                    setFormData(newFormData);
+                    if (!editMode && taskId && task) {
+                      updateTask.mutate({
+                        id: taskId,
+                        updates: { status: value },
+                        oldData: task,
+                      });
+                    }
+                  }}
+                >
+                  <SelectTrigger className="h-auto p-0 border-0 shadow-none hover:bg-transparent">
+                    <Badge 
+                      variant={formData.status as any || "outline"} 
+                      className="text-sm px-3 py-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+                    >
+                      {formData.status === "in_progress" 
+                        ? "In Progress" 
+                        : formData.status === "in_review" 
+                        ? "In Review" 
+                        : formData.status === "todo"
+                        ? "To Do"
+                        : formData.status 
+                        ? formData.status.charAt(0).toUpperCase() + formData.status.slice(1) 
+                        : "Select"}
+                    </Badge>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="backlog">Backlog</SelectItem>
+                    <SelectItem value="todo">To Do</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="in_review">In Review</SelectItem>
+                    <SelectItem value="blocked">Blocked</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
