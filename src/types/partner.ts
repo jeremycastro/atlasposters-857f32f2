@@ -78,9 +78,12 @@ export interface PartnerAgreement {
 export interface PartnerContact {
   id: string;
   partner_id: string;
+  first_name: string;
+  last_name?: string;
   full_name: string;
   email: string;
-  phone?: string;
+  mobile_phone?: string;
+  country_code?: string;
   designation: 'point_of_contact' | 'marketing' | 'legal' | 'graphic_designer' | 'finance' | 'other';
   user_id?: string;
   notes?: string;

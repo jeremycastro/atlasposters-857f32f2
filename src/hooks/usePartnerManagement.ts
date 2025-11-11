@@ -41,7 +41,7 @@ export const usePartnerById = (partnerId: string | null) => {
             is_active,
             artworks(id, title, asc_code, status)
           ),
-          partner_contacts(id, full_name, email, phone, designation, is_primary, user_id),
+          partner_contacts(id, first_name, last_name, full_name, email, mobile_phone, country_code, designation, is_primary, user_id),
           partner_addresses(id, designation, address_line1, address_line2, city, state, postal_code, country, is_primary),
           partner_agreements(id, agreement_type, effective_date, expiration_date, royalty_rate, commission_rate, payment_period, status, agreement_document_path),
           partner_assets(id, asset_type, file_name, file_path, uploaded_at)
