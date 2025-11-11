@@ -1,8 +1,5 @@
-import { Link } from "react-router-dom";
-import { Navigation } from "@/components/Navigation";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 interface Technology {
   name: string;
@@ -148,18 +145,9 @@ const categories = Array.from(new Set(technologies.map((t) => t.category)));
 const TechStack = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <div className="mb-8">
-          <Link to="/">
-            <Button variant="ghost" className="gap-2 mb-4">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </Button>
-          </Link>
-          
           <h1 className="text-4xl font-bold text-foreground mb-2">Tech Stack</h1>
           <p className="text-muted-foreground">
             Technologies, frameworks, and tools powering Atlas Posters

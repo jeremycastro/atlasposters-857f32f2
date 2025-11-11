@@ -2,7 +2,7 @@ import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { RoleSwitcher } from '@/components/RoleSwitcher';
-import { LayoutDashboard, CheckSquare, Users, LogOut, Map, GitBranch } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Users, LogOut, Map, GitBranch, Code2 } from 'lucide-react';
 
 export default function AdminLayout() {
   const { profile, activeRole, signOut } = useAuth();
@@ -44,6 +44,13 @@ export default function AdminLayout() {
             <Button variant="ghost" className="w-full justify-start">
               <GitBranch className="mr-2 h-4 w-4" />
               Changelog
+            </Button>
+          </Link>
+          
+          <Link to="/admin/techstack">
+            <Button variant="ghost" className="w-full justify-start">
+              <Code2 className="mr-2 h-4 w-4" />
+              Tech Stack
             </Button>
           </Link>
           

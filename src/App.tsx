@@ -10,8 +10,8 @@ import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import Collection from "./pages/Collection";
 import About from "./pages/About";
-import TechStack from "./pages/TechStack";
 import Changelog from "./pages/admin/Changelog";
+import TechStack from "./pages/admin/TechStack";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import PartnerAuth from "./pages/PartnerAuth";
@@ -42,7 +42,6 @@ const App = () => (
             <Route path="/product/:handle" element={<ProductDetail />} />
             <Route path="/collections/:handle" element={<Collection />} />
             <Route path="/about" element={<About />} />
-            <Route path="/techstack" element={<TechStack />} />
             
             {/* Auth routes */}
             <Route path="/auth" element={<Auth />} />
@@ -63,6 +62,7 @@ const App = () => (
               <Route path="tasks" element={<TaskManager />} />
               <Route path="roadmap" element={<RoadmapManager />} />
               <Route path="changelog" element={<Changelog />} />
+              <Route path="techstack" element={<TechStack />} />
               <Route path="users" element={<UserManagement />} />
             </Route>
             
