@@ -201,3 +201,79 @@ export const useCreateAddress = () => {
     },
   });
 };
+
+export const useUpdateAgreement = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+      const { data, error } = await (supabase as any)
+        .from("partner_agreements")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["partner"] });
+      queryClient.invalidateQueries({ queryKey: ["partner-stats"] });
+      toast.success("Agreement updated successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to update agreement: ${error.message}`);
+    },
+  });
+};
+
+export const useUpdateContact = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+      const { data, error } = await (supabase as any)
+        .from("partner_contacts")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["partner"] });
+      toast.success("Contact updated successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to update contact: ${error.message}`);
+    },
+  });
+};
+
+export const useUpdateAddress = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+      const { data, error } = await (supabase as any)
+        .from("partner_addresses")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["partner"] });
+      toast.success("Address updated successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to update address: ${error.message}`);
+    },
+  });
+};

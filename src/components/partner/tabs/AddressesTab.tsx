@@ -1,18 +1,34 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useCreateAddress } from "@/hooks/usePartnerMutations";
-import { Plus, MapPin, Star } from "lucide-react";
-import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Star } from "lucide-react";
+import { useCreateAddress, useUpdateAddress } from "@/hooks/usePartnerMutations";
 
-export const AddressesTab = ({ partnerId, addresses }: { partnerId: string; addresses: any[] }) => {
-  const [showForm, setShowForm] = useState(false);
-  const createAddress = useCreateAddress();
+interface Address {
+  id: string;
+  designation?: string;
+  address_line1: string;
+  address_line2?: string;
+  city: string;
+  state?: string;
+  postal_code?: string;
+  country: string;
+  is_primary?: boolean;
+}
 
+interface AddressesTabProps {
+  partnerId: string;
+  addresses: Address[];
+}
+
+export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [formData, setFormData] = useState({
     designation: "ship_to",
     address_line1: "",
@@ -21,138 +37,84 @@ export const AddressesTab = ({ partnerId, addresses }: { partnerId: string; addr
     state: "",
     postal_code: "",
     country: "USA",
-    is_primary: false,
   });
+
+  const createAddress = useCreateAddress();
+  const updateAddress = useUpdateAddress();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createAddress.mutate(
-      {
-        partner_id: partnerId,
-        ...formData,
-      },
-      {
-        onSuccess: () => {
-          setShowForm(false);
-          setFormData({
-            designation: "ship_to",
-            address_line1: "",
-            address_line2: "",
-            city: "",
-            state: "",
-            postal_code: "",
-            country: "USA",
-            is_primary: false,
-          });
-        },
-      }
-    );
+    
+    if (editingAddress) {
+      updateAddress.mutate(
+        { id: editingAddress.id, updates: formData },
+        {
+          onSuccess: () => {
+            setDialogOpen(false);
+            setEditingAddress(null);
+            resetForm();
+          },
+        }
+      );
+    } else {
+      createAddress.mutate(
+        { ...formData, partner_id: partnerId },
+        {
+          onSuccess: () => {
+            setDialogOpen(false);
+            resetForm();
+          },
+        }
+      );
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      designation: "ship_to",
+      address_line1: "",
+      address_line2: "",
+      city: "",
+      state: "",
+      postal_code: "",
+      country: "USA",
+    });
+  };
+
+  const handleOpenDialog = (address?: Address) => {
+    if (address) {
+      setEditingAddress(address);
+      setFormData({
+        designation: address.designation || "ship_to",
+        address_line1: address.address_line1,
+        address_line2: address.address_line2 || "",
+        city: address.city,
+        state: address.state || "",
+        postal_code: address.postal_code || "",
+        country: address.country,
+      });
+    } else {
+      setEditingAddress(null);
+      resetForm();
+    }
+    setDialogOpen(true);
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Addresses ({addresses.length})</h3>
-        <Button onClick={() => setShowForm(!showForm)} variant="outline" size="sm">
+        <Button onClick={() => handleOpenDialog()} variant="outline" size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Add Address
         </Button>
       </div>
 
-      {showForm && (
-        <Card>
-          <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Designation *</Label>
-                <Select value={formData.designation} onValueChange={(value) => setFormData({ ...formData, designation: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ship_to">Ship To</SelectItem>
-                    <SelectItem value="bill_to">Bill To</SelectItem>
-                    <SelectItem value="headquarters">Headquarters</SelectItem>
-                    <SelectItem value="warehouse">Warehouse</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Address Line 1 *</Label>
-                <Input
-                  value={formData.address_line1}
-                  onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Address Line 2</Label>
-                <Input
-                  value={formData.address_line2}
-                  onChange={(e) => setFormData({ ...formData, address_line2: e.target.value })}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>City *</Label>
-                  <Input
-                    value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>State</Label>
-                  <Input
-                    value={formData.state}
-                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Postal Code *</Label>
-                  <Input
-                    value={formData.postal_code}
-                    onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Country *</Label>
-                  <Input
-                    value={formData.country}
-                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button type="submit" disabled={createAddress.isPending}>
-                  {createAddress.isPending ? "Creating..." : "Create Address"}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
-
-{addresses.length === 0 && !showForm ? (
-        <Card>
-          <CardContent className="pt-6 text-center text-muted-foreground">
-            No addresses yet. Add one to get started.
-          </CardContent>
-        </Card>
-      ) : addresses.length > 0 ? (
+      {addresses.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-8">
+          No addresses yet. Click "Add Address" to create one.
+        </p>
+      ) : (
         <div className="border rounded-lg">
           <Table>
             <TableHeader>
@@ -171,23 +133,11 @@ export const AddressesTab = ({ partnerId, addresses }: { partnerId: string; addr
                 <TableRow 
                   key={address.id}
                   className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => {
-                    setFormData({
-                      designation: address.designation,
-                      address_line1: address.address_line1,
-                      address_line2: address.address_line2 || '',
-                      city: address.city,
-                      state: address.state || '',
-                      postal_code: address.postal_code,
-                      country: address.country,
-                      is_primary: address.is_primary || false,
-                    });
-                    setShowForm(true);
-                  }}
+                  onClick={() => handleOpenDialog(address)}
                 >
                   <TableCell>
                     <Badge variant="secondary" className="capitalize">
-                      {address.designation.replace('_', ' ')}
+                      {address.designation?.replace('_', ' ') || 'Other'}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-sm">
@@ -211,7 +161,114 @@ export const AddressesTab = ({ partnerId, addresses }: { partnerId: string; addr
             </TableBody>
           </Table>
         </div>
-      ) : null}
+      )}
+
+      <Dialog open={dialogOpen} onOpenChange={(open) => {
+        setDialogOpen(open);
+        if (!open) {
+          setEditingAddress(null);
+          resetForm();
+        }
+      }}>
+        <DialogContent className="max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingAddress ? "Edit Address" : "Add Address"}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="designation">Designation *</Label>
+              <Select
+                value={formData.designation}
+                onValueChange={(value) => setFormData({ ...formData, designation: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ship_to">Ship To</SelectItem>
+                  <SelectItem value="bill_to">Bill To</SelectItem>
+                  <SelectItem value="headquarters">Headquarters</SelectItem>
+                  <SelectItem value="warehouse">Warehouse</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address_line1">Address Line 1 *</Label>
+              <Input
+                id="address_line1"
+                value={formData.address_line1}
+                onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address_line2">Address Line 2</Label>
+              <Input
+                id="address_line2"
+                value={formData.address_line2}
+                onChange={(e) => setFormData({ ...formData, address_line2: e.target.value })}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city">City *</Label>
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="state">State</Label>
+                <Input
+                  id="state"
+                  value={formData.state}
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="postal_code">Postal Code *</Label>
+                <Input
+                  id="postal_code"
+                  value={formData.postal_code}
+                  onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="country">Country *</Label>
+                <Input
+                  id="country"
+                  value={formData.country}
+                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={createAddress.isPending || updateAddress.isPending}>
+                {editingAddress ? "Update Address" : "Create Address"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
-};
+}
