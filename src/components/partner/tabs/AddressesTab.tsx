@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useCreateAddress } from "@/hooks/usePartnerMutations";
 import { Plus, MapPin, Star } from "lucide-react";
 import { useState } from "react";
@@ -145,45 +146,56 @@ export const AddressesTab = ({ partnerId, addresses }: { partnerId: string; addr
         </Card>
       )}
 
-      <div className="grid gap-4">
-        {addresses.map((address) => (
-          <Card key={address.id}>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
+{addresses.length === 0 && !showForm ? (
+        <Card>
+          <CardContent className="pt-6 text-center text-muted-foreground">
+            No addresses yet. Add one to get started.
+          </CardContent>
+        </Card>
+      ) : addresses.length > 0 ? (
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Designation</TableHead>
+                <TableHead>Address</TableHead>
+                <TableHead>City</TableHead>
+                <TableHead>State</TableHead>
+                <TableHead>Postal Code</TableHead>
+                <TableHead>Country</TableHead>
+                <TableHead>Primary</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {addresses.map((address) => (
+                <TableRow key={address.id}>
+                  <TableCell>
                     <Badge variant="secondary" className="capitalize">
                       {address.designation.replace('_', ' ')}
                     </Badge>
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    <div>{address.address_line1}</div>
+                    {address.address_line2 && <div className="text-muted-foreground">{address.address_line2}</div>}
+                  </TableCell>
+                  <TableCell className="text-sm">{address.city}</TableCell>
+                  <TableCell className="text-sm">{address.state || '-'}</TableCell>
+                  <TableCell className="text-sm">{address.postal_code}</TableCell>
+                  <TableCell className="text-sm">{address.country}</TableCell>
+                  <TableCell>
                     {address.is_primary && (
                       <Badge variant="outline" className="gap-1">
                         <Star className="h-3 w-3" />
                         Primary
                       </Badge>
                     )}
-                  </div>
-                  <div className="text-sm">
-                    <p>{address.address_line1}</p>
-                    {address.address_line2 && <p>{address.address_line2}</p>}
-                    <p>
-                      {address.city}, {address.state} {address.postal_code}
-                    </p>
-                    <p>{address.country}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-        {addresses.length === 0 && !showForm && (
-          <Card>
-            <CardContent className="pt-6 text-center text-muted-foreground">
-              No addresses yet. Add one to get started.
-            </CardContent>
-          </Card>
-        )}
-      </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ) : null}
     </div>
   );
 };

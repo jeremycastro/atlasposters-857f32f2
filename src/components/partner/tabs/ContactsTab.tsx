@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useCreateContact } from "@/hooks/usePartnerMutations";
 import { Plus, Mail, Phone, Star } from "lucide-react";
 import { useState } from "react";
@@ -151,47 +152,61 @@ export const ContactsTab = ({ partnerId, contacts }: { partnerId: string; contac
         </Card>
       )}
 
-      <div className="grid gap-4">
-        {contacts.map((contact) => (
-          <Card key={contact.id}>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-medium">{contact.full_name}</h4>
+{contacts.length === 0 && !showForm ? (
+        <Card>
+          <CardContent className="pt-6 text-center text-muted-foreground">
+            No contacts yet. Add one to get started.
+          </CardContent>
+        </Card>
+      ) : contacts.length > 0 ? (
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Mobile Phone</TableHead>
+                <TableHead>Designation</TableHead>
+                <TableHead>Primary</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {contacts.map((contact) => (
+                <TableRow key={contact.id}>
+                  <TableCell className="font-medium">{contact.full_name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Mail className="h-3 w-3 text-muted-foreground" />
+                      {contact.email}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {contact.mobile_phone ? (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Phone className="h-3 w-3 text-muted-foreground" />
+                        {contact.country_code} {contact.mobile_phone}
+                      </div>
+                    ) : '-'}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary" className="capitalize">
+                      {contact.designation.replace('_', ' ')}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
                     {contact.is_primary && (
                       <Badge variant="outline" className="gap-1">
                         <Star className="h-3 w-3" />
                         Primary
                       </Badge>
                     )}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Mail className="h-3 w-3" />
-                    {contact.email}
-                  </div>
-                  {contact.mobile_phone && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Phone className="h-3 w-3" />
-                      {contact.country_code} {contact.mobile_phone}
-                    </div>
-                  )}
-                </div>
-                <Badge variant="secondary" className="capitalize">
-                  {contact.designation.replace('_', ' ')}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-        {contacts.length === 0 && !showForm && (
-          <Card>
-            <CardContent className="pt-6 text-center text-muted-foreground">
-              No contacts yet. Add one to get started.
-            </CardContent>
-          </Card>
-        )}
-      </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ) : null}
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useCreateAgreement } from "@/hooks/usePartnerMutations";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -174,51 +175,54 @@ export const AgreementsTab = ({ partnerId, agreements }: { partnerId: string; ag
         </Card>
       )}
 
-      <div className="grid gap-4">
-        {agreements.map((agreement) => (
-          <Card key={agreement.id}>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-medium capitalize">{agreement.agreement_type}</h4>
+{agreements.length === 0 && !showForm ? (
+        <Card>
+          <CardContent className="pt-6 text-center text-muted-foreground">
+            No agreements yet. Add one to get started.
+          </CardContent>
+        </Card>
+      ) : agreements.length > 0 ? (
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Effective Date</TableHead>
+                <TableHead>Expiration Date</TableHead>
+                <TableHead>Royalty Rate</TableHead>
+                <TableHead>Commission Rate</TableHead>
+                <TableHead>Payment Period</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {agreements.map((agreement) => (
+                <TableRow key={agreement.id}>
+                  <TableCell className="font-medium capitalize">{agreement.agreement_type}</TableCell>
+                  <TableCell>
                     <Badge className={getStatusColor(agreement.status)}>{agreement.status}</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {new Date(agreement.effective_date).toLocaleDateString()} - 
-                    {agreement.expiration_date ? new Date(agreement.expiration_date).toLocaleDateString() : ' No end date'}
-                  </p>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                {agreement.royalty_rate && (
-                  <div>
-                    <span className="text-muted-foreground">Royalty Rate:</span> {agreement.royalty_rate}%
-                  </div>
-                )}
-                {agreement.commission_rate && (
-                  <div>
-                    <span className="text-muted-foreground">Commission Rate:</span> {agreement.commission_rate}%
-                  </div>
-                )}
-                {agreement.payment_period && (
-                  <div>
-                    <span className="text-muted-foreground">Payment Period:</span>{" "}
-                    <span className="capitalize">{agreement.payment_period.replace('_', ' ')}</span>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-        {agreements.length === 0 && !showForm && (
-          <Card>
-            <CardContent className="pt-6 text-center text-muted-foreground">
-              No agreements yet. Add one to get started.
-            </CardContent>
-          </Card>
-        )}
-      </div>
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {new Date(agreement.effective_date).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {agreement.expiration_date ? new Date(agreement.expiration_date).toLocaleDateString() : '-'}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {agreement.royalty_rate ? `${agreement.royalty_rate}%` : '-'}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {agreement.commission_rate ? `${agreement.commission_rate}%` : '-'}
+                  </TableCell>
+                  <TableCell className="text-sm capitalize">
+                    {agreement.payment_period ? agreement.payment_period.replace('_', ' ') : '-'}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ) : null}
     </div>
   );
 };
