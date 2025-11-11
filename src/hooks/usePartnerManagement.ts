@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Partner, Brand } from "@/types/partner";
 
 export const usePartners = () => {
-  return useQuery({
+  return useQuery<Partner[]>({
     queryKey: ["partners"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("partners")
         .select(`
           *,
@@ -17,18 +18,18 @@ export const usePartners = () => {
         .order("partner_name");
 
       if (error) throw error;
-      return data;
+      return data as Partner[];
     },
   });
 };
 
 export const usePartnerById = (partnerId: string | null) => {
-  return useQuery({
+  return useQuery<Partner | null>({
     queryKey: ["partner", partnerId],
     queryFn: async () => {
       if (!partnerId) return null;
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("partners")
         .select(`
           *,
@@ -49,17 +50,17 @@ export const usePartnerById = (partnerId: string | null) => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Partner;
     },
     enabled: !!partnerId,
   });
 };
 
 export const useBrands = () => {
-  return useQuery({
+  return useQuery<Brand[]>({
     queryKey: ["brands"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("brands")
         .select(`
           *,
@@ -68,7 +69,7 @@ export const useBrands = () => {
         .order("brand_name");
 
       if (error) throw error;
-      return data;
+      return data as Brand[];
     },
   });
 };
@@ -77,19 +78,19 @@ export const usePartnerStats = () => {
   return useQuery({
     queryKey: ["partner-stats"],
     queryFn: async () => {
-      const { data: partners, error: partnersError } = await supabase
+      const { data: partners, error: partnersError } = await (supabase as any)
         .from("partners")
         .select("id, status");
 
       if (partnersError) throw partnersError;
 
-      const { data: brands, error: brandsError } = await supabase
+      const { data: brands, error: brandsError } = await (supabase as any)
         .from("brands")
         .select("id, is_active");
 
       if (brandsError) throw brandsError;
 
-      const { data: agreements, error: agreementsError } = await supabase
+      const { data: agreements, error: agreementsError } = await (supabase as any)
         .from("partner_agreements")
         .select("id, status");
 
@@ -97,10 +98,10 @@ export const usePartnerStats = () => {
 
       return {
         totalPartners: partners?.length || 0,
-        activePartners: partners?.filter(p => p.status === 'active').length || 0,
+        activePartners: partners?.filter((p: any) => p.status === 'active').length || 0,
         totalBrands: brands?.length || 0,
-        activeBrands: brands?.filter(b => b.is_active).length || 0,
-        activeAgreements: agreements?.filter(a => a.status === 'active').length || 0,
+        activeBrands: brands?.filter((b: any) => b.is_active).length || 0,
+        activeAgreements: agreements?.filter((a: any) => a.status === 'active').length || 0,
       };
     },
   });

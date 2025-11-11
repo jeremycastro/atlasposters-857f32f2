@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { Partner, Brand } from "@/types/partner";
 
 export const useCreatePartner = () => {
   const queryClient = useQueryClient();
@@ -16,7 +17,7 @@ export const useCreatePartner = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data: partner, error } = await supabase
+      const { data: partner, error } = await (supabase as any)
         .from("partners")
         .insert({
           ...data,
@@ -26,7 +27,7 @@ export const useCreatePartner = () => {
         .single();
 
       if (error) throw error;
-      return partner;
+      return partner as Partner;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
@@ -44,7 +45,7 @@ export const useUpdatePartner = () => {
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("partners")
         .update(updates)
         .eq("id", id)
@@ -52,7 +53,7 @@ export const useUpdatePartner = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Partner;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["partners"] });
@@ -75,14 +76,14 @@ export const useCreateBrand = () => {
       brand_name: string;
       description?: string;
     }) => {
-      const { data: brand, error } = await supabase
+      const { data: brand, error } = await (supabase as any)
         .from("brands")
         .insert(data)
         .select()
         .single();
 
       if (error) throw error;
-      return brand;
+      return brand as Brand;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["brands"] });
@@ -101,7 +102,7 @@ export const useUpdateBrand = () => {
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("brands")
         .update(updates)
         .eq("id", id)
@@ -109,7 +110,7 @@ export const useUpdateBrand = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Brand;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["brands"] });
@@ -130,7 +131,7 @@ export const useCreateAgreement = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data: agreement, error } = await supabase
+      const { data: agreement, error } = await (supabase as any)
         .from("partner_agreements")
         .insert({
           ...data,
@@ -158,7 +159,7 @@ export const useCreateContact = () => {
 
   return useMutation({
     mutationFn: async (data: any) => {
-      const { data: contact, error } = await supabase
+      const { data: contact, error } = await (supabase as any)
         .from("partner_contacts")
         .insert(data)
         .select()
@@ -182,7 +183,7 @@ export const useCreateAddress = () => {
 
   return useMutation({
     mutationFn: async (data: any) => {
-      const { data: address, error } = await supabase
+      const { data: address, error } = await (supabase as any)
         .from("partner_addresses")
         .insert(data)
         .select()
