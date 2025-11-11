@@ -9,6 +9,7 @@ import { Plus, Edit, Save, X, Palette, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import type { Brand } from "@/types/partner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { BrandLogoUpload } from "@/components/partner/BrandLogoUpload";
 
 interface BrandFormData {
   brand_name: string;
@@ -88,12 +89,24 @@ const BrandForm = ({ formData, setFormData, onSubmit, onCancel, submitLabel, isS
         Visual Identity
       </h4>
       <div className="space-y-2">
-        <Label>Logo URL</Label>
+        <Label>Brand Logos</Label>
+        <p className="text-xs text-muted-foreground mb-2">
+          Upload multiple logo variations. Set one as the primary brand logo.
+        </p>
+        {/* We'll only show this upload section when editing an existing brand */}
+        {formData.brand_name && (
+          <div className="text-sm text-muted-foreground italic">
+            Logo upload will be available after creating the brand
+          </div>
+        )}
+      </div>
+      <div className="space-y-2">
+        <Label>Logo URL (Optional)</Label>
         <Input
           type="url"
           value={formData.logo_url}
           onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-          placeholder="https://example.com/logo.png"
+          placeholder="https://example.com/logo.png or leave empty to upload"
         />
         {formData.logo_url && (
           <div className="mt-2 p-4 border rounded-md bg-muted/30">
@@ -425,17 +438,32 @@ export const BrandsTab = ({ partnerId, brands }: { partnerId: string; brands: Br
 
                 <CollapsibleContent className="mt-4 pt-4 border-t">
                   {editingId === brand.id ? (
-                    <BrandForm
-                      formData={formData}
-                      setFormData={setFormData}
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        handleUpdate(brand.id);
-                      }}
-                      onCancel={handleCancelEdit}
-                      submitLabel="Save Changes"
-                      isSubmitting={updateBrand.isPending}
-                    />
+                    <div className="space-y-6">
+                      {/* Logo Upload Section */}
+                      <div>
+                        <Label className="mb-2 block">Brand Logos</Label>
+                        <BrandLogoUpload 
+                          brandId={brand.id} 
+                          currentLogoUrl={brand.logo_url || undefined}
+                          onLogoChange={(url) => {
+                            setFormData({ ...formData, logo_url: url });
+                          }}
+                        />
+                      </div>
+                      
+                      {/* Regular Form Fields */}
+                      <BrandForm
+                        formData={formData}
+                        setFormData={setFormData}
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          handleUpdate(brand.id);
+                        }}
+                        onCancel={handleCancelEdit}
+                        submitLabel="Save Changes"
+                        isSubmitting={updateBrand.isPending}
+                      />
+                    </div>
                   ) : (
                     <div className="space-y-6">
                       {/* Brand Identity */}
