@@ -15,12 +15,58 @@ interface ChangelogEntry {
 
 const changelogData: ChangelogEntry[] = [
   {
-    version: "0.002",
+    version: "1.0.0",
+    date: "2025-12-01",
+    changes: [
+      {
+        type: "added",
+        description: "Roadmap Manager with semantic versioning (v1.0.0) and progress tracking",
+      },
+      {
+        type: "added",
+        description: "Task Management system with Kanban and Table views",
+      },
+      {
+        type: "added",
+        description: "Activity logging with human-readable change descriptions",
+      },
+      {
+        type: "added",
+        description: "Role-based access control with admin, editor, partner, viewer, and customer roles",
+      },
+      {
+        type: "added",
+        description: "User Management interface for role assignments",
+      },
+      {
+        type: "added",
+        description: "Admin Dashboard with statistics and insights",
+      },
+      {
+        type: "added",
+        description: "Task filtering, sorting, and search capabilities",
+      },
+      {
+        type: "added",
+        description: "Task comments and collaboration features",
+      },
+      {
+        type: "added",
+        description: "Milestone tracking with deliverables and success metrics",
+      },
+      {
+        type: "changed",
+        description: "Migrated to semantic versioning format (v1.0.0) for better version management",
+      },
+    ],
+  },
+  {
+    version: "0.2.0",
     date: "2025-01-11",
     changes: [
       {
         type: "added",
-        description: "Custom favicon with Atlas branding (atlasposters-logo-04.png)",
+        description: "Custom favicon with Atlas branding",
       },
       {
         type: "changed",
@@ -53,7 +99,7 @@ const changelogData: ChangelogEntry[] = [
     ],
   },
   {
-    version: "0.001",
+    version: "0.1.0",
     date: "2025-01-10",
     changes: [
       {
@@ -165,8 +211,8 @@ const Changelog = () => {
         {/* Footer Note */}
         <div className="mt-12 p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground text-center">
-            Version numbers will eventually align with Atlas Catalog application releases.
-            Each increment represents significant progress toward our goals.
+            Following semantic versioning: Major.Minor.Patch (v1.0.0). 
+            Each version represents milestones in the Atlas Platform journey to MVP launch.
           </p>
         </div>
       </main>
