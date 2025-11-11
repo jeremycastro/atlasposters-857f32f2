@@ -137,8 +137,10 @@ export type Database = {
           estimated_hours: number | null
           id: string
           milestone: string | null
+          milestone_id: string | null
           notes: string | null
           phase: string | null
+          phase_id: string | null
           priority: Database["public"]["Enums"]["task_priority"] | null
           started_at: string | null
           status: Database["public"]["Enums"]["task_status"] | null
@@ -160,8 +162,10 @@ export type Database = {
           estimated_hours?: number | null
           id?: string
           milestone?: string | null
+          milestone_id?: string | null
           notes?: string | null
           phase?: string | null
+          phase_id?: string | null
           priority?: Database["public"]["Enums"]["task_priority"] | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["task_status"] | null
@@ -183,8 +187,10 @@ export type Database = {
           estimated_hours?: number | null
           id?: string
           milestone?: string | null
+          milestone_id?: string | null
           notes?: string | null
           phase?: string | null
+          phase_id?: string | null
           priority?: Database["public"]["Enums"]["task_priority"] | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["task_status"] | null
@@ -207,7 +213,173 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "project_tasks_milestone_id_fkey"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "roadmap_milestones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_tasks_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "roadmap_phases"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      roadmap_milestones: {
+        Row: {
+          completed_date: string | null
+          created_at: string | null
+          deliverables: Json | null
+          description: string | null
+          due_date: string | null
+          id: string
+          milestone_number: string
+          name: string
+          order_index: number
+          phase_id: string
+          status: Database["public"]["Enums"]["roadmap_milestone_status"] | null
+          success_metrics: Json | null
+          target_week: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          completed_date?: string | null
+          created_at?: string | null
+          deliverables?: Json | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          milestone_number: string
+          name: string
+          order_index: number
+          phase_id: string
+          status?:
+            | Database["public"]["Enums"]["roadmap_milestone_status"]
+            | null
+          success_metrics?: Json | null
+          target_week?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          completed_date?: string | null
+          created_at?: string | null
+          deliverables?: Json | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          milestone_number?: string
+          name?: string
+          order_index?: number
+          phase_id?: string
+          status?:
+            | Database["public"]["Enums"]["roadmap_milestone_status"]
+            | null
+          success_metrics?: Json | null
+          target_week?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roadmap_milestones_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "roadmap_phases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roadmap_phases: {
+        Row: {
+          actual_end_date: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          order_index: number
+          phase_number: number
+          start_date: string | null
+          status: Database["public"]["Enums"]["roadmap_phase_status"] | null
+          target_end_date: string | null
+          updated_at: string | null
+          version_id: string
+        }
+        Insert: {
+          actual_end_date?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          order_index: number
+          phase_number: number
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["roadmap_phase_status"] | null
+          target_end_date?: string | null
+          updated_at?: string | null
+          version_id: string
+        }
+        Update: {
+          actual_end_date?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          order_index?: number
+          phase_number?: number
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["roadmap_phase_status"] | null
+          target_end_date?: string | null
+          updated_at?: string | null
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roadmap_phases_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "roadmap_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roadmap_versions: {
+        Row: {
+          content_markdown: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          release_date: string | null
+          status: Database["public"]["Enums"]["roadmap_version_status"] | null
+          title: string
+          updated_at: string | null
+          version: string
+        }
+        Insert: {
+          content_markdown?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          release_date?: string | null
+          status?: Database["public"]["Enums"]["roadmap_version_status"] | null
+          title: string
+          updated_at?: string | null
+          version: string
+        }
+        Update: {
+          content_markdown?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          release_date?: string | null
+          status?: Database["public"]["Enums"]["roadmap_version_status"] | null
+          title?: string
+          updated_at?: string | null
+          version?: string
+        }
+        Relationships: []
       }
       task_activity: {
         Row: {
@@ -396,6 +568,13 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "editor" | "viewer" | "partner" | "customer"
+      roadmap_milestone_status:
+        | "not_started"
+        | "in_progress"
+        | "completed"
+        | "blocked"
+      roadmap_phase_status: "planned" | "in_progress" | "completed" | "on_hold"
+      roadmap_version_status: "draft" | "current" | "archived"
       task_priority: "low" | "medium" | "high" | "urgent"
       task_status:
         | "backlog"
@@ -533,6 +712,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "editor", "viewer", "partner", "customer"],
+      roadmap_milestone_status: [
+        "not_started",
+        "in_progress",
+        "completed",
+        "blocked",
+      ],
+      roadmap_phase_status: ["planned", "in_progress", "completed", "on_hold"],
+      roadmap_version_status: ["draft", "current", "archived"],
       task_priority: ["low", "medium", "high", "urgent"],
       task_status: [
         "backlog",

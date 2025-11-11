@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { useState } from "react";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { useProfiles } from "@/hooks/useProfiles";
+import { useRoadmapPhases, useRoadmapMilestones, useRoadmapVersions } from "@/hooks/useRoadmap";
 import { cn } from "@/lib/utils";
 
 interface CreateTaskDialogProps {
@@ -27,6 +28,12 @@ interface CreateTaskDialogProps {
 export const CreateTaskDialog = ({ open, onOpenChange }: CreateTaskDialogProps) => {
   const { createTask } = useTaskMutations();
   const { data: profiles } = useProfiles();
+  const { data: versions } = useRoadmapVersions();
+  const currentVersion = versions?.find(v => v.status === 'current');
+  const { data: phases } = useRoadmapPhases(currentVersion?.id);
+  
+  const [selectedPhaseId, setSelectedPhaseId] = useState<string>("");
+  const { data: milestones } = useRoadmapMilestones(selectedPhaseId);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -37,8 +44,8 @@ export const CreateTaskDialog = ({ open, onOpenChange }: CreateTaskDialogProps) 
     assigned_to: "",
     due_date: undefined as Date | undefined,
     estimated_hours: "",
-    phase: "",
-    milestone: "",
+    phase_id: "",
+    milestone_id: "",
     tags: "",
   });
 
@@ -55,8 +62,8 @@ export const CreateTaskDialog = ({ open, onOpenChange }: CreateTaskDialogProps) 
         assigned_to: formData.assigned_to || null,
         due_date: formData.due_date?.toISOString() || null,
         estimated_hours: formData.estimated_hours ? parseInt(formData.estimated_hours) : null,
-        phase: formData.phase || null,
-        milestone: formData.milestone || null,
+        phase_id: formData.phase_id || null,
+        milestone_id: formData.milestone_id || null,
         tags: formData.tags ? formData.tags.split(",").map((t) => t.trim()) : null,
         created_by: "", // Will be set in the mutation
       } as any,
@@ -72,10 +79,11 @@ export const CreateTaskDialog = ({ open, onOpenChange }: CreateTaskDialogProps) 
             assigned_to: "",
             due_date: undefined,
             estimated_hours: "",
-            phase: "",
-            milestone: "",
+            phase_id: "",
+            milestone_id: "",
             tags: "",
           });
+          setSelectedPhaseId("");
         },
       }
     );
@@ -196,33 +204,57 @@ export const CreateTaskDialog = ({ open, onOpenChange }: CreateTaskDialogProps) 
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="estimated_hours">Est. Hours</Label>
-              <Input
-                id="estimated_hours"
-                type="number"
-                value={formData.estimated_hours}
-                onChange={(e) => setFormData({ ...formData, estimated_hours: e.target.value })}
-              />
-            </div>
+          <div>
+            <Label htmlFor="estimated_hours">Estimated Hours</Label>
+            <Input
+              id="estimated_hours"
+              type="number"
+              value={formData.estimated_hours}
+              onChange={(e) => setFormData({ ...formData, estimated_hours: e.target.value })}
+            />
+          </div>
 
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="phase">Phase</Label>
-              <Input
-                id="phase"
-                value={formData.phase}
-                onChange={(e) => setFormData({ ...formData, phase: e.target.value })}
-              />
+              <Select
+                value={formData.phase_id}
+                onValueChange={(value) => {
+                  setFormData({ ...formData, phase_id: value, milestone_id: "" });
+                  setSelectedPhaseId(value);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select phase" />
+                </SelectTrigger>
+                <SelectContent>
+                  {phases?.map((phase) => (
+                    <SelectItem key={phase.id} value={phase.id}>
+                      Phase {phase.phase_number}: {phase.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
               <Label htmlFor="milestone">Milestone</Label>
-              <Input
-                id="milestone"
-                value={formData.milestone}
-                onChange={(e) => setFormData({ ...formData, milestone: e.target.value })}
-              />
+              <Select
+                value={formData.milestone_id}
+                onValueChange={(value) => setFormData({ ...formData, milestone_id: value })}
+                disabled={!formData.phase_id}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={formData.phase_id ? "Select milestone" : "Select phase first"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {milestones?.map((milestone) => (
+                    <SelectItem key={milestone.id} value={milestone.id}>
+                      {milestone.milestone_number}: {milestone.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

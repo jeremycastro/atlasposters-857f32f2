@@ -23,6 +23,7 @@ import CustomerLayout from "./layouts/CustomerLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import TaskManager from "./pages/admin/TaskManager";
+import RoadmapManager from "./pages/admin/RoadmapManager";
 import PartnerDashboard from "./pages/partner/Dashboard";
 import CustomerDashboard from "./pages/customer/Dashboard";
 
@@ -63,6 +64,7 @@ const App = () => (
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="tasks" element={<TaskManager />} />
+              <Route path="roadmap" element={<RoadmapManager />} />
               <Route path="users" element={<UserManagement />} />
             </Route>
             
