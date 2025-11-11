@@ -1,8 +1,5 @@
-import { Link } from "react-router-dom";
-import { Navigation } from "@/components/Navigation";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, GitBranch } from "lucide-react";
+import { GitBranch } from "lucide-react";
 
 interface ChangelogEntry {
   version: string;
@@ -151,19 +148,10 @@ const Changelog = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
+    <div className="min-h-screen bg-background">      
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
-          <Link to="/">
-            <Button variant="ghost" className="gap-2 mb-4">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </Button>
-          </Link>
-          
           <div className="flex items-center gap-3 mb-2">
             <GitBranch className="w-8 h-8 text-primary" />
             <h1 className="text-4xl font-bold text-foreground">Changelog</h1>
