@@ -13,9 +13,11 @@ export const ContactsTab = ({ partnerId, contacts }: { partnerId: string; contac
   const createContact = useCreateContact();
 
   const [formData, setFormData] = useState({
-    full_name: "",
+    first_name: "",
+    last_name: "",
     email: "",
-    phone: "",
+    mobile_phone: "",
+    country_code: "+1",
     designation: "other",
     is_primary: false,
   });
@@ -31,9 +33,11 @@ export const ContactsTab = ({ partnerId, contacts }: { partnerId: string; contac
         onSuccess: () => {
           setShowForm(false);
           setFormData({
-            full_name: "",
+            first_name: "",
+            last_name: "",
             email: "",
-            phone: "",
+            mobile_phone: "",
+            country_code: "+1",
             designation: "other",
             is_primary: false,
           });
@@ -58,15 +62,23 @@ export const ContactsTab = ({ partnerId, contacts }: { partnerId: string; contac
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Full Name *</Label>
+                  <Label>First Name *</Label>
                   <Input
-                    value={formData.full_name}
-                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                    value={formData.first_name}
+                    onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
+                  <Label>Last Name</Label>
+                  <Input
+                    value={formData.last_name}
+                    onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2 col-span-2">
                   <Label>Email *</Label>
                   <Input
                     type="email"
@@ -77,10 +89,34 @@ export const ContactsTab = ({ partnerId, contacts }: { partnerId: string; contac
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Phone</Label>
+                  <Label>Country Code</Label>
+                  <Select value={formData.country_code} onValueChange={(value) => setFormData({ ...formData, country_code: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="+1">+1 (US/Canada)</SelectItem>
+                      <SelectItem value="+44">+44 (UK)</SelectItem>
+                      <SelectItem value="+61">+61 (Australia)</SelectItem>
+                      <SelectItem value="+81">+81 (Japan)</SelectItem>
+                      <SelectItem value="+86">+86 (China)</SelectItem>
+                      <SelectItem value="+91">+91 (India)</SelectItem>
+                      <SelectItem value="+33">+33 (France)</SelectItem>
+                      <SelectItem value="+49">+49 (Germany)</SelectItem>
+                      <SelectItem value="+39">+39 (Italy)</SelectItem>
+                      <SelectItem value="+34">+34 (Spain)</SelectItem>
+                      <SelectItem value="+52">+52 (Mexico)</SelectItem>
+                      <SelectItem value="+55">+55 (Brazil)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Mobile Phone</Label>
                   <Input
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    value={formData.mobile_phone}
+                    onChange={(e) => setFormData({ ...formData, mobile_phone: e.target.value })}
+                    placeholder="555-1234"
                   />
                 </div>
 
@@ -134,10 +170,10 @@ export const ContactsTab = ({ partnerId, contacts }: { partnerId: string; contac
                     <Mail className="h-3 w-3" />
                     {contact.email}
                   </div>
-                  {contact.phone && (
+                  {contact.mobile_phone && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Phone className="h-3 w-3" />
-                      {contact.phone}
+                      {contact.country_code} {contact.mobile_phone}
                     </div>
                   )}
                 </div>

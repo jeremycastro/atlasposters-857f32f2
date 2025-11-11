@@ -725,41 +725,50 @@ export type Database = {
       }
       partner_contacts: {
         Row: {
+          country_code: string | null
           created_at: string | null
           designation: string | null
           email: string
-          full_name: string
+          first_name: string
+          full_name: string | null
           id: string
           is_primary: boolean | null
+          last_name: string | null
+          mobile_phone: string | null
           notes: string | null
           partner_id: string
-          phone: string | null
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
+          country_code?: string | null
           created_at?: string | null
           designation?: string | null
           email: string
-          full_name: string
+          first_name: string
+          full_name?: string | null
           id?: string
           is_primary?: boolean | null
+          last_name?: string | null
+          mobile_phone?: string | null
           notes?: string | null
           partner_id: string
-          phone?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
+          country_code?: string | null
           created_at?: string | null
           designation?: string | null
           email?: string
-          full_name?: string
+          first_name?: string
+          full_name?: string | null
           id?: string
           is_primary?: boolean | null
+          last_name?: string | null
+          mobile_phone?: string | null
           notes?: string | null
           partner_id?: string
-          phone?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
