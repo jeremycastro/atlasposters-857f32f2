@@ -212,10 +212,52 @@ export const useRoadmapMutations = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["roadmap-milestones"] });
+      queryClient.invalidateQueries({ queryKey: ["roadmap-with-progress"] });
       toast.success("Milestone updated successfully");
     },
     onError: (error: Error) => {
       toast.error("Failed to update milestone: " + error.message);
+    },
+  });
+
+  const toggleDeliverable = useMutation({
+    mutationFn: async ({ milestoneId, deliverableIndex }: { milestoneId: string; deliverableIndex: number }) => {
+      // Fetch current milestone
+      const { data: milestone, error: fetchError } = await supabase
+        .from("roadmap_milestones")
+        .select("deliverables")
+        .eq("id", milestoneId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const deliverables = (milestone.deliverables || []) as any[];
+      if (deliverableIndex >= deliverables.length) throw new Error("Invalid deliverable index");
+
+      // Toggle the completed status
+      const currentDeliverable = deliverables[deliverableIndex];
+      deliverables[deliverableIndex] = {
+        text: currentDeliverable.text || currentDeliverable,
+        completed: !(currentDeliverable.completed || false),
+      };
+
+      // Update the milestone
+      const { data, error } = await supabase
+        .from("roadmap_milestones")
+        .update({ deliverables })
+        .eq("id", milestoneId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["roadmap-milestones"] });
+      queryClient.invalidateQueries({ queryKey: ["roadmap-with-progress"] });
+    },
+    onError: (error: Error) => {
+      toast.error("Failed to update deliverable: " + error.message);
     },
   });
 
@@ -224,5 +266,6 @@ export const useRoadmapMutations = () => {
     updatePhase,
     createMilestone,
     updateMilestone,
+    toggleDeliverable,
   };
 };
