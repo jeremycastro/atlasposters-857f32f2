@@ -1,12 +1,14 @@
 import { useState, useCallback, useEffect } from "react";
-import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Upload, X, Image as ImageIcon, Loader2, Download, ExternalLink, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useBrandAssetUpload, useDeleteBrandAsset, useListBrandAssets } from "@/hooks/useBrandAssetUpload";
 import { useUpdateBrand } from "@/hooks/usePartnerMutations";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BrandLogoUploadProps {
   brandId: string;
@@ -227,6 +229,56 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
     });
   };
 
+  const handleDownload = async (file: any) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('brand-assets')
+        .download(file.fullPath);
+
+      if (error) throw error;
+
+      const url = URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name.replace(/^\d+-/, ''); // Remove timestamp
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast.success("Download started");
+    } catch (error: any) {
+      toast.error(`Download failed: ${error.message}`, {
+        duration: Infinity,
+        action: {
+          label: "Copy",
+          onClick: () => {
+            navigator.clipboard.writeText(error.message);
+            toast.success("Error copied to clipboard");
+          },
+        },
+        dismissible: true,
+      });
+    }
+  };
+
+  const handleView = (publicUrl: string) => {
+    window.open(publicUrl, '_blank');
+  };
+
+  const getFileIcon = (mimetype?: string) => {
+    if (!mimetype) return <FileText className="h-8 w-8" />;
+    if (mimetype.startsWith('image/')) return <ImageIcon className="h-8 w-8" />;
+    if (mimetype === 'application/pdf') return <FileText className="h-8 w-8" />;
+    return <FileText className="h-8 w-8" />;
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
   return (
     <div className="space-y-4">
       {/* Upload Area */}
@@ -310,74 +362,118 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
         </Card>
       )}
 
-      {/* Uploaded Files Gallery */}
+      {/* Uploaded Files List */}
       {uploadedFiles.length > 0 && (
         <div>
           <h4 className="text-sm font-medium mb-3">Uploaded Assets ({uploadedFiles.length})</h4>
-          <div className="grid grid-cols-3 gap-3">
-            {uploadedFiles.map((file) => {
-              const isImage = file.metadata?.mimetype?.startsWith('image/');
-              const displayName = file.name.replace(/^\d+-/, ''); // Remove timestamp prefix
-              
-              return (
-                <Card key={file.name} className="relative group overflow-hidden">
-                  <CardContent className="p-2">
-                    <div className="aspect-square relative bg-muted rounded-md overflow-hidden flex items-center justify-center">
-                      {isImage ? (
-                        <img
-                          src={file.publicUrl}
-                          alt={displayName}
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                          <ImageIcon className="h-8 w-8" />
-                          <span className="text-xs">{file.name.split('.').pop()?.toUpperCase()}</span>
+          <div className="border rounded-md">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50px]">Preview</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="w-[100px]">Size</TableHead>
+                  <TableHead className="w-[120px]">Status</TableHead>
+                  <TableHead className="w-[200px] text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {uploadedFiles.map((file) => {
+                  const isImage = file.metadata?.mimetype?.startsWith('image/');
+                  const displayName = file.name.replace(/^\d+-/, ''); // Remove timestamp prefix
+                  const isActiveLogo = currentLogoUrl === file.publicUrl;
+                  
+                  return (
+                    <TableRow key={file.name}>
+                      <TableCell>
+                        <div className="w-10 h-10 rounded bg-muted flex items-center justify-center overflow-hidden">
+                          {isImage ? (
+                            <img
+                              src={file.publicUrl}
+                              alt={displayName}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="text-muted-foreground">
+                              {getFileIcon(file.metadata?.mimetype)}
+                            </div>
+                          )}
                         </div>
-                      )}
-                      {currentLogoUrl === file.publicUrl && (
-                        <div className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
-                          Active Logo
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium truncate max-w-[300px]" title={displayName}>
+                            {displayName}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {file.name.split('.').pop()?.toUpperCase()}
+                          </span>
                         </div>
-                      )}
-                    </div>
-                    <div className="mt-2 space-y-2">
-                      <p className="text-xs truncate" title={displayName}>
-                        {displayName}
-                      </p>
-                      <div className="flex gap-1">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex-1 h-7 text-xs"
-                          onClick={() => handleSetAsLogo(file.publicUrl)}
-                          disabled={currentLogoUrl === file.publicUrl || updateBrand.isPending}
-                        >
-                          {currentLogoUrl === file.publicUrl ? "Current" : "Set as Logo"}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 w-7 p-0"
-                          onClick={() => handleDelete(file.fullPath)}
-                          disabled={deleteAsset.isPending}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {formatFileSize(file.metadata?.size || 0)}
+                      </TableCell>
+                      <TableCell>
+                        {isActiveLogo && (
+                          <div className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-1 rounded">
+                            Active Logo
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleView(file.publicUrl)}
+                            title="View"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleDownload(file)}
+                            title="Download"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-xs px-2"
+                            onClick={() => handleSetAsLogo(file.publicUrl)}
+                            disabled={isActiveLogo || updateBrand.isPending}
+                          >
+                            {isActiveLogo ? "Current" : "Set Logo"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                            onClick={() => handleDelete(file.fullPath)}
+                            disabled={deleteAsset.isPending}
+                            title="Delete"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </div>
         </div>
       )}
 
       {uploadedFiles.length === 0 && !uploadAssets.isPending && (
-        <div className="text-center py-8 text-muted-foreground">
+        <div className="text-center py-8 text-muted-foreground border rounded-md">
           <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-          <p className="text-sm">No logos uploaded yet</p>
+          <p className="text-sm">No assets uploaded yet</p>
         </div>
       )}
     </div>

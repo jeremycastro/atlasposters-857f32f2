@@ -146,6 +146,8 @@ export const useDeleteBrandAsset = () => {
 export const useListBrandAssets = () => {
   return useMutation({
     mutationFn: async (brandId: string) => {
+      console.log(`Listing assets for brand: ${brandId}`);
+      
       const { data, error } = await supabase.storage
         .from('brand-assets')
         .list(brandId, {
@@ -154,20 +156,29 @@ export const useListBrandAssets = () => {
           sortBy: { column: 'created_at', order: 'desc' },
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error listing assets:", error);
+        throw error;
+      }
 
-      // Get public URLs for all files
-      const filesWithUrls = data.map((file) => {
-        const { data: { publicUrl } } = supabase.storage
-          .from('brand-assets')
-          .getPublicUrl(`${brandId}/${file.name}`);
+      console.log(`Found ${data?.length || 0} assets`, data);
 
-        return {
-          ...file,
-          publicUrl,
-          fullPath: `${brandId}/${file.name}`,
-        };
-      });
+      // Get public URLs and signed URLs for all files
+      const filesWithUrls = await Promise.all(
+        data.map(async (file) => {
+          const fullPath = `${brandId}/${file.name}`;
+          
+          const { data: { publicUrl } } = supabase.storage
+            .from('brand-assets')
+            .getPublicUrl(fullPath);
+
+          return {
+            ...file,
+            publicUrl,
+            fullPath,
+          };
+        })
+      );
 
       return filesWithUrls;
     },
