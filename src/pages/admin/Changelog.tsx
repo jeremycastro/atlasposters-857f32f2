@@ -17,6 +17,10 @@ const changelogData: ChangelogEntry[] = [
     changes: [
       {
         type: "added",
+        description: "Atlas Artwork Catalog - Complete artwork management system with image upload, metadata tracking, ASC code generation, and full CRUD operations",
+      },
+      {
+        type: "added",
         description: "Partner Management System - Comprehensive partner database with contacts, addresses, and agreements tracking",
       },
       {
