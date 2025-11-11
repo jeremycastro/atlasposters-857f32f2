@@ -126,22 +126,33 @@ export const TaskFilters = ({ filters, onFiltersChange }: TaskFiltersProps) => {
 
       <div>
         <Label>Assigned To</Label>
-        <Select
-          value={filters.assigned_to}
-          onValueChange={(value) => onFiltersChange({ ...filters, assigned_to: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="All users" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">All users</SelectItem>
-            {profiles?.map((profile) => (
-              <SelectItem key={profile.id} value={profile.id}>
-                {profile.full_name || profile.email}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex gap-2">
+          <Select
+            value={filters.assigned_to || undefined}
+            onValueChange={(value) => onFiltersChange({ ...filters, assigned_to: value })}
+          >
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="All users" />
+            </SelectTrigger>
+            <SelectContent>
+              {profiles?.map((profile) => (
+                <SelectItem key={profile.id} value={profile.id}>
+                  {profile.full_name || profile.email}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {filters.assigned_to && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onFiltersChange({ ...filters, assigned_to: "" })}
+              className="shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
