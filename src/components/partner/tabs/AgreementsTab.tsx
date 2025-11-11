@@ -197,7 +197,22 @@ export const AgreementsTab = ({ partnerId, agreements }: { partnerId: string; ag
             </TableHeader>
             <TableBody>
               {agreements.map((agreement) => (
-                <TableRow key={agreement.id}>
+                <TableRow 
+                  key={agreement.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    setFormData({
+                      agreement_type: agreement.agreement_type,
+                      effective_date: agreement.effective_date,
+                      expiration_date: agreement.expiration_date || '',
+                      commission_rate: agreement.commission_rate?.toString() || '',
+                      royalty_rate: agreement.royalty_rate?.toString() || '',
+                      payment_period: agreement.payment_period || '',
+                      status: agreement.status,
+                    });
+                    setShowForm(true);
+                  }}
+                >
                   <TableCell className="font-medium capitalize">{agreement.agreement_type}</TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(agreement.status)}>{agreement.status}</Badge>

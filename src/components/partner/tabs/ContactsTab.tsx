@@ -172,7 +172,22 @@ export const ContactsTab = ({ partnerId, contacts }: { partnerId: string; contac
             </TableHeader>
             <TableBody>
               {contacts.map((contact) => (
-                <TableRow key={contact.id}>
+                <TableRow 
+                  key={contact.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    setFormData({
+                      first_name: contact.first_name,
+                      last_name: contact.last_name || '',
+                      email: contact.email,
+                      mobile_phone: contact.mobile_phone || '',
+                      country_code: contact.country_code || '+1',
+                      designation: contact.designation || 'other',
+                      is_primary: contact.is_primary || false,
+                    });
+                    setShowForm(true);
+                  }}
+                >
                   <TableCell className="font-medium">{contact.full_name}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2 text-sm">

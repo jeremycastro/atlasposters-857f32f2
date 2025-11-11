@@ -168,7 +168,23 @@ export const AddressesTab = ({ partnerId, addresses }: { partnerId: string; addr
             </TableHeader>
             <TableBody>
               {addresses.map((address) => (
-                <TableRow key={address.id}>
+                <TableRow 
+                  key={address.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    setFormData({
+                      designation: address.designation,
+                      address_line1: address.address_line1,
+                      address_line2: address.address_line2 || '',
+                      city: address.city,
+                      state: address.state || '',
+                      postal_code: address.postal_code,
+                      country: address.country,
+                      is_primary: address.is_primary || false,
+                    });
+                    setShowForm(true);
+                  }}
+                >
                   <TableCell>
                     <Badge variant="secondary" className="capitalize">
                       {address.designation.replace('_', ' ')}

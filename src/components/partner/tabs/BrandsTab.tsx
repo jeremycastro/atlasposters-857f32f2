@@ -412,7 +412,11 @@ export const BrandsTab = ({ partnerId, brands }: { partnerId: string; brands: Br
             </TableHeader>
             <TableBody>
               {brands.map((brand) => (
-                <TableRow key={brand.id}>
+                <TableRow 
+                  key={brand.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleEdit(brand)}
+                >
                   <TableCell>
                     <div className="flex gap-3 items-center">
                       {brand.logo_url && (
@@ -436,7 +440,13 @@ export const BrandsTab = ({ partnerId, brands }: { partnerId: string; brands: Br
                   </TableCell>
                   <TableCell>
                     {brand.website_url ? (
-                      <a href={brand.website_url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-1">
+                      <a 
+                        href={brand.website_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-sm text-primary hover:underline flex items-center gap-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <ExternalLink className="h-3 w-3" />
                         Visit
                       </a>
@@ -446,7 +456,14 @@ export const BrandsTab = ({ partnerId, brands }: { partnerId: string; brands: Br
                     {brand.artworks && brand.artworks.length > 0 ? brand.artworks.length : 0}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(brand)}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEdit(brand);
+                      }}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
                   </TableCell>
