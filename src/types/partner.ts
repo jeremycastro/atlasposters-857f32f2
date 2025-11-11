@@ -27,6 +27,22 @@ export interface Brand {
   partner_id: string;
   brand_name: string;
   description?: string;
+  logo_url?: string;
+  primary_color?: string;
+  secondary_color?: string;
+  accent_color?: string;
+  tagline?: string;
+  brand_story?: string;
+  website_url?: string;
+  social_links?: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+    linkedin?: string;
+    pinterest?: string;
+    [key: string]: string | undefined;
+  };
+  metadata?: any;
   is_active: boolean;
   created_at: string;
   updated_at: string;

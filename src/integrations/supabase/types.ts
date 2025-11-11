@@ -290,31 +290,58 @@ export type Database = {
       }
       brands: {
         Row: {
+          accent_color: string | null
           brand_name: string
+          brand_story: string | null
           created_at: string | null
           description: string | null
           id: string
           is_active: boolean | null
+          logo_url: string | null
+          metadata: Json | null
           partner_id: string
+          primary_color: string | null
+          secondary_color: string | null
+          social_links: Json | null
+          tagline: string | null
           updated_at: string | null
+          website_url: string | null
         }
         Insert: {
+          accent_color?: string | null
           brand_name: string
+          brand_story?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
           is_active?: boolean | null
+          logo_url?: string | null
+          metadata?: Json | null
           partner_id: string
+          primary_color?: string | null
+          secondary_color?: string | null
+          social_links?: Json | null
+          tagline?: string | null
           updated_at?: string | null
+          website_url?: string | null
         }
         Update: {
+          accent_color?: string | null
           brand_name?: string
+          brand_story?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
           is_active?: boolean | null
+          logo_url?: string | null
+          metadata?: Json | null
           partner_id?: string
+          primary_color?: string | null
+          secondary_color?: string | null
+          social_links?: Json | null
+          tagline?: string | null
           updated_at?: string | null
+          website_url?: string | null
         }
         Relationships: [
           {
