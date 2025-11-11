@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRoadmapVersions, useRoadmapWithProgress, useRoadmapMutations } from "@/hooks/useRoadmap";
+import { useTasks } from "@/hooks/useTasks";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,11 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckCircle2, Circle, Clock, AlertCircle } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { CheckCircle2, Circle, Clock, AlertCircle, ChevronDown, ChevronRight } from "lucide-react";
 
 const RoadmapManager = () => {
   const { data: versions, isLoading: versionsLoading } = useRoadmapVersions();
   const [selectedVersionId, setSelectedVersionId] = useState<string>("");
+  const [expandedMilestones, setExpandedMilestones] = useState<Set<string>>(new Set());
   const { toggleDeliverable } = useRoadmapMutations();
   
   const { data: phasesWithProgress, isLoading: progressLoading } = useRoadmapWithProgress(
@@ -20,6 +23,21 @@ const RoadmapManager = () => {
   );
 
   const currentVersionId = selectedVersionId || versions?.[0]?.id;
+
+  // Fetch all tasks to show in milestone tables
+  const { data: allTasks } = useTasks();
+
+  const toggleMilestone = (milestoneId: string) => {
+    setExpandedMilestones((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(milestoneId)) {
+        newSet.delete(milestoneId);
+      } else {
+        newSet.add(milestoneId);
+      }
+      return newSet;
+    });
+  };
 
   const handleToggleDeliverable = (milestoneId: string, deliverableIndex: number) => {
     toggleDeliverable.mutate({ milestoneId, deliverableIndex });
@@ -114,25 +132,37 @@ const RoadmapManager = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {phase.milestones?.map((milestone: any) => (
-                      <div
-                        key={milestone.id}
-                        className="border rounded-lg p-4 space-y-3"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              {getStatusIcon(milestone.status)}
-                              <h4 className="font-semibold">
-                                Milestone {milestone.milestone_number}: {milestone.name}
-                              </h4>
+                    {phase.milestones?.map((milestone: any) => {
+                      const milestoneTasks = allTasks?.filter(task => task.milestone_id === milestone.id) || [];
+                      const isExpanded = expandedMilestones.has(milestone.id);
+                      
+                      return (
+                        <div
+                          key={milestone.id}
+                          className="border rounded-lg p-4 space-y-3"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <button
+                                onClick={() => toggleMilestone(milestone.id)}
+                                className="flex items-center gap-2 mb-1 hover:opacity-70 transition-opacity w-full text-left"
+                              >
+                                {isExpanded ? (
+                                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                ) : (
+                                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                )}
+                                {getStatusIcon(milestone.status)}
+                                <h4 className="font-semibold">
+                                  Milestone {milestone.milestone_number}: {milestone.name}
+                                </h4>
+                              </button>
+                              <p className="text-sm text-muted-foreground ml-10">
+                                {milestone.description}
+                              </p>
                             </div>
-                            <p className="text-sm text-muted-foreground">
-                              {milestone.description}
-                            </p>
+                            {getStatusBadge(milestone.status)}
                           </div>
-                          {getStatusBadge(milestone.status)}
-                        </div>
 
                         {/* Deliverables with checkboxes */}
                         {milestone.deliverables && milestone.deliverables.length > 0 && (
@@ -188,13 +218,64 @@ const RoadmapManager = () => {
                           </div>
                         )}
 
-                        {milestone.progress?.total === 0 && (
+                        {milestone.progress?.total === 0 && !isExpanded && (
                           <p className="text-sm text-muted-foreground">
                             No tasks assigned to this milestone yet
                           </p>
                         )}
+
+                        {/* Tasks Table - Only visible when expanded */}
+                        {isExpanded && (
+                          <div className="mt-4 border-t pt-4">
+                            {milestoneTasks.length > 0 ? (
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Task</TableHead>
+                                    <TableHead>Priority</TableHead>
+                                    <TableHead>Assigned To</TableHead>
+                                    <TableHead className="text-right">Est. Hours</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {milestoneTasks.map((task) => (
+                                    <TableRow key={task.id}>
+                                      <TableCell>
+                                        {getStatusBadge(task.status)}
+                                      </TableCell>
+                                      <TableCell className="font-medium">
+                                        {task.title}
+                                      </TableCell>
+                                      <TableCell>
+                                        <Badge variant={
+                                          task.priority === 'urgent' ? 'destructive' :
+                                          task.priority === 'high' ? 'default' :
+                                          task.priority === 'medium' ? 'secondary' :
+                                          'outline'
+                                        }>
+                                          {task.priority}
+                                        </Badge>
+                                      </TableCell>
+                                      <TableCell>
+                                        {task.assigned_to_profile?.full_name || 'Unassigned'}
+                                      </TableCell>
+                                      <TableCell className="text-right">
+                                        {task.estimated_hours || '-'}
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            ) : (
+                              <p className="text-sm text-muted-foreground text-center py-4">
+                                No tasks assigned to this milestone yet
+                              </p>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    ))}
+                    )})}
                   </div>
                 </CardContent>
               </Card>
