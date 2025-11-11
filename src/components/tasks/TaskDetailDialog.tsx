@@ -76,27 +76,9 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>Task Details</span>
-            <div className="flex gap-2">
-              {editMode ? (
-                <>
-                  <Button size="sm" onClick={handleSave} disabled={updateTask.isPending}>
-                    Save
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => setEditMode(false)}>
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <Button size="sm" onClick={() => setEditMode(true)}>
-                  Edit
-                </Button>
-              )}
-            </div>
-          </DialogTitle>
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="px-6 pt-6 pb-0">
+          <DialogTitle>Task Details</DialogTitle>
         </DialogHeader>
 
         {/* Sticky Navigation */}
@@ -352,6 +334,24 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
             <h3 className="text-lg font-semibold">Comments</h3>
             <TaskComments taskId={taskId || ""} />
           </section>
+        </div>
+
+        {/* Sticky Footer with Action Buttons */}
+        <div className="sticky bottom-0 z-10 bg-background border-t px-6 py-4 flex justify-end gap-2">
+          {editMode ? (
+            <>
+              <Button size="sm" variant="outline" onClick={() => setEditMode(false)}>
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleSave} disabled={updateTask.isPending}>
+                Save
+              </Button>
+            </>
+          ) : (
+            <Button size="sm" onClick={() => setEditMode(true)}>
+              Edit
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
