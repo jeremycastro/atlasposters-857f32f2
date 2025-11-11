@@ -125,12 +125,13 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
 
   if (showForm) {
     return (
-      <div className="space-y-4">
-        <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
-          ← Back to Contacts
-        </Button>
-        <h3 className="text-lg font-medium">{editingContact ? "Edit Contact" : "Add Contact"}</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex flex-col h-full">
+        <div className="flex-1 overflow-y-auto space-y-4 pb-20">
+          <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
+            ← Back to Contacts
+          </Button>
+          <h3 className="text-lg font-medium">{editingContact ? "Edit Contact" : "Add Contact"}</h3>
+          <form onSubmit={handleSubmit} className="space-y-4" id="contact-form">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="first_name">First Name *</Label>
@@ -213,19 +214,20 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
             </Select>
           </div>
 
-          <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleBack}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={createContact.isPending || updateContact.isPending}>
-              {editingContact ? "Update Contact" : "Create Contact"}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </div>
+        <div className="sticky bottom-0 left-0 right-0 bg-background border-t p-4 flex gap-2 justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleBack}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" form="contact-form" disabled={createContact.isPending || updateContact.isPending}>
+            {editingContact ? "Update Contact" : "Create Contact"}
+          </Button>
+        </div>
       </div>
     );
   }

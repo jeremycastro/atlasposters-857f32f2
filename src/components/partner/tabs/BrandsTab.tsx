@@ -386,21 +386,222 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
 
   if (showForm) {
     return (
-      <div className="space-y-4">
-        <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
-          ← Back to Brands
-        </Button>
-        <h3 className="text-lg font-medium">{editingBrand ? "Edit Brand" : "Add Brand"}</h3>
-        <BrandForm
-          formData={formData}
-          setFormData={setFormData}
-          onSubmit={handleSubmit}
-          onCancel={handleBack}
-          submitLabel={editingBrand ? "Save Changes" : "Create Brand"}
-          isSubmitting={createBrand.isPending || updateBrand.isPending}
-          partnerId={partnerId}
-          brandId={editingBrand?.id}
-        />
+      <div className="flex flex-col h-full">
+        <div className="flex-1 overflow-y-auto space-y-4 pb-20">
+          <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
+            ← Back to Brands
+          </Button>
+          <h3 className="text-lg font-medium">{editingBrand ? "Edit Brand" : "Add Brand"}</h3>
+          <form onSubmit={handleSubmit} className="space-y-6" id="brand-form">
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm text-muted-foreground">Basic Information</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Brand Name *</Label>
+                  <Input
+                    value={formData.brand_name}
+                    onChange={(e) => setFormData({ ...formData, brand_name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tagline</Label>
+                  <Input
+                    value={formData.tagline}
+                    onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
+                    placeholder="Short brand tagline"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Description</Label>
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={2}
+                  placeholder="Brief description"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Brand Story</Label>
+                <Textarea
+                  value={formData.brand_story}
+                  onChange={(e) => setFormData({ ...formData, brand_story: e.target.value })}
+                  rows={3}
+                  placeholder="Detailed brand story for landing pages"
+                />
+              </div>
+            </div>
+
+            {/* Brand Colors */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
+                <Palette className="h-4 w-4" />
+                Brand Colors
+              </h4>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Primary Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={formData.primary_color}
+                      onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
+                      className="w-16 h-10 p-1"
+                    />
+                    <Input
+                      type="text"
+                      value={formData.primary_color}
+                      onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
+                      placeholder="#000000"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Secondary Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={formData.secondary_color}
+                      onChange={(e) => setFormData({ ...formData, secondary_color: e.target.value })}
+                      className="w-16 h-10 p-1"
+                    />
+                    <Input
+                      type="text"
+                      value={formData.secondary_color}
+                      onChange={(e) => setFormData({ ...formData, secondary_color: e.target.value })}
+                      placeholder="#666666"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Accent Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={formData.accent_color}
+                      onChange={(e) => setFormData({ ...formData, accent_color: e.target.value })}
+                      className="w-16 h-10 p-1"
+                    />
+                    <Input
+                      type="text"
+                      value={formData.accent_color}
+                      onChange={(e) => setFormData({ ...formData, accent_color: e.target.value })}
+                      placeholder="#FF6B6B"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Online Presence */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
+                <ExternalLink className="h-4 w-4" />
+                Online Presence
+              </h4>
+              <div className="space-y-2">
+                <Label>Website URL</Label>
+                <Input
+                  type="url"
+                  value={formData.website_url}
+                  onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
+                  placeholder="https://brand.com"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Instagram</Label>
+                  <Input
+                    value={formData.social_links.instagram}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      social_links: { ...formData.social_links, instagram: e.target.value }
+                    })}
+                    placeholder="@brandname or full URL"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Facebook</Label>
+                  <Input
+                    value={formData.social_links.facebook}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      social_links: { ...formData.social_links, facebook: e.target.value }
+                    })}
+                    placeholder="facebook.com/brandname"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Twitter/X</Label>
+                  <Input
+                    value={formData.social_links.twitter}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      social_links: { ...formData.social_links, twitter: e.target.value }
+                    })}
+                    placeholder="@brandname"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>LinkedIn</Label>
+                  <Input
+                    value={formData.social_links.linkedin}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      social_links: { ...formData.social_links, linkedin: e.target.value }
+                    })}
+                    placeholder="linkedin.com/company/brand"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Pinterest</Label>
+                  <Input
+                    value={formData.social_links.pinterest}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      social_links: { ...formData.social_links, pinterest: e.target.value }
+                    })}
+                    placeholder="pinterest.com/brandname"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Brand Logo Upload */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
+                <Palette className="h-4 w-4" />
+                Brand Logo
+              </h4>
+              {editingBrand && (
+                <BrandLogoUpload
+                  brandId={editingBrand.id}
+                  currentLogoUrl={formData.logo_url}
+                  onLogoChange={(url) => setFormData({ ...formData, logo_url: url })}
+                />
+              )}
+              {!editingBrand && (
+                <p className="text-sm text-muted-foreground">
+                  Save the brand first to upload a logo
+                </p>
+              )}
+            </div>
+          </form>
+        </div>
+        <div className="sticky bottom-0 left-0 right-0 bg-background border-t p-4 flex gap-2 justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleBack}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" form="brand-form" disabled={createBrand.isPending || updateBrand.isPending}>
+            {editingBrand ? "Save Changes" : "Create Brand"}
+          </Button>
+        </div>
       </div>
     );
   }

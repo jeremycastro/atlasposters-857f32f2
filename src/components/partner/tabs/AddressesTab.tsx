@@ -128,12 +128,13 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
 
   if (showForm) {
     return (
-      <div className="space-y-4">
-        <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
-          ← Back to Addresses
-        </Button>
-        <h3 className="text-lg font-medium">{editingAddress ? "Edit Address" : "Add Address"}</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex flex-col h-full">
+        <div className="flex-1 overflow-y-auto space-y-4 pb-20">
+          <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
+            ← Back to Addresses
+          </Button>
+          <h3 className="text-lg font-medium">{editingAddress ? "Edit Address" : "Add Address"}</h3>
+          <form onSubmit={handleSubmit} className="space-y-4" id="address-form">
           <div className="space-y-2">
             <Label htmlFor="designation">Designation *</Label>
             <Select
@@ -213,19 +214,20 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             </div>
           </div>
 
-          <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleBack}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={createAddress.isPending || updateAddress.isPending}>
-              {editingAddress ? "Update Address" : "Create Address"}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </div>
+        <div className="sticky bottom-0 left-0 right-0 bg-background border-t p-4 flex gap-2 justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleBack}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" form="address-form" disabled={createAddress.isPending || updateAddress.isPending}>
+            {editingAddress ? "Update Address" : "Create Address"}
+          </Button>
+        </div>
       </div>
     );
   }

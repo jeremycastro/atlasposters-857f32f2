@@ -147,12 +147,13 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
 
   if (showForm) {
     return (
-      <div className="space-y-4">
-        <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
-          ← Back to Agreements
-        </Button>
-        <h3 className="text-lg font-medium">{editingAgreement ? "Edit Agreement" : "Add Agreement"}</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex flex-col h-full">
+        <div className="flex-1 overflow-y-auto space-y-4 pb-20">
+          <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
+            ← Back to Agreements
+          </Button>
+          <h3 className="text-lg font-medium">{editingAgreement ? "Edit Agreement" : "Add Agreement"}</h3>
+          <form onSubmit={handleSubmit} className="space-y-4" id="agreement-form">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="agreement_type">Agreement Type *</Label>
@@ -256,19 +257,20 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
             </Select>
           </div>
 
-          <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleBack}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={createAgreement.isPending || updateAgreement.isPending}>
-              {editingAgreement ? "Update Agreement" : "Create Agreement"}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </div>
+        <div className="sticky bottom-0 left-0 right-0 bg-background border-t p-4 flex gap-2 justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleBack}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" form="agreement-form" disabled={createAgreement.isPending || updateAgreement.isPending}>
+            {editingAgreement ? "Update Agreement" : "Create Agreement"}
+          </Button>
+        </div>
       </div>
     );
   }
