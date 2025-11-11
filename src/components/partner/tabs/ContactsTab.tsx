@@ -5,9 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Mail, Phone, Star, Plus } from "lucide-react";
-import { useCreateContact, useUpdateContact } from "@/hooks/usePartnerMutations";
+import { Mail, Phone, Star, Plus, Trash2 } from "lucide-react";
+import { useCreateContact, useUpdateContact, useDeleteContact } from "@/hooks/usePartnerMutations";
 
 interface Contact {
   id: string;
@@ -29,6 +30,8 @@ interface ContactsTabProps {
 export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -40,6 +43,7 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
 
   const createContact = useCreateContact();
   const updateContact = useUpdateContact();
+  const deleteContact = useDeleteContact();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,6 +101,23 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
     setDialogOpen(true);
   };
 
+  const handleDeleteClick = (contact: Contact, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setContactToDelete(contact);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (contactToDelete) {
+      deleteContact.mutate(contactToDelete.id, {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          setContactToDelete(null);
+        },
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -121,6 +142,7 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
                 <TableHead>Mobile Phone</TableHead>
                 <TableHead>Designation</TableHead>
                 <TableHead>Primary</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -157,6 +179,15 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
                         Primary
                       </Badge>
                     )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={(e) => handleDeleteClick(contact, e)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -274,6 +305,23 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Contact</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{contactToDelete?.full_name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

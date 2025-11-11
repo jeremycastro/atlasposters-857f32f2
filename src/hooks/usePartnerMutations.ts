@@ -277,3 +277,92 @@ export const useUpdateAddress = () => {
     },
   });
 };
+
+export const useDeleteBrand = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await (supabase as any)
+        .from("brands")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["brands"] });
+      queryClient.invalidateQueries({ queryKey: ["partner"] });
+      toast.success("Brand deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete brand: ${error.message}`);
+    },
+  });
+};
+
+export const useDeleteAgreement = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await (supabase as any)
+        .from("partner_agreements")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["partner"] });
+      toast.success("Agreement deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete agreement: ${error.message}`);
+    },
+  });
+};
+
+export const useDeleteContact = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await (supabase as any)
+        .from("partner_contacts")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["partner"] });
+      toast.success("Contact deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete contact: ${error.message}`);
+    },
+  });
+};
+
+export const useDeleteAddress = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await (supabase as any)
+        .from("partner_addresses")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["partner"] });
+      toast.success("Address deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete address: ${error.message}`);
+    },
+  });
+};

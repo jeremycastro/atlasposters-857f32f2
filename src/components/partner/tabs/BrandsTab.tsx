@@ -5,10 +5,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Plus, Edit, Palette, Save, X } from "lucide-react";
-import { useCreateBrand, useUpdateBrand } from "@/hooks/usePartnerMutations";
+import { ExternalLink, Plus, Edit, Palette, Save, X, Trash2 } from "lucide-react";
+import { useCreateBrand, useUpdateBrand, useDeleteBrand } from "@/hooks/usePartnerMutations";
+import { BrandLogoUpload } from "@/components/partner/BrandLogoUpload";
 import type { Brand } from "@/types/partner";
 
 interface BrandFormData {
@@ -37,9 +39,11 @@ interface BrandFormProps {
   onCancel: () => void;
   submitLabel: string;
   isSubmitting: boolean;
+  partnerId: string;
+  brandId?: string;
 }
 
-const BrandForm = ({ formData, setFormData, onSubmit, onCancel, submitLabel, isSubmitting }: BrandFormProps) => (
+const BrandForm = ({ formData, setFormData, onSubmit, onCancel, submitLabel, isSubmitting, partnerId, brandId }: BrandFormProps) => (
   <form onSubmit={onSubmit} className="space-y-6">
     {/* Basic Information */}
     <div className="space-y-4">
@@ -217,28 +221,24 @@ const BrandForm = ({ formData, setFormData, onSubmit, onCancel, submitLabel, isS
       </div>
     </div>
 
-    {/* Logo URL */}
+    {/* Brand Logo Upload */}
     <div className="space-y-4">
       <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
         <Palette className="h-4 w-4" />
-        Logo URL (Optional)
+        Brand Logo
       </h4>
-      <div className="space-y-2">
-        <p className="text-xs text-muted-foreground">
-          Provide a logo URL as an alternative
-        </p>
-        <Input
-          type="url"
-          value={formData.logo_url}
-          onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-          placeholder="https://example.com/logo.png"
+      {brandId && (
+        <BrandLogoUpload
+          brandId={brandId}
+          currentLogoUrl={formData.logo_url}
+          onLogoChange={(url) => setFormData({ ...formData, logo_url: url })}
         />
-        {formData.logo_url && (
-          <div className="mt-2 p-4 border rounded-md bg-muted/30">
-            <img src={formData.logo_url} alt="Brand logo preview" className="h-16 object-contain" />
-          </div>
-        )}
-      </div>
+      )}
+      {!brandId && (
+        <p className="text-sm text-muted-foreground">
+          Save the brand first to upload a logo
+        </p>
+      )}
     </div>
 
     <div className="flex gap-2 justify-end">
@@ -262,6 +262,8 @@ interface BrandsTabProps {
 export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
   const [formData, setFormData] = useState<BrandFormData>({
     brand_name: "",
     description: "",
@@ -283,6 +285,7 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
 
   const createBrand = useCreateBrand();
   const updateBrand = useUpdateBrand();
+  const deleteBrand = useDeleteBrand();
 
   const resetForm = () => {
     setFormData({
@@ -360,6 +363,23 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
     setDialogOpen(true);
   };
 
+  const handleDeleteClick = (brand: Brand, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBrandToDelete(brand);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (brandToDelete) {
+      deleteBrand.mutate(brandToDelete.id, {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          setBrandToDelete(null);
+        },
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -389,7 +409,11 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
             </TableHeader>
             <TableBody>
               {brands.map((brand) => (
-                <TableRow key={brand.id}>
+                <TableRow 
+                  key={brand.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleOpenDialog(brand)}
+                >
                   <TableCell>
                     <div className="flex gap-3 items-center">
                       {brand.logo_url && (
@@ -429,16 +453,25 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
                     {brand.artworks && brand.artworks.length > 0 ? brand.artworks.length : 0}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenDialog(brand);
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-1 justify-end">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDialog(brand);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => handleDeleteClick(brand, e)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -466,10 +499,29 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
               onCancel={() => setDialogOpen(false)}
               submitLabel={editingBrand ? "Save Changes" : "Create Brand"}
               isSubmitting={createBrand.isPending || updateBrand.isPending}
+              partnerId={partnerId}
+              brandId={editingBrand?.id}
             />
           </ScrollArea>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Brand</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{brandToDelete?.brand_name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

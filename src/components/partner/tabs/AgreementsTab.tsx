@@ -5,9 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus } from "lucide-react";
-import { useCreateAgreement, useUpdateAgreement } from "@/hooks/usePartnerMutations";
+import { Plus, Trash2 } from "lucide-react";
+import { useCreateAgreement, useUpdateAgreement, useDeleteAgreement } from "@/hooks/usePartnerMutations";
 
 interface Agreement {
   id: string;
@@ -28,6 +29,8 @@ interface AgreementsTabProps {
 export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingAgreement, setEditingAgreement] = useState<Agreement | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [agreementToDelete, setAgreementToDelete] = useState<Agreement | null>(null);
   const [formData, setFormData] = useState({
     agreement_type: "royalty",
     effective_date: "",
@@ -40,6 +43,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
 
   const createAgreement = useCreateAgreement();
   const updateAgreement = useUpdateAgreement();
+  const deleteAgreement = useDeleteAgreement();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,6 +123,23 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
     setDialogOpen(true);
   };
 
+  const handleDeleteClick = (agreement: Agreement, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setAgreementToDelete(agreement);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (agreementToDelete) {
+      deleteAgreement.mutate(agreementToDelete.id, {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          setAgreementToDelete(null);
+        },
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -145,6 +166,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                 <TableHead>Royalty Rate</TableHead>
                 <TableHead>Commission Rate</TableHead>
                 <TableHead>Payment Period</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -172,6 +194,15 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                   </TableCell>
                   <TableCell className="text-sm capitalize">
                     {agreement.payment_period ? agreement.payment_period.replace('_', ' ') : '-'}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={(e) => handleDeleteClick(agreement, e)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -310,6 +341,23 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Agreement</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the "{agreementToDelete?.agreement_type}" agreement? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
