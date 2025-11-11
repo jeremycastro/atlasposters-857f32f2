@@ -141,6 +141,7 @@ export type Database = {
           art_medium: string | null
           artist_name: string | null
           asc_code: string
+          brand_id: string | null
           created_at: string | null
           created_by: string | null
           description: string | null
@@ -162,6 +163,7 @@ export type Database = {
           art_medium?: string | null
           artist_name?: string | null
           asc_code: string
+          brand_id?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
@@ -183,6 +185,7 @@ export type Database = {
           art_medium?: string | null
           artist_name?: string | null
           asc_code?: string
+          brand_id?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
@@ -201,6 +204,13 @@ export type Database = {
           year_created?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "artworks_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "artworks_created_by_fkey"
             columns: ["created_by"]
@@ -274,6 +284,44 @@ export type Database = {
             columns: ["voided_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brands: {
+        Row: {
+          brand_name: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          partner_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          brand_name: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          partner_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          brand_name?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          partner_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brands_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
             referencedColumns: ["id"]
           },
         ]
@@ -464,6 +512,294 @@ export type Database = {
             columns: ["suggested_product_type_id"]
             isOneToOne: false
             referencedRelation: "product_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_addresses: {
+        Row: {
+          address_line1: string
+          address_line2: string | null
+          city: string
+          country: string
+          created_at: string | null
+          designation: string
+          id: string
+          is_primary: boolean | null
+          partner_id: string
+          postal_code: string
+          state: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address_line1: string
+          address_line2?: string | null
+          city: string
+          country?: string
+          created_at?: string | null
+          designation: string
+          id?: string
+          is_primary?: boolean | null
+          partner_id: string
+          postal_code: string
+          state?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address_line1?: string
+          address_line2?: string | null
+          city?: string
+          country?: string
+          created_at?: string | null
+          designation?: string
+          id?: string
+          is_primary?: boolean | null
+          partner_id?: string
+          postal_code?: string
+          state?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_addresses_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_agreements: {
+        Row: {
+          agreement_document_path: string | null
+          agreement_type: string
+          commission_rate: number | null
+          created_at: string | null
+          created_by: string | null
+          effective_date: string
+          expiration_date: string | null
+          id: string
+          partner_id: string
+          payment_period: string | null
+          royalty_rate: number | null
+          status: string | null
+          terms: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          agreement_document_path?: string | null
+          agreement_type: string
+          commission_rate?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          effective_date: string
+          expiration_date?: string | null
+          id?: string
+          partner_id: string
+          payment_period?: string | null
+          royalty_rate?: number | null
+          status?: string | null
+          terms?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          agreement_document_path?: string | null
+          agreement_type?: string
+          commission_rate?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          effective_date?: string
+          expiration_date?: string | null
+          id?: string
+          partner_id?: string
+          payment_period?: string | null
+          royalty_rate?: number | null
+          status?: string | null
+          terms?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_agreements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_agreements_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_assets: {
+        Row: {
+          asset_type: string
+          brand_id: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          partner_id: string
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          asset_type: string
+          brand_id?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          partner_id: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          asset_type?: string
+          brand_id?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          partner_id?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_assets_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_assets_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_assets_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_contacts: {
+        Row: {
+          created_at: string | null
+          designation: string | null
+          email: string
+          full_name: string
+          id: string
+          is_primary: boolean | null
+          notes: string | null
+          partner_id: string
+          phone: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          designation?: string | null
+          email: string
+          full_name: string
+          id?: string
+          is_primary?: boolean | null
+          notes?: string | null
+          partner_id: string
+          phone?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          designation?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          is_primary?: boolean | null
+          notes?: string | null
+          partner_id?: string
+          phone?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_contacts_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partners: {
+        Row: {
+          atlas_manager_id: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          notes: string | null
+          partner_name: string
+          status: string | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          atlas_manager_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          partner_name: string
+          status?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          atlas_manager_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          partner_name?: string
+          status?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partners_atlas_manager_id_fkey"
+            columns: ["atlas_manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partners_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
