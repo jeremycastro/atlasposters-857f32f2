@@ -13,6 +13,10 @@ import About from "./pages/About";
 import Changelog from "./pages/admin/Changelog";
 import TechStack from "./pages/admin/TechStack";
 import SKUMethodology from "./pages/admin/SKUMethodology";
+import KnowledgeBase from "./pages/admin/KnowledgeBase";
+import PartnerManagementKB from "./pages/admin/knowledge/PartnerManagement";
+import BrandAssets from "./pages/admin/knowledge/BrandAssets";
+import TaskManagementKB from "./pages/admin/knowledge/TaskManagement";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import PartnerAuth from "./pages/PartnerAuth";
@@ -67,7 +71,11 @@ const App = () => (
               <Route path="roadmap" element={<RoadmapManager />} />
               <Route path="changelog" element={<Changelog />} />
               <Route path="techstack" element={<TechStack />} />
-              <Route path="sku-methodology" element={<SKUMethodology />} />
+              <Route path="knowledge" element={<KnowledgeBase />} />
+              <Route path="knowledge/sku-methodology" element={<SKUMethodology />} />
+              <Route path="knowledge/partner-management" element={<PartnerManagementKB />} />
+              <Route path="knowledge/brand-assets" element={<BrandAssets />} />
+              <Route path="knowledge/task-management" element={<TaskManagementKB />} />
               <Route path="artworks" element={<ArtworkCatalog />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="navigation" element={<NavigationManager />} />
