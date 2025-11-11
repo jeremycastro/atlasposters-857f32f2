@@ -1,10 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TaskComments } from "./TaskComments";
 import { TaskActivityLog } from "./TaskActivityLog";
@@ -76,265 +76,236 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0">
-        <DialogHeader className="px-6 pt-6 pb-3 shrink-0">
+      <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
+        <DialogHeader>
           <DialogTitle>Task Details</DialogTitle>
         </DialogHeader>
 
-        {/* Sticky Navigation */}
-        <nav className="shrink-0 bg-background border-b px-6 py-3">
-          <div className="flex gap-6">
-            <a 
-              href="#details" 
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Details
-            </a>
-            <a 
-              href="#comments" 
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Comments
-            </a>
-            <a 
-              href="#activity" 
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Activity
-            </a>
-          </div>
-        </nav>
+        <Tabs defaultValue="details" className="w-full flex flex-col flex-1 overflow-hidden">
+          <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="comments">Comments</TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger>
+          </TabsList>
 
-        {/* Scrollable Content */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-6 space-y-8 scroll-smooth">
-          {/* Details Section */}
-          <section id="details" className="space-y-4 pt-4">
-            <div>
-              <Label>Title</Label>
-              {editMode ? (
-                <Input
-                  value={formData.title || ""}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                />
-              ) : (
-                <p className="text-foreground font-medium">{task.title}</p>
-              )}
-            </div>
-
-            <div>
-              <Label>Description</Label>
-              {editMode ? (
-                <Textarea
-                  value={formData.description || ""}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={4}
-                />
-              ) : (
-                <p className="text-muted-foreground">{task.description || "No description"}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Status</Label>
-                <Select
-                  value={formData.status || ""}
-                  onValueChange={(value: any) => {
-                    const newFormData = { ...formData, status: value };
-                    setFormData(newFormData);
-                    if (!editMode && taskId && task) {
-                      updateTask.mutate({
-                        id: taskId,
-                        updates: { status: value },
-                        oldData: task,
-                      });
-                    }
-                  }}
-                >
-                  <SelectTrigger className="h-auto p-0 border-0 shadow-none hover:bg-transparent">
-                    <Badge 
-                      variant={formData.status as any || "outline"} 
-                      className="text-sm px-3 py-1.5 cursor-pointer hover:opacity-80 transition-opacity"
-                    >
-                      {formData.status === "in_progress" 
-                        ? "In Progress" 
-                        : formData.status === "in_review" 
-                        ? "In Review" 
-                        : formData.status === "todo"
-                        ? "To Do"
-                        : formData.status 
-                        ? formData.status.charAt(0).toUpperCase() + formData.status.slice(1) 
-                        : "Select"}
-                    </Badge>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="backlog">Backlog</SelectItem>
-                    <SelectItem value="todo">To Do</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="in_review">In Review</SelectItem>
-                    <SelectItem value="blocked">Blocked</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label>Priority</Label>
-                {editMode ? (
-                  <Select
-                    value={formData.priority || ""}
-                    onValueChange={(value: any) => setFormData({ ...formData, priority: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="urgent">Urgent</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <Badge variant="outline">{task.priority}</Badge>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <Label>Assigned To</Label>
-              {editMode ? (
-                <Select
-                  value={formData.assigned_to || ""}
-                  onValueChange={(value) => setFormData({ ...formData, assigned_to: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select user" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {profiles?.map((profile) => (
-                      <SelectItem key={profile.id} value={profile.id}>
-                        {profile.full_name || profile.email}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <p className="text-muted-foreground">
-                  {(task as any).assigned_to_profile?.full_name || "Unassigned"}
-                </p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label>Phase</Label>
-                {editMode ? (
-                  <Select
-                    value={formData.phase_id || undefined}
-                    onValueChange={(value) => {
-                      setFormData({ 
-                        ...formData, 
-                        phase_id: value || null,
-                        milestone_id: null
-                      });
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select phase" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {phases.map((phase) => (
-                        <SelectItem key={phase.id} value={phase.id}>
-                          Phase {phase.phase_number}: {phase.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="text-muted-foreground">
-                    {(task as any).phase_data 
-                      ? `Phase ${(task as any).phase_data.phase_number}: ${(task as any).phase_data.name}`
-                      : "N/A"}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label>Milestone</Label>
-                {editMode ? (
-                  <Select
-                    value={formData.milestone_id || undefined}
-                    onValueChange={(value) => setFormData({ ...formData, milestone_id: value || null })}
-                    disabled={!formData.phase_id}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={formData.phase_id ? "Select milestone" : "Select phase first"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {filteredMilestones.map((milestone) => (
-                        <SelectItem key={milestone.id} value={milestone.id}>
-                          {milestone.milestone_number}: {milestone.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="text-muted-foreground">
-                    {(task as any).milestone_data 
-                      ? `${(task as any).milestone_data.milestone_number}: ${(task as any).milestone_data.name}`
-                      : "N/A"}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label>Est. Hours</Label>
-                {editMode ? (
-                  <Input
-                    type="number"
-                    value={formData.estimated_hours || ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, estimated_hours: parseInt(e.target.value) || null })
-                    }
-                  />
-                ) : (
-                  <p className="text-muted-foreground">{task.estimated_hours || "N/A"}</p>
-                )}
-              </div>
-            </div>
-
-            {task.tags && task.tags.length > 0 && (
-              <div>
-                <Label>Tags</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {task.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))}
+          <div className="flex-1 overflow-y-auto">
+            <TabsContent value="details" className="h-full mt-0">
+              <div className="p-6 space-y-4">
+                <div>
+                  <Label>Title</Label>
+                  {editMode ? (
+                    <Input
+                      value={formData.title || ""}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    />
+                  ) : (
+                    <p className="text-foreground font-medium">{task.title}</p>
+                  )}
                 </div>
+
+                <div>
+                  <Label>Description</Label>
+                  {editMode ? (
+                    <Textarea
+                      value={formData.description || ""}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={4}
+                    />
+                  ) : (
+                    <p className="text-muted-foreground whitespace-pre-wrap">
+                      {task.description || "No description"}
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Status</Label>
+                    {editMode ? (
+                      <Select
+                        value={formData.status || ""}
+                        onValueChange={(value: any) => setFormData({ ...formData, status: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="backlog">Backlog</SelectItem>
+                          <SelectItem value="todo">To Do</SelectItem>
+                          <SelectItem value="in_progress">In Progress</SelectItem>
+                          <SelectItem value="in_review">In Review</SelectItem>
+                          <SelectItem value="done">Done</SelectItem>
+                          <SelectItem value="blocked">Blocked</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Badge variant="outline" className="mt-2">
+                        {task.status.replace(/_/g, " ")}
+                      </Badge>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label>Priority</Label>
+                    {editMode ? (
+                      <Select
+                        value={formData.priority || ""}
+                        onValueChange={(value: any) => setFormData({ ...formData, priority: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="critical">Critical</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Badge variant="outline" className="mt-2">
+                        {task.priority}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Assigned To</Label>
+                    {editMode ? (
+                      <Select
+                        value={formData.assigned_to || ""}
+                        onValueChange={(value) => setFormData({ ...formData, assigned_to: value || null })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select assignee" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {profiles?.map((profile) => (
+                            <SelectItem key={profile.id} value={profile.id}>
+                              {profile.full_name || profile.email}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="text-muted-foreground">
+                        {task.assigned_to
+                          ? profiles?.find((p) => p.id === task.assigned_to)?.full_name ||
+                            profiles?.find((p) => p.id === task.assigned_to)?.email ||
+                            "Unknown"
+                          : "Unassigned"}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label>Phase</Label>
+                    {editMode ? (
+                      <Select
+                        value={formData.phase_id || ""}
+                        onValueChange={(value) => {
+                          setFormData({ ...formData, phase_id: value || null, milestone_id: null });
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select phase" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {phases?.map((phase) => (
+                            <SelectItem key={phase.id} value={phase.id}>
+                              {phase.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="text-muted-foreground">
+                        {task.phase_id
+                          ? phases?.find((p) => p.id === task.phase_id)?.name || "Unknown"
+                          : task.phase || "N/A"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Milestone</Label>
+                    {editMode ? (
+                      <Select
+                        value={formData.milestone_id || ""}
+                        onValueChange={(value) => setFormData({ ...formData, milestone_id: value || null })}
+                        disabled={!formData.phase_id}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={formData.phase_id ? "Select milestone" : "Select phase first"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {filteredMilestones.map((milestone) => (
+                            <SelectItem key={milestone.id} value={milestone.id}>
+                              {milestone.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="text-muted-foreground">
+                        {task.milestone_id
+                          ? allMilestones?.find((m) => m.id === task.milestone_id)?.name || "Unknown"
+                          : task.milestone || "N/A"}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label>Estimated Hours</Label>
+                    {editMode ? (
+                      <Input
+                        type="number"
+                        value={formData.estimated_hours || ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            estimated_hours: e.target.value ? parseInt(e.target.value) : null,
+                          })
+                        }
+                      />
+                    ) : (
+                      <p className="text-muted-foreground">{task.estimated_hours || "N/A"}</p>
+                    )}
+                  </div>
+                </div>
+
+                {task.tags && task.tags.length > 0 && (
+                  <div>
+                    <Label>Tags</Label>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {task.tags.map((tag) => (
+                        <Badge key={tag} variant="secondary">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </section>
+            </TabsContent>
 
-          <Separator />
+            <TabsContent value="comments" className="h-full mt-0">
+              <div className="p-6">
+                <TaskComments taskId={taskId || ""} />
+              </div>
+            </TabsContent>
 
-          {/* Comments Section */}
-          <section id="comments" className="space-y-4">
-            <h3 className="text-lg font-semibold">Comments</h3>
-            <TaskComments taskId={taskId || ""} />
-          </section>
-
-          <Separator />
-
-          {/* Activity Section */}
-          <section id="activity" className="space-y-4 pb-4">
-            <h3 className="text-lg font-semibold">Activity Log</h3>
-            <TaskActivityLog taskId={taskId || ""} />
-          </section>
-        </div>
+            <TabsContent value="activity" className="h-full mt-0">
+              <div className="p-6">
+                <TaskActivityLog taskId={taskId || ""} />
+              </div>
+            </TabsContent>
+          </div>
+        </Tabs>
 
         {/* Sticky Footer with Action Buttons */}
         <div className="shrink-0 bg-background border-t px-6 py-4 flex justify-end gap-2">
