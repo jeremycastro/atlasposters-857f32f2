@@ -89,13 +89,18 @@ export const useTaskById = (taskId: string | undefined) => {
         .select(`
           *,
           assigned_to_profile:profiles!project_tasks_assigned_to_fkey(id, full_name, avatar_url),
-          created_by_profile:profiles!project_tasks_created_by_fkey(id, full_name)
+          created_by_profile:profiles!project_tasks_created_by_fkey(id, full_name),
+          phase_data:roadmap_phases!project_tasks_phase_id_fkey(id, phase_number, name),
+          milestone_data:roadmap_milestones!project_tasks_milestone_id_fkey(id, milestone_number, name)
         `)
         .eq("id", taskId)
         .single();
 
       if (error) throw error;
-      return data as Task;
+      return data as Task & {
+        phase_data?: { id: string; phase_number: number; name: string } | null;
+        milestone_data?: { id: string; milestone_number: string; name: string } | null;
+      };
     },
     enabled: !!taskId,
   });

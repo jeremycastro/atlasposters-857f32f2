@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useTaskById } from "@/hooks/useTasks";
+import { useRoadmapVersions, useRoadmapWithProgress } from "@/hooks/useRoadmap";
 import type { Database } from "@/integrations/supabase/types";
 
 type Task = Database["public"]["Tables"]["project_tasks"]["Row"];
@@ -26,9 +27,21 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
   const { data: task, isLoading } = useTaskById(taskId || undefined);
   const { updateTask } = useTaskMutations();
   const { data: profiles } = useProfiles();
+  const { data: versions } = useRoadmapVersions();
+  const activeVersion = versions?.[0]?.id;
+  const { data: phasesData } = useRoadmapWithProgress(activeVersion);
   
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState<Partial<Task>>({});
+
+  // Prepare phases and milestones data
+  const phases = phasesData || [];
+  const allMilestones = phases.flatMap(p => 
+    p.milestones?.map(m => ({ ...m, phase_id: p.id, phase_name: p.name })) || []
+  );
+  const filteredMilestones = formData.phase_id 
+    ? allMilestones.filter(m => m.phase_id === formData.phase_id)
+    : allMilestones;
 
   useEffect(() => {
     if (task) {
@@ -197,24 +210,63 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
               <div>
                 <Label>Phase</Label>
                 {editMode ? (
-                  <Input
-                    value={formData.phase || ""}
-                    onChange={(e) => setFormData({ ...formData, phase: e.target.value })}
-                  />
+                  <Select
+                    value={formData.phase_id || ""}
+                    onValueChange={(value) => {
+                      setFormData({ 
+                        ...formData, 
+                        phase_id: value || null,
+                        milestone_id: null // Clear milestone when phase changes
+                      });
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select phase" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">None</SelectItem>
+                      {phases.map((phase) => (
+                        <SelectItem key={phase.id} value={phase.id}>
+                          Phase {phase.phase_number}: {phase.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 ) : (
-                  <p className="text-muted-foreground">{task.phase || "N/A"}</p>
+                  <p className="text-muted-foreground">
+                    {(task as any).phase_data 
+                      ? `Phase ${(task as any).phase_data.phase_number}: ${(task as any).phase_data.name}`
+                      : "N/A"}
+                  </p>
                 )}
               </div>
 
               <div>
                 <Label>Milestone</Label>
                 {editMode ? (
-                  <Input
-                    value={formData.milestone || ""}
-                    onChange={(e) => setFormData({ ...formData, milestone: e.target.value })}
-                  />
+                  <Select
+                    value={formData.milestone_id || ""}
+                    onValueChange={(value) => setFormData({ ...formData, milestone_id: value || null })}
+                    disabled={!formData.phase_id}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={formData.phase_id ? "Select milestone" : "Select phase first"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">None</SelectItem>
+                      {filteredMilestones.map((milestone) => (
+                        <SelectItem key={milestone.id} value={milestone.id}>
+                          {milestone.milestone_number}: {milestone.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 ) : (
-                  <p className="text-muted-foreground">{task.milestone || "N/A"}</p>
+                  <p className="text-muted-foreground">
+                    {(task as any).milestone_data 
+                      ? `${(task as any).milestone_data.milestone_number}: ${(task as any).milestone_data.name}`
+                      : "N/A"}
+                  </p>
                 )}
               </div>
 
