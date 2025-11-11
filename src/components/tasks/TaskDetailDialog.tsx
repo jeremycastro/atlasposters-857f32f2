@@ -211,7 +211,7 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
                 <Label>Phase</Label>
                 {editMode ? (
                   <Select
-                    value={formData.phase_id || ""}
+                    value={formData.phase_id || undefined}
                     onValueChange={(value) => {
                       setFormData({ 
                         ...formData, 
@@ -224,7 +224,6 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
                       <SelectValue placeholder="Select phase" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
                       {phases.map((phase) => (
                         <SelectItem key={phase.id} value={phase.id}>
                           Phase {phase.phase_number}: {phase.name}
@@ -245,7 +244,7 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
                 <Label>Milestone</Label>
                 {editMode ? (
                   <Select
-                    value={formData.milestone_id || ""}
+                    value={formData.milestone_id || undefined}
                     onValueChange={(value) => setFormData({ ...formData, milestone_id: value || null })}
                     disabled={!formData.phase_id}
                   >
@@ -253,7 +252,6 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
                       <SelectValue placeholder={formData.phase_id ? "Select milestone" : "Select phase first"} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
                       {filteredMilestones.map((milestone) => (
                         <SelectItem key={milestone.id} value={milestone.id}>
                           {milestone.milestone_number}: {milestone.name}
