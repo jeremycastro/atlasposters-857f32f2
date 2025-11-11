@@ -12,6 +12,7 @@ import Collection from "./pages/Collection";
 import About from "./pages/About";
 import Changelog from "./pages/admin/Changelog";
 import TechStack from "./pages/admin/TechStack";
+import SKUMethodology from "./pages/admin/SKUMethodology";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import PartnerAuth from "./pages/PartnerAuth";
@@ -66,6 +67,7 @@ const App = () => (
               <Route path="roadmap" element={<RoadmapManager />} />
               <Route path="changelog" element={<Changelog />} />
               <Route path="techstack" element={<TechStack />} />
+              <Route path="sku-methodology" element={<SKUMethodology />} />
               <Route path="artworks" element={<ArtworkCatalog />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="navigation" element={<NavigationManager />} />
