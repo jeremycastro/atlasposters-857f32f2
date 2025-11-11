@@ -77,12 +77,12 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0">
-        <DialogHeader className="px-6 pt-6 pb-0">
+        <DialogHeader className="px-6 pt-6 pb-3 shrink-0">
           <DialogTitle>Task Details</DialogTitle>
         </DialogHeader>
 
         {/* Sticky Navigation */}
-        <nav className="sticky top-0 z-10 bg-background border-b -mx-6 px-6 py-3">
+        <nav className="shrink-0 bg-background border-b px-6 py-3">
           <div className="flex gap-6">
             <a 
               href="#details" 
@@ -106,7 +106,7 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
         </nav>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto -mx-6 px-6 space-y-8 scroll-smooth">
+        <div className="flex-1 min-h-0 overflow-y-auto px-6 space-y-8 scroll-smooth">
           {/* Details Section */}
           <section id="details" className="space-y-4 pt-4">
             <div>
@@ -337,7 +337,7 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
         </div>
 
         {/* Sticky Footer with Action Buttons */}
-        <div className="sticky bottom-0 z-10 bg-background border-t px-6 py-4 flex justify-end gap-2">
+        <div className="shrink-0 bg-background border-t px-6 py-4 flex justify-end gap-2">
           {editMode ? (
             <>
               <Button size="sm" variant="outline" onClick={() => setEditMode(false)}>
