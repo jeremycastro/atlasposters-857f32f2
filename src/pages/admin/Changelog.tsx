@@ -13,7 +13,7 @@ interface ChangelogEntry {
 const changelogData: ChangelogEntry[] = [
   {
     version: "1.1.0",
-    date: "2025-01-11",
+    date: "2024-11-10",
     changes: [
       {
         type: "added",
@@ -67,7 +67,7 @@ const changelogData: ChangelogEntry[] = [
   },
   {
     version: "1.0.0",
-    date: "2025-12-01",
+    date: "2024-11-01",
     changes: [
       {
         type: "added",
@@ -113,7 +113,7 @@ const changelogData: ChangelogEntry[] = [
   },
   {
     version: "0.2.0",
-    date: "2025-01-11",
+    date: "2024-10-20",
     changes: [
       {
         type: "added",
@@ -151,7 +151,7 @@ const changelogData: ChangelogEntry[] = [
   },
   {
     version: "0.1.0",
-    date: "2025-01-10",
+    date: "2024-10-10",
     changes: [
       {
         type: "added",
