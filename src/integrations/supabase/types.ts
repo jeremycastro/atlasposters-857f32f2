@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_navigation: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          group_name: string | null
+          icon: string
+          id: string
+          is_active: boolean | null
+          label: string
+          order_index: number
+          parent_id: string | null
+          route: string
+          updated_at: string | null
+          visible_to_roles: Database["public"]["Enums"]["app_role"][]
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          group_name?: string | null
+          icon: string
+          id?: string
+          is_active?: boolean | null
+          label: string
+          order_index?: number
+          parent_id?: string | null
+          route: string
+          updated_at?: string | null
+          visible_to_roles?: Database["public"]["Enums"]["app_role"][]
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          group_name?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          order_index?: number
+          parent_id?: string | null
+          route?: string
+          updated_at?: string | null
+          visible_to_roles?: Database["public"]["Enums"]["app_role"][]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_navigation_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "admin_navigation"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artwork_files: {
         Row: {
           artwork_id: string

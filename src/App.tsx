@@ -25,6 +25,7 @@ import TaskManager from "./pages/admin/TaskManager";
 import RoadmapManager from "./pages/admin/RoadmapManager";
 import PartnerDashboard from "./pages/partner/Dashboard";
 import ArtworkCatalog from "./pages/partner/ArtworkCatalog";
+import NavigationManager from "./pages/admin/NavigationManager";
 import CustomerDashboard from "./pages/customer/Dashboard";
 
 const queryClient = new QueryClient();
@@ -66,6 +67,7 @@ const App = () => (
               <Route path="techstack" element={<TechStack />} />
               <Route path="artworks" element={<ArtworkCatalog />} />
               <Route path="users" element={<UserManagement />} />
+              <Route path="navigation" element={<NavigationManager />} />
             </Route>
             
             {/* Partner routes */}

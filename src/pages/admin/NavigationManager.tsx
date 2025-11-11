@@ -1,0 +1,208 @@
+import { useState } from 'react';
+import { useAllNavigation } from '@/hooks/useNavigation';
+import { useNavigationMutations } from '@/hooks/useNavigationMutations';
+import { NavigationItemDialog } from '@/components/admin/NavigationItemDialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Plus, Edit, Trash2, GripVertical, Eye, EyeOff } from 'lucide-react';
+import { Database } from '@/integrations/supabase/types';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import * as LucideIcons from 'lucide-react';
+
+type NavigationItem = Database['public']['Tables']['admin_navigation']['Row'];
+
+const SortableNavItem = ({ item, onEdit, onDelete }: { item: NavigationItem; onEdit: () => void; onDelete: () => void }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  const IconComponent = (LucideIcons as any)[item.icon] || LucideIcons.Circle;
+
+  return (
+    <div ref={setNodeRef} style={style} className="bg-card border rounded-lg p-4 flex items-center gap-3">
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+        <GripVertical className="h-5 w-5 text-muted-foreground" />
+      </div>
+
+      <IconComponent className="h-5 w-5 text-muted-foreground" />
+
+      <div className="flex-1">
+        <div className="flex items-center gap-2">
+          <span className="font-medium">{item.label}</span>
+          {!item.is_active && <EyeOff className="h-4 w-4 text-muted-foreground" />}
+        </div>
+        <p className="text-sm text-muted-foreground">{item.route}</p>
+      </div>
+
+      <div className="flex gap-1 flex-wrap">
+        {item.visible_to_roles.map(role => (
+          <Badge key={role} variant="secondary" className="text-xs">
+            {role}
+          </Badge>
+        ))}
+      </div>
+
+      <div className="flex gap-2">
+        <Button variant="ghost" size="icon" onClick={onEdit}>
+          <Edit className="h-4 w-4" />
+        </Button>
+        <Button variant="ghost" size="icon" onClick={onDelete}>
+          <Trash2 className="h-4 w-4 text-destructive" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default function NavigationManager() {
+  const { data, isLoading } = useAllNavigation();
+  const { reorderNavItems, deleteNavItem } = useNavigationMutations();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<NavigationItem | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<NavigationItem | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id && data?.items) {
+      const oldIndex = data.items.findIndex(item => item.id === active.id);
+      const newIndex = data.items.findIndex(item => item.id === over.id);
+
+      const reorderedItems = arrayMove(data.items, oldIndex, newIndex);
+      
+      // Update order_index for all items
+      const updates = reorderedItems.map((item, index) => ({
+        id: item.id,
+        order_index: index + 1,
+        group_name: item.group_name,
+      }));
+
+      reorderNavItems.mutate(updates);
+    }
+  };
+
+  const handleEdit = (item: NavigationItem) => {
+    setSelectedItem(item);
+    setDialogOpen(true);
+  };
+
+  const handleCreate = () => {
+    setSelectedItem(null);
+    setDialogOpen(true);
+  };
+
+  const handleDelete = (item: NavigationItem) => {
+    setItemToDelete(item);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (itemToDelete) {
+      await deleteNavItem.mutateAsync(itemToDelete.id);
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container py-6">
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container py-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Navigation Configuration</h1>
+          <p className="text-muted-foreground">
+            Manage admin navigation links, groups, and visibility
+          </p>
+        </div>
+        <Button onClick={handleCreate}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Item
+        </Button>
+      </div>
+
+      {data?.grouped && Object.entries(data.grouped).map(([groupName, items]) => (
+        <Card key={groupName}>
+          <CardHeader>
+            <CardTitle>{groupName}</CardTitle>
+            <CardDescription>
+              {items.length} {items.length === 1 ? 'item' : 'items'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-2">
+                  {items.map(item => (
+                    <SortableNavItem
+                      key={item.id}
+                      item={item}
+                      onEdit={() => handleEdit(item)}
+                      onDelete={() => handleDelete(item)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </CardContent>
+        </Card>
+      ))}
+
+      <NavigationItemDialog
+        item={selectedItem}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Navigation Item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{itemToDelete?.label}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}

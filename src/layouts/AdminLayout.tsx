@@ -1,11 +1,22 @@
 import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigation } from '@/hooks/useNavigation';
 import { Button } from '@/components/ui/button';
 import { RoleSwitcher } from '@/components/RoleSwitcher';
-import { LayoutDashboard, CheckSquare, Users, LogOut, Map, GitBranch, Code2, Image } from 'lucide-react';
+import { LogOut } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown } from 'lucide-react';
+import { useState } from 'react';
 
 export default function AdminLayout() {
   const { profile, activeRole, signOut } = useAuth();
+  const { data: navData, isLoading } = useNavigation(activeRole);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+
+  const toggleGroup = (group: string) => {
+    setOpenGroups(prev => ({ ...prev, [group]: !prev[group] }));
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -19,58 +30,39 @@ export default function AdminLayout() {
         <RoleSwitcher className="mx-4 my-4" />
         
         <nav className="space-y-2 px-4 flex-1 overflow-y-auto">
-          <Link to="/admin/dashboard">
-            <Button variant="ghost" className="w-full justify-start">
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              Dashboard
-            </Button>
-          </Link>
-          
-          <Link to="/admin/tasks">
-            <Button variant="ghost" className="w-full justify-start">
-              <CheckSquare className="mr-2 h-4 w-4" />
-              Task Manager
-            </Button>
-          </Link>
-          
-          <Link to="/admin/roadmap">
-            <Button variant="ghost" className="w-full justify-start">
-              <Map className="mr-2 h-4 w-4" />
-              Roadmap
-            </Button>
-          </Link>
-          
-          <Link to="/admin/changelog">
-            <Button variant="ghost" className="w-full justify-start">
-              <GitBranch className="mr-2 h-4 w-4" />
-              Changelog
-            </Button>
-          </Link>
-          
-          <Link to="/admin/techstack">
-            <Button variant="ghost" className="w-full justify-start">
-              <Code2 className="mr-2 h-4 w-4" />
-              Tech Stack
-            </Button>
-          </Link>
-          
-          {activeRole === 'admin' && (
-            <>
-              <Link to="/admin/artworks">
-                <Button variant="ghost" className="w-full justify-start">
-                  <Image className="mr-2 h-4 w-4" />
-                  Artwork Catalog
-                </Button>
-              </Link>
-              
-              <Link to="/admin/users">
-                <Button variant="ghost" className="w-full justify-start">
-                  <Users className="mr-2 h-4 w-4" />
-                  User Management
-                </Button>
-              </Link>
-            </>
-          )}
+          {isLoading ? (
+            <div className="flex items-center justify-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+            </div>
+          ) : navData?.grouped ? (
+            Object.entries(navData.grouped).map(([groupName, items]) => (
+              <Collapsible
+                key={groupName}
+                open={openGroups[groupName] !== false}
+                onOpenChange={() => toggleGroup(groupName)}
+              >
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-between text-xs font-semibold text-muted-foreground hover:text-foreground">
+                    {groupName}
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openGroups[groupName] === false ? '' : 'rotate-180'}`} />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-1 mt-1">
+                  {items.map(item => {
+                    const IconComponent = (LucideIcons as any)[item.icon] || LucideIcons.Circle;
+                    return (
+                      <Link key={item.id} to={item.route}>
+                        <Button variant="ghost" className="w-full justify-start">
+                          <IconComponent className="mr-2 h-4 w-4" />
+                          {item.label}
+                        </Button>
+                      </Link>
+                    );
+                  })}
+                </CollapsibleContent>
+              </Collapsible>
+            ))
+          ) : null}
         </nav>
 
         <div className="p-4 border-t mt-auto">
