@@ -15,9 +15,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Edit, Trash2, GripVertical, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit, Trash2, GripVertical, Eye, EyeOff, GripHorizontal } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import * as LucideIcons from 'lucide-react';
@@ -71,9 +71,79 @@ const SortableNavItem = ({ item, onEdit, onDelete }: { item: NavigationItem; onE
   );
 };
 
+const SortableGroupCard = ({ 
+  groupName, 
+  items, 
+  onEdit, 
+  onDelete 
+}: { 
+  groupName: string; 
+  items: NavigationItem[]; 
+  onEdit: (item: NavigationItem) => void;
+  onDelete: (item: NavigationItem) => void;
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ 
+    id: `group-${groupName}` 
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleItemDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      // This will be handled by the parent component
+    }
+  };
+
+  return (
+    <Card ref={setNodeRef} style={style}>
+      <CardHeader className="pb-3">
+        <div className="flex items-center gap-3">
+          <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+            <GripHorizontal className="h-5 w-5 text-muted-foreground" />
+          </div>
+          <div className="flex-1">
+            <CardTitle>{groupName}</CardTitle>
+            <CardDescription>
+              {items.length} {items.length === 1 ? 'item' : 'items'}
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleItemDragEnd}>
+          <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
+            <div className="space-y-2">
+              {items.map(item => (
+                <SortableNavItem
+                  key={item.id}
+                  item={item}
+                  onEdit={() => onEdit(item)}
+                  onDelete={() => onDelete(item)}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      </CardContent>
+    </Card>
+  );
+};
+
 export default function NavigationManager() {
   const { data, isLoading } = useAllNavigation();
-  const { reorderNavItems, deleteNavItem } = useNavigationMutations();
+  const { reorderNavItems, reorderGroups, deleteNavItem } = useNavigationMutations();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<NavigationItem | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -86,7 +156,31 @@ export default function NavigationManager() {
     })
   );
 
-  const handleDragEnd = (event: any) => {
+  const handleGroupDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id && data?.grouped) {
+      const groupNames = Object.keys(data.grouped);
+      const activeGroupName = active.id.replace('group-', '');
+      const overGroupName = over.id.replace('group-', '');
+
+      const oldIndex = groupNames.indexOf(activeGroupName);
+      const newIndex = groupNames.indexOf(overGroupName);
+
+      const reorderedGroups = arrayMove(groupNames, oldIndex, newIndex);
+      
+      // Update group_order for all items in each group
+      const updates = reorderedGroups.map((groupName, index) => ({
+        groupName,
+        order: index + 1,
+        itemIds: data.grouped[groupName].map(item => item.id),
+      }));
+
+      reorderGroups.mutate(updates);
+    }
+  };
+
+  const handleItemDragEnd = (event: any) => {
     const { active, over } = event;
 
     if (active.id !== over.id && data?.items) {
@@ -154,32 +248,22 @@ export default function NavigationManager() {
         </Button>
       </div>
 
-      {data?.grouped && Object.entries(data.grouped).map(([groupName, items]) => (
-        <Card key={groupName}>
-          <CardHeader>
-            <CardTitle>{groupName}</CardTitle>
-            <CardDescription>
-              {items.length} {items.length === 1 ? 'item' : 'items'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
-                <div className="space-y-2">
-                  {items.map(item => (
-                    <SortableNavItem
-                      key={item.id}
-                      item={item}
-                      onEdit={() => handleEdit(item)}
-                      onDelete={() => handleDelete(item)}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-          </CardContent>
-        </Card>
-      ))}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleGroupDragEnd}>
+        <SortableContext 
+          items={data?.grouped ? Object.keys(data.grouped).map(name => `group-${name}`) : []} 
+          strategy={verticalListSortingStrategy}
+        >
+          {data?.grouped && Object.entries(data.grouped).map(([groupName, items]) => (
+            <SortableGroupCard
+              key={groupName}
+              groupName={groupName}
+              items={items}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
 
       <NavigationItemDialog
         item={selectedItem}

@@ -99,11 +99,15 @@ export const useNavigationMutations = () => {
   });
 
   const reorderNavItems = useMutation({
-    mutationFn: async (items: { id: string; order_index: number; group_name: string | null }[]) => {
+    mutationFn: async (items: { id: string; order_index: number; group_name: string | null; group_order?: number }[]) => {
       const updates = items.map(item =>
         supabase
           .from('admin_navigation')
-          .update({ order_index: item.order_index, group_name: item.group_name })
+          .update({ 
+            order_index: item.order_index, 
+            group_name: item.group_name,
+            ...(item.group_order !== undefined && { group_order: item.group_order })
+          })
           .eq('id', item.id)
       );
 
@@ -131,10 +135,47 @@ export const useNavigationMutations = () => {
     },
   });
 
+  const reorderGroups = useMutation({
+    mutationFn: async (groupOrders: { groupName: string; order: number; itemIds: string[] }[]) => {
+      // Update group_order for all items in each group
+      const updates = groupOrders.flatMap(({ itemIds, order }) =>
+        itemIds.map(id =>
+          supabase
+            .from('admin_navigation')
+            .update({ group_order: order })
+            .eq('id', id)
+        )
+      );
+
+      const results = await Promise.all(updates);
+      const errors = results.filter(r => r.error);
+      
+      if (errors.length > 0) {
+        throw new Error('Failed to reorder groups');
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-navigation'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-navigation-all'] });
+      toast({
+        title: 'Groups reordered',
+        description: 'Changes saved successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error reordering groups',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
   return {
     createNavItem,
     updateNavItem,
     deleteNavItem,
     reorderNavItems,
+    reorderGroups,
   };
 };

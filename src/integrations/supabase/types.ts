@@ -19,6 +19,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           group_name: string | null
+          group_order: number | null
           icon: string
           id: string
           is_active: boolean | null
@@ -33,6 +34,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           group_name?: string | null
+          group_order?: number | null
           icon: string
           id?: string
           is_active?: boolean | null
@@ -47,6 +49,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           group_name?: string | null
+          group_order?: number | null
           icon?: string
           id?: string
           is_active?: boolean | null
