@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Mail, Phone, Star, Plus, Trash2 } from "lucide-react";
@@ -28,7 +27,7 @@ interface ContactsTabProps {
 }
 
 export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
@@ -53,7 +52,7 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
         { id: editingContact.id, updates: formData },
         {
           onSuccess: () => {
-            setDialogOpen(false);
+            setShowForm(false);
             setEditingContact(null);
             resetForm();
           },
@@ -64,7 +63,7 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
         { ...formData, partner_id: partnerId },
         {
           onSuccess: () => {
-            setDialogOpen(false);
+            setShowForm(false);
             resetForm();
           },
         }
@@ -83,7 +82,7 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
     });
   };
 
-  const handleOpenDialog = (contact?: Contact) => {
+  const handleOpenForm = (contact?: Contact) => {
     if (contact) {
       setEditingContact(contact);
       setFormData({
@@ -98,7 +97,13 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
       setEditingContact(null);
       resetForm();
     }
-    setDialogOpen(true);
+    setShowForm(true);
+  };
+
+  const handleBack = () => {
+    setShowForm(false);
+    setEditingContact(null);
+    resetForm();
   };
 
   const handleDeleteClick = (contact: Contact, e: React.MouseEvent) => {
@@ -118,11 +123,118 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
     }
   };
 
+  if (showForm) {
+    return (
+      <div className="space-y-4">
+        <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
+          ← Back to Contacts
+        </Button>
+        <h3 className="text-lg font-medium">{editingContact ? "Edit Contact" : "Add Contact"}</h3>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="first_name">First Name *</Label>
+              <Input
+                id="first_name"
+                value={formData.first_name}
+                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="last_name">Last Name</Label>
+              <Input
+                id="last_name"
+                value={formData.last_name}
+                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email *</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="country_code">Country Code</Label>
+              <Select
+                value={formData.country_code}
+                onValueChange={(value) => setFormData({ ...formData, country_code: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="+1">+1 (US/CA)</SelectItem>
+                  <SelectItem value="+44">+44 (UK)</SelectItem>
+                  <SelectItem value="+61">+61 (AU)</SelectItem>
+                  <SelectItem value="+81">+81 (JP)</SelectItem>
+                  <SelectItem value="+86">+86 (CN)</SelectItem>
+                  <SelectItem value="+91">+91 (IN)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2 col-span-2">
+              <Label htmlFor="mobile_phone">Mobile Phone</Label>
+              <Input
+                id="mobile_phone"
+                value={formData.mobile_phone}
+                onChange={(e) => setFormData({ ...formData, mobile_phone: e.target.value })}
+                placeholder="555-1234"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="designation">Designation</Label>
+            <Select
+              value={formData.designation}
+              onValueChange={(value) => setFormData({ ...formData, designation: value })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="point_of_contact">Point of Contact</SelectItem>
+                <SelectItem value="marketing">Marketing</SelectItem>
+                <SelectItem value="legal">Legal</SelectItem>
+                <SelectItem value="graphic_designer">Graphic Designer</SelectItem>
+                <SelectItem value="finance">Finance</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex gap-2 justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleBack}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={createContact.isPending || updateContact.isPending}>
+              {editingContact ? "Update Contact" : "Create Contact"}
+            </Button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Contacts ({contacts.length})</h3>
-        <Button onClick={() => handleOpenDialog()} variant="outline" size="sm">
+        <Button onClick={() => handleOpenForm()} variant="outline" size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Add Contact
         </Button>
@@ -150,7 +262,7 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
                 <TableRow 
                   key={contact.id}
                   className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleOpenDialog(contact)}
+                  onClick={() => handleOpenForm(contact)}
                 >
                   <TableCell className="font-medium">{contact.full_name}</TableCell>
                   <TableCell>
@@ -195,116 +307,6 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
           </Table>
         </div>
       )}
-
-      <Dialog open={dialogOpen} onOpenChange={(open) => {
-        setDialogOpen(open);
-        if (!open) {
-          setEditingContact(null);
-          resetForm();
-        }
-      }}>
-        <DialogContent className="max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingContact ? "Edit Contact" : "Add Contact"}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="first_name">First Name *</Label>
-                <Input
-                  id="first_name"
-                  value={formData.first_name}
-                  onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="last_name">Last Name</Label>
-                <Input
-                  id="last_name"
-                  value={formData.last_name}
-                  onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email *</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="country_code">Country Code</Label>
-                <Select
-                  value={formData.country_code}
-                  onValueChange={(value) => setFormData({ ...formData, country_code: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="+1">+1 (US/CA)</SelectItem>
-                    <SelectItem value="+44">+44 (UK)</SelectItem>
-                    <SelectItem value="+61">+61 (AU)</SelectItem>
-                    <SelectItem value="+81">+81 (JP)</SelectItem>
-                    <SelectItem value="+86">+86 (CN)</SelectItem>
-                    <SelectItem value="+91">+91 (IN)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2 col-span-2">
-                <Label htmlFor="mobile_phone">Mobile Phone</Label>
-                <Input
-                  id="mobile_phone"
-                  value={formData.mobile_phone}
-                  onChange={(e) => setFormData({ ...formData, mobile_phone: e.target.value })}
-                  placeholder="555-1234"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="designation">Designation</Label>
-              <Select
-                value={formData.designation}
-                onValueChange={(value) => setFormData({ ...formData, designation: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="point_of_contact">Point of Contact</SelectItem>
-                  <SelectItem value="marketing">Marketing</SelectItem>
-                  <SelectItem value="legal">Legal</SelectItem>
-                  <SelectItem value="graphic_designer">Graphic Designer</SelectItem>
-                  <SelectItem value="finance">Finance</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex gap-2 justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={createContact.isPending || updateContact.isPending}>
-                {editingContact ? "Update Contact" : "Create Contact"}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

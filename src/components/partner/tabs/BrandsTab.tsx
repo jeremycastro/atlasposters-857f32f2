@@ -4,9 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Plus, Edit, Palette, Save, X, Trash2 } from "lucide-react";
 import { useCreateBrand, useUpdateBrand, useDeleteBrand } from "@/hooks/usePartnerMutations";
@@ -260,7 +258,7 @@ interface BrandsTabProps {
 }
 
 export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
@@ -316,7 +314,7 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
         { id: editingBrand.id, updates: formData },
         {
           onSuccess: () => {
-            setDialogOpen(false);
+            setShowForm(false);
             setEditingBrand(null);
             resetForm();
           },
@@ -327,7 +325,7 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
         { ...formData, partner_id: partnerId },
         {
           onSuccess: () => {
-            setDialogOpen(false);
+            setShowForm(false);
             resetForm();
           },
         }
@@ -335,7 +333,7 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
     }
   };
 
-  const handleOpenDialog = (brand?: Brand) => {
+  const handleOpenForm = (brand?: Brand) => {
     if (brand) {
       setEditingBrand(brand);
       setFormData({
@@ -360,7 +358,13 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
       setEditingBrand(null);
       resetForm();
     }
-    setDialogOpen(true);
+    setShowForm(true);
+  };
+
+  const handleBack = () => {
+    setShowForm(false);
+    setEditingBrand(null);
+    resetForm();
   };
 
   const handleDeleteClick = (brand: Brand, e: React.MouseEvent) => {
@@ -380,11 +384,32 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
     }
   };
 
+  if (showForm) {
+    return (
+      <div className="space-y-4">
+        <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
+          ← Back to Brands
+        </Button>
+        <h3 className="text-lg font-medium">{editingBrand ? "Edit Brand" : "Add Brand"}</h3>
+        <BrandForm
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleSubmit}
+          onCancel={handleBack}
+          submitLabel={editingBrand ? "Save Changes" : "Create Brand"}
+          isSubmitting={createBrand.isPending || updateBrand.isPending}
+          partnerId={partnerId}
+          brandId={editingBrand?.id}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Brands ({brands.length})</h3>
-        <Button onClick={() => handleOpenDialog()} variant="outline" size="sm">
+        <Button onClick={() => handleOpenForm()} variant="outline" size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Add Brand
         </Button>
@@ -412,7 +437,7 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
                 <TableRow 
                   key={brand.id}
                   className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleOpenDialog(brand)}
+                  onClick={() => handleOpenForm(brand)}
                 >
                   <TableCell>
                     <div className="flex gap-3 items-center">
@@ -459,7 +484,7 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
                         size="sm" 
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleOpenDialog(brand);
+                          handleOpenForm(brand);
                         }}
                       >
                         <Edit className="h-4 w-4" />
@@ -479,32 +504,6 @@ export function BrandsTab({ partnerId, brands }: BrandsTabProps) {
           </Table>
         </div>
       )}
-
-      <Dialog open={dialogOpen} onOpenChange={(open) => {
-        setDialogOpen(open);
-        if (!open) {
-          setEditingBrand(null);
-          resetForm();
-        }
-      }}>
-        <DialogContent className="max-w-3xl max-h-[85vh]">
-          <DialogHeader>
-            <DialogTitle>{editingBrand ? "Edit Brand" : "Add Brand"}</DialogTitle>
-          </DialogHeader>
-          <ScrollArea className="max-h-[calc(85vh-8rem)] pr-4">
-            <BrandForm
-              formData={formData}
-              setFormData={setFormData}
-              onSubmit={handleSubmit}
-              onCancel={() => setDialogOpen(false)}
-              submitLabel={editingBrand ? "Save Changes" : "Create Brand"}
-              isSubmitting={createBrand.isPending || updateBrand.isPending}
-              partnerId={partnerId}
-              brandId={editingBrand?.id}
-            />
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

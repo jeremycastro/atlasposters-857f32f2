@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2 } from "lucide-react";
@@ -27,7 +26,7 @@ interface AgreementsTabProps {
 }
 
 export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [editingAgreement, setEditingAgreement] = useState<Agreement | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [agreementToDelete, setAgreementToDelete] = useState<Agreement | null>(null);
@@ -63,7 +62,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
         { id: editingAgreement.id, updates: agreementData },
         {
           onSuccess: () => {
-            setDialogOpen(false);
+            setShowForm(false);
             setEditingAgreement(null);
             resetForm();
           },
@@ -74,7 +73,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
         { ...agreementData, partner_id: partnerId },
         {
           onSuccess: () => {
-            setDialogOpen(false);
+            setShowForm(false);
             resetForm();
           },
         }
@@ -104,7 +103,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
     }
   };
 
-  const handleOpenDialog = (agreement?: Agreement) => {
+  const handleOpenForm = (agreement?: Agreement) => {
     if (agreement) {
       setEditingAgreement(agreement);
       setFormData({
@@ -120,7 +119,13 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
       setEditingAgreement(null);
       resetForm();
     }
-    setDialogOpen(true);
+    setShowForm(true);
+  };
+
+  const handleBack = () => {
+    setShowForm(false);
+    setEditingAgreement(null);
+    resetForm();
   };
 
   const handleDeleteClick = (agreement: Agreement, e: React.MouseEvent) => {
@@ -140,11 +145,139 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
     }
   };
 
+  if (showForm) {
+    return (
+      <div className="space-y-4">
+        <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
+          ← Back to Agreements
+        </Button>
+        <h3 className="text-lg font-medium">{editingAgreement ? "Edit Agreement" : "Add Agreement"}</h3>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="agreement_type">Agreement Type *</Label>
+              <Select
+                value={formData.agreement_type}
+                onValueChange={(value) => setFormData({ ...formData, agreement_type: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="royalty">Royalty</SelectItem>
+                  <SelectItem value="wholesale">Wholesale</SelectItem>
+                  <SelectItem value="commission">Commission</SelectItem>
+                  <SelectItem value="licensing">Licensing</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => setFormData({ ...formData, status: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="expired">Expired</SelectItem>
+                  <SelectItem value="terminated">Terminated</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="effective_date">Effective Date *</Label>
+              <Input
+                id="effective_date"
+                type="date"
+                value={formData.effective_date}
+                onChange={(e) => setFormData({ ...formData, effective_date: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="expiration_date">Expiration Date</Label>
+              <Input
+                id="expiration_date"
+                type="date"
+                value={formData.expiration_date}
+                onChange={(e) => setFormData({ ...formData, expiration_date: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="royalty_rate">Royalty Rate (%)</Label>
+              <Input
+                id="royalty_rate"
+                type="number"
+                step="0.01"
+                value={formData.royalty_rate}
+                onChange={(e) => setFormData({ ...formData, royalty_rate: e.target.value })}
+                placeholder="10.00"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="commission_rate">Commission Rate (%)</Label>
+              <Input
+                id="commission_rate"
+                type="number"
+                step="0.01"
+                value={formData.commission_rate}
+                onChange={(e) => setFormData({ ...formData, commission_rate: e.target.value })}
+                placeholder="15.00"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="payment_period">Payment Period</Label>
+            <Select
+              value={formData.payment_period}
+              onValueChange={(value) => setFormData({ ...formData, payment_period: value })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="monthly">Monthly</SelectItem>
+                <SelectItem value="quarterly">Quarterly</SelectItem>
+                <SelectItem value="annually">Annually</SelectItem>
+                <SelectItem value="per_transaction">Per Transaction</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex gap-2 justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleBack}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={createAgreement.isPending || updateAgreement.isPending}>
+              {editingAgreement ? "Update Agreement" : "Create Agreement"}
+            </Button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Agreements ({agreements.length})</h3>
-        <Button onClick={() => handleOpenDialog()} variant="outline" size="sm">
+        <Button onClick={() => handleOpenForm()} variant="outline" size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Add Agreement
         </Button>
@@ -174,7 +307,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                 <TableRow 
                   key={agreement.id}
                   className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleOpenDialog(agreement)}
+                  onClick={() => handleOpenForm(agreement)}
                 >
                   <TableCell className="font-medium capitalize">{agreement.agreement_type}</TableCell>
                   <TableCell>
@@ -210,137 +343,6 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
           </Table>
         </div>
       )}
-
-      <Dialog open={dialogOpen} onOpenChange={(open) => {
-        setDialogOpen(open);
-        if (!open) {
-          setEditingAgreement(null);
-          resetForm();
-        }
-      }}>
-        <DialogContent className="max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingAgreement ? "Edit Agreement" : "Add Agreement"}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="agreement_type">Agreement Type *</Label>
-                <Select
-                  value={formData.agreement_type}
-                  onValueChange={(value) => setFormData({ ...formData, agreement_type: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="royalty">Royalty</SelectItem>
-                    <SelectItem value="wholesale">Wholesale</SelectItem>
-                    <SelectItem value="commission">Commission</SelectItem>
-                    <SelectItem value="licensing">Licensing</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) => setFormData({ ...formData, status: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="expired">Expired</SelectItem>
-                    <SelectItem value="terminated">Terminated</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="effective_date">Effective Date *</Label>
-                <Input
-                  id="effective_date"
-                  type="date"
-                  value={formData.effective_date}
-                  onChange={(e) => setFormData({ ...formData, effective_date: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="expiration_date">Expiration Date</Label>
-                <Input
-                  id="expiration_date"
-                  type="date"
-                  value={formData.expiration_date}
-                  onChange={(e) => setFormData({ ...formData, expiration_date: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="royalty_rate">Royalty Rate (%)</Label>
-                <Input
-                  id="royalty_rate"
-                  type="number"
-                  step="0.01"
-                  value={formData.royalty_rate}
-                  onChange={(e) => setFormData({ ...formData, royalty_rate: e.target.value })}
-                  placeholder="10.00"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="commission_rate">Commission Rate (%)</Label>
-                <Input
-                  id="commission_rate"
-                  type="number"
-                  step="0.01"
-                  value={formData.commission_rate}
-                  onChange={(e) => setFormData({ ...formData, commission_rate: e.target.value })}
-                  placeholder="15.00"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="payment_period">Payment Period</Label>
-              <Select
-                value={formData.payment_period}
-                onValueChange={(value) => setFormData({ ...formData, payment_period: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                  <SelectItem value="quarterly">Quarterly</SelectItem>
-                  <SelectItem value="annually">Annually</SelectItem>
-                  <SelectItem value="per_transaction">Per Transaction</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex gap-2 justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={createAgreement.isPending || updateAgreement.isPending}>
-                {editingAgreement ? "Update Agreement" : "Create Agreement"}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
