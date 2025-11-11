@@ -12,6 +12,60 @@ interface ChangelogEntry {
 
 const changelogData: ChangelogEntry[] = [
   {
+    version: "1.1.0",
+    date: "2025-01-11",
+    changes: [
+      {
+        type: "added",
+        description: "Partner Management System - Comprehensive partner database with contacts, addresses, and agreements tracking",
+      },
+      {
+        type: "added",
+        description: "Enhanced Brand Management - Logos, colors (primary/secondary/accent), taglines, brand stories, and social media links",
+      },
+      {
+        type: "added",
+        description: "Bulk Logo Upload - Drag-and-drop interface for uploading multiple brand logos with gallery view and asset management",
+      },
+      {
+        type: "added",
+        description: "Brand Assets Storage - Secure 'brand-assets' bucket with RLS policies for partner and admin access (5MB limit, supports JPG/PNG/WEBP/SVG)",
+      },
+      {
+        type: "added",
+        description: "Dynamic Brand Pages Foundation - Brand identity system designed for generating dynamic landing pages with logos, colors, and stories",
+      },
+      {
+        type: "added",
+        description: "Partner-Brand Artwork Linking - Database relationship structure to link artworks and products to specific partner brands",
+      },
+      {
+        type: "changed",
+        description: "Partner Modal UI - Redesigned with tabbed interface (Info/Brands/Agreements/Contacts/Addresses) and fixed-height layout to prevent tab-switching resizing",
+      },
+      {
+        type: "changed",
+        description: "Task Modal Tabs - Updated to match Partner modal styling with TabsList and TabsTrigger components for consistent design",
+      },
+      {
+        type: "changed",
+        description: "Sticky Action Buttons - Save/Cancel buttons now sticky at bottom of forms, matching Task detail dialog pattern for better UX",
+      },
+      {
+        type: "fixed",
+        description: "Modal Focus Issue - Resolved text input focus loss in Partner modal forms by extracting BrandForm as separate component",
+      },
+      {
+        type: "fixed",
+        description: "Always-Editable Status - Restored prominent Badge-style status dropdown in Task modal for quick updates without entering edit mode",
+      },
+      {
+        type: "changed",
+        description: "Logo Management - Moved logo upload section to bottom of brand forms for better visual hierarchy and workflow",
+      },
+    ],
+  },
+  {
     version: "1.0.0",
     date: "2025-12-01",
     changes: [
