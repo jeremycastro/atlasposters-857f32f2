@@ -10,727 +10,324 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { FileText, History } from "lucide-react";
-
-// Version data structure
-interface RoadmapVersion {
-  version: string;
-  date: string;
-  content: string;
-}
-
-const roadmapVersions: RoadmapVersion[] = [
-  {
-    version: "0.002",
-    date: "2025-01-11",
-    content: `# 🎯 Atlas Posters: Project Status Update - v0.002
-
-## ✅ COMPLETED: Foundation Phase
-
-### Customer-Facing Website
-We've successfully launched the foundational public website with:
-
-**✓ Branding & Identity**
-- Custom favicon with Atlas branding
-- Social media preview cards (OG tags) with custom hero image
-- Brand typography and color system implemented
-- Logo variations and brand assets in place
-
-**✓ Coming Soon Experience**
-- Hero section with compelling brand positioning
-- "Why Atlas Posters?" features grid
-- Clear value proposition communication
-- Partner collaboration CTA section
-- Email signup with validation
-
-**✓ Technical Foundation**
-- Lovable Cloud (Supabase) integration
-- Responsive design system
-- Navigation architecture
-- Form validation and error handling
-- SEO metadata structure
-
----
-
-## 🚀 CURRENT PHASE: Deciding Next Steps
-
-### Option A: Phase 1 - Build Atlas Catalog (Admin Platform)
-**Focus:** Internal tooling for product & artist management
-
-**What We'd Build:**
-- Admin dashboard for artwork catalog management
-- Product configuration builder
-- Multi-platform sync engine (Shopify, etc.)
-- Project management module
-- Artist & partner management
-
-**Timeline:** 4-5 weeks
-**Value:** Enables scalable product management and team collaboration
-
----
-
-### Option B: Phase 2 - Enhance Storefront First
-**Focus:** Customer-facing features and experiences
-
-**What We'd Build:**
-- Brand guidelines page
-- Partner page architecture (SNB pilot)
-- Landing page generator for marketing campaigns
-- Enhanced product detail pages
-- Shopping cart and checkout flow
-
-**Timeline:** 4-5 weeks
-**Value:** Drives customer engagement and revenue faster
-
----
-
-## 📊 Roadmap Context
-
-### Original Plan (from v0.001)
-Our comprehensive implementation plan includes:
-
-**Foundation Database Architecture:**
-- artwork_catalog (source of truth for all artwork)
-- artists table (with royalty rates and partner info)
-- product_configurations (variants, pricing, options)
-- platform_products (multi-platform sync tracking)
-- marketing_landing_pages (campaign management)
-- partner_pages (custom branded experiences)
-- project_tasks (built-in PM system)
-
-**Phase 1: Atlas Catalog** - Internal admin platform (Weeks 1-5)
-**Phase 2: Storefront** - Customer-facing features (Weeks 2-8)
-**Phase 3: Integration & Launch** - Testing and optimization (Weeks 8-10)
-
----
-
-## 🤔 Decision Point: What Should We Build Next?
-
-### Questions to Consider:
-
-1. **Revenue Priority**
-   - Do we need to start selling immediately? → Storefront first
-   - Can we wait while building better internal tools? → Admin first
-
-2. **Team Bandwidth**
-   - Is manual product management okay short-term? → Storefront first
-   - Do we need scalable workflows now? → Admin first
-
-3. **Partner Commitments**
-   - Do we have SNB products ready to sync? → Admin first
-   - Is SNB page the priority deliverable? → Storefront first
-
-4. **Marketing Timeline**
-   - Are we launching ad campaigns soon? → Storefront + landing pages
-   - Can marketing wait for better product tools? → Admin first
-
----
-
-## 💡 Recommendation: Hybrid Approach
-
-**Week 6-7: Quick Storefront Wins**
-- Build 1-2 partner pages (SNB)
-- Create landing page system
-- Launch email collection campaigns
-
-**Week 7-10: Focus on Admin Platform**
-- Build catalog management
-- Implement product sync engine
-- Set up team workflows
-
-**Rationale:** 
-- Get marketing momentum while systems scale
-- Avoid bottleneck of manual product entry
-- Enable data-driven decisions with proper tracking
-
----
-
-## 📈 Success Metrics (Next 30 Days)
-
-**If we go Storefront-first:**
-- [ ] 100+ email signups
-- [ ] SNB partner page live
-- [ ] 5+ landing pages for campaigns
-- [ ] First test purchase completed
-
-**If we go Admin-first:**
-- [ ] 50+ artworks cataloged
-- [ ] Products syncing to Shopify automatically
-- [ ] 3 team members using admin daily
-- [ ] Zero manual Shopify product entry
-
-**Hybrid Approach:**
-- [ ] SNB page + 2 landing pages live
-- [ ] Email capture hitting 20+ signups/week
-- [ ] Atlas Catalog managing 30+ artworks
-- [ ] First automated product sync working
-
----
-
-## 🎯 Ready to Build
-
-We've laid a strong foundation. The coming soon page is live, branding is polished, and technical infrastructure is ready. Now we choose our path forward.
-
-**What matters most to the business right now?**
-- Speed to revenue → Storefront
-- Long-term scalability → Admin platform
-- Balanced growth → Hybrid approach
-
-Let's decide and start building! 🚀`,
-  },
-  {
-    version: "0.001",
-    date: "2025-01-10",
-    content: `# 🎯 Atlas Posters: Comprehensive Implementation Plan
-
-## Project Overview
-Building two concurrent systems:
-- **Atlas Catalog**: Internal product & project management platform
-- **atlasposters.com**: Customer-facing storefront with dynamic branding
-
----
-
-## 🏗️ FOUNDATION: Atlas Catalog Database Architecture
-
-### Core Database Tables
-
-#### 1. **artwork_catalog** (The Source of Truth)
-\`\`\`sql
-- id (uuid, primary key)
-- title (text) - "Bali Rice Terraces at Sunset"
-- artist_id (uuid, foreign key to artists table)
-- description_long (text) - Full story/description
-- description_short (text) - Brief description for products
-- category (enum) - travel, sport, culture, nature
-- tags (text[]) - Keywords for search/filtering
-- source_image_url (text) - Original high-res artwork
-- source_image_metadata (jsonb) - Dimensions, DPI, color profile
-- rights_status (enum) - owned, licensed, partner
-- license_details (jsonb) - Terms, expiration, royalty info
-- created_at, updated_at
-- status (enum) - draft, approved, archived
-\`\`\`
-
-#### 2. **artists**
-\`\`\`sql
-- id (uuid)
-- name (text)
-- bio (text)
-- website (text)
-- social_links (jsonb)
-- royalty_rate (decimal) - For revenue sharing
-- partner_type (enum) - internal, brand_partner, independent
-- brand_assets (jsonb) - Logo, colors, fonts for partner pages
-\`\`\`
-
-#### 3. **product_configurations**
-\`\`\`sql
-- id (uuid)
-- artwork_id (uuid, foreign key)
-- product_type (enum) - poster, canvas, digital, tshirt, etc.
-- default_size (text) - "A2 (42x59cm)"
-- default_quality (text) - "Standard"
-- default_frame (text) - "Unframed"
-- available_sizes (jsonb) - [{name: "A2", price_modifier: 0}, ...]
-- available_qualities (jsonb) - [{name: "Premium", price_modifier: 10}, ...]
-- available_frames (jsonb) - [{name: "Black Wooden Frame", price_modifier: 15}, ...]
-- base_price (decimal)
-- production_cost (decimal) - For margin calculations
-\`\`\`
-
-#### 4. **platform_products** (Multi-Platform Sync)
-\`\`\`sql
-- id (uuid)
-- product_config_id (uuid, foreign key)
-- platform (enum) - shopify, woocommerce, etsy, printful
-- platform_product_id (text) - External ID
-- platform_handle (text) - URL slug on that platform
-- sync_status (enum) - synced, pending, error
-- last_synced_at (timestamptz)
-- sync_errors (jsonb)
-- platform_specific_data (jsonb) - Custom fields per platform
-\`\`\`
-
-#### 5. **marketing_landing_pages**
-\`\`\`sql
-- id (uuid)
-- campaign_name (text)
-- url_slug (text, unique) - "/summer-adventure-2024"
-- heading_1 (text)
-- heading_2 (text)
-- hero_image_url (text)
-- cta_text (text)
-- cta_link (text)
-- ad_copy_1 (text)
-- ad_copy_2 (text)
-- keywords (text[])
-- product_selection (uuid[]) - Array of product_config_ids
-- budget (decimal)
-- start_date, end_date
-- status (enum) - draft, active, paused, completed
-- analytics (jsonb) - Click-through, conversion, etc.
-\`\`\`
-
-#### 6. **partner_pages**
-\`\`\`sql
-- id (uuid)
-- partner_id (uuid, foreign key to artists)
-- url_slug (text) - "/stick-no-bills"
-- page_title (text)
-- hero_section (jsonb) - Heading, image, description
-- brand_colors (jsonb) - Primary, secondary, accent
-- featured_collections (uuid[])
-- custom_sections (jsonb) - Flexible content blocks
-- is_published (boolean)
-\`\`\`
-
-#### 7. **project_tasks** (Built-in PM System)
-\`\`\`sql
-- id (uuid)
-- title (text)
-- description (text)
-- assigned_to (uuid, foreign key to auth.users)
-- project_area (enum) - atlas_catalog, storefront, infrastructure, marketing
-- status (enum) - todo, in_progress, review, completed, blocked
-- priority (enum) - low, medium, high, urgent
-- due_date (date)
-- tags (text[])
-- checklist_items (jsonb) - [{text: "...", completed: bool}, ...]
-- metrics (jsonb) - Custom KPIs
-- parent_task_id (uuid) - For subtasks
-- created_by, created_at, updated_at
-\`\`\`
-
----
-
-## 📋 PHASE 1: Atlas Catalog - Internal Admin Platform
-
-### Milestone 1.1: Core Infrastructure (Week 1)
-**Deliverables:**
-- [ ] Supabase project setup with Lovable Cloud
-- [ ] Authentication system (email + Google OAuth)
-- [ ] User roles table (admin, editor, viewer)
-- [ ] Security policies (RLS) for all tables
-- [ ] Database migrations for core tables
-
-**Success Metrics:**
-- 3 users can log in and have appropriate permissions
-- All tables created with proper relationships
-
----
-
-### Milestone 1.2: Artwork Catalog Module (Week 2)
-**Deliverables:**
-- [ ] \`/admin/catalog\` - Main catalog view (table/grid toggle)
-- [ ] \`/admin/catalog/new\` - Add artwork form
-- [ ] \`/admin/catalog/[id]\` - Edit artwork details
-- [ ] Image upload system (Supabase Storage)
-- [ ] Bulk import via CSV
-- [ ] Search & filter by category, artist, tags, status
-
-**Key Features:**
-- Visual grid view with thumbnails
-- Inline editing for quick updates
-- Tag management (autocomplete existing tags)
-- Artwork status workflow (draft → approved → published)
-
-**Success Metrics:**
-- Can add 100 artworks in under 30 minutes
-- Search returns results in <500ms
-
----
-
-### Milestone 1.3: Product Configuration Builder (Week 3)
-**Deliverables:**
-- [ ] \`/admin/products\` - Product configurations list
-- [ ] \`/admin/products/create-from-artwork\` - Wizard to turn artwork into sellable product
-- [ ] Default variant selector (size, quality, frame)
-- [ ] Pricing calculator with cost margins
-- [ ] Multi-platform target selection (Shopify, WooCommerce, etc.)
-
-**Key Features:**
-- Visual variant builder (drag to reorder)
-- Real-time price preview with margins
-- Duplicate configuration for quick variations
-- Bulk update defaults across products
-
-**Success Metrics:**
-- Create product from artwork in <2 minutes
-- Pricing calculations accurate to actual platform sync
-
----
-
-### Milestone 1.4: Platform Sync Engine (Week 4)
-**Deliverables:**
-- [ ] Supabase Edge Functions for platform APIs
-- [ ] Shopify sync (create, update, delete)
-- [ ] Sync status dashboard
-- [ ] Error handling & retry logic
-- [ ] Webhook listeners for external changes
-
-**Technical Specs:**
-\`\`\`typescript
-// Edge Function: sync-product-to-shopify
-- Reads from product_configurations + artwork_catalog
-- Creates/updates Shopify product via Admin API
-- Handles variant creation (all size/quality/frame combos)
-- Updates platform_products table with sync status
-\`\`\`
-
-**Success Metrics:**
-- 100 products sync to Shopify without errors
-- Sync time: <5 seconds per product
-- Failed syncs logged with actionable error messages
-
----
-
-### Milestone 1.5: Project Management Module (Week 5)
-**Deliverables:**
-- [ ] \`/admin/projects\` - Kanban board view
-- [ ] \`/admin/projects/list\` - Table view with filters
-- [ ] Task creation with checklist builder
-- [ ] Assignment & due date management
-- [ ] Real-time updates (Supabase Realtime)
-- [ ] Email notifications for assignments
-
-**Key Features:**
-- Drag-and-drop between status columns
-- Filter by assignee, project area, priority
-- Progress tracking (% of checklist complete)
-- Comment threads on tasks
-- Time tracking (optional)
-
-**Success Metrics:**
-- Team uses this instead of external PM tools
-- Task completion rate visible on dashboard
-- Zero tasks "lost" or forgotten
-
----
-
-## 🌐 PHASE 2: atlasposters.com - Customer Storefront
-
-### Milestone 2.1: Brand Foundation (Week 2-3, parallel with 1.2)
-**Deliverables:**
-- [ ] Coming Soon page at root \`/\`
-- [ ] Brand story section (from email to Meg)
-- [ ] Artist/partner pitch section
-- [ ] Email capture form (Supabase table)
-- [ ] Social media links
-
-**Design Requirements:**
-- Logo implementation (test multiple options)
-- Color palette application
-- Typography system (headings, body, accents)
-- Mobile-responsive hero section
-- Animated transitions (subtle, professional)
-
-**Success Metrics:**
-- Page loads in <2 seconds
-- Email capture works (stores in DB)
-- Looks professional on mobile & desktop
-
----
-
-### Milestone 2.2: Brand Guidelines System (Week 3-4)
-**Deliverables:**
-- [ ] \`/brand-guide\` - Public-facing brand guidelines
-- [ ] Logo variations & usage rules
-- [ ] Color system with hex codes
-- [ ] Typography scale & font files
-- [ ] Component showcase (buttons, cards, etc.)
-- [ ] Voice & tone guidelines
-- [ ] Example layouts
-
-**Technical:**
-- Exportable as PDF for partners
-- Code snippets for developers
-- Figma embed (if applicable)
-
-**Success Metrics:**
-- Partners can implement brand correctly
-- Internal team references for all design decisions
-- Downloadable assets package
-
----
-
-### Milestone 2.3: Partner Page Architecture (Week 5-6)
-**Deliverables:**
-- [ ] Dynamic route \`/partner/[slug]\`
-- [ ] Partner page template system
-- [ ] Stick No Bills (SNB) pilot page
-- [ ] Brand color override system
-- [ ] Custom hero sections
-- [ ] Featured collection grids
-- [ ] Partner story section
-
-**Technical Implementation:**
-\`\`\`typescript
-// Route: /partner/stick-no-bills
-- Fetches partner_pages + artists table
-- Applies brand_colors override to CSS variables
-- Queries products filtered by artist_id
-- Renders custom_sections from JSONB
-\`\`\`
-
-**SNB Specific Requirements:**
-- Parse SNB brand book (colors, fonts, imagery style)
-- Custom typography matching SNB aesthetic
-- Integration with their Syncio product feed
-- "About SNB" section with their story
-
-**Success Metrics:**
-- SNB page feels distinctly different from Atlas main brand
-- Products display correctly with SNB branding
-- Page load time <3 seconds
-
----
-
-### Milestone 2.4: Landing Page Generator (Week 6-7)
-**Deliverables:**
-- [ ] \`/admin/marketing/landing-pages\` - Campaign manager
-- [ ] Spreadsheet-style table editor
-- [ ] One-click page generation
-- [ ] Dynamic route \`/lp/[slug]\`
-- [ ] A/B testing support
-- [ ] Analytics integration (Google Analytics)
-
-**Landing Page Builder Fields:**
-\`\`\`
-- Campaign Name
-- URL Slug
-- Heading 1 (H1)
-- Heading 2 (H2)
-- Hero Image (upload or select from catalog)
-- CTA Text + CTA Link
-- Ad Copy Section 1
-- Ad Copy Section 2
-- Keywords (for meta tags)
-- Product Selection (multi-select from catalog)
-- Budget & Duration
-- Target Audience Notes
-\`\`\`
-
-**Technical Flow:**
-1. Admin fills out row in table
-2. Clicks "Generate Page"
-3. Edge function creates landing page entry
-4. Page is live at \`/lp/summer-adventure-2024\`
-5. Analytics tracking code auto-added
-
-**Success Metrics:**
-- Marketing team creates 5 test pages in <15 minutes
-- Pages rank on Google for target keywords
-- Conversion tracking works (form submissions, cart adds)
-
----
-
-### Milestone 2.5: Enhanced Product Detail Pages (Week 7-8)
-**Deliverables:**
-- [ ] Redesigned \`/product/[handle]\` page
-- [ ] Default variant pre-selection (from metadata)
-- [ ] Large image gallery (zoom, swipe)
-- [ ] Artist bio section
-- [ ] Frame preview toggle (visual frame mockup)
-- [ ] Size comparison chart
-- [ ] "Similar Artworks" recommendations
-- [ ] Add to Cart with real-time price updates
-
-**UX Improvements:**
-- Sticky Add to Cart button on mobile
-- Visual frame selector (not dropdown)
-- Size visualization (room mockup)
-- Quality comparison (Standard vs Premium)
-- Shipping estimate calculator
-
-**Success Metrics:**
-- Conversion rate >3% (industry standard ~2%)
-- Average time on page >45 seconds
-- Reduced cart abandonment
-
----
-
-## 🔗 PHASE 3: Integration & Launch (Week 8-10)
-
-### Milestone 3.1: Product Import & Sync
-**Deliverables:**
-- [ ] Syncio connection for SNB products
-- [ ] Atlas Catalog import for Quantity Postcards
-- [ ] Metadata enrichment for all products
-- [ ] Bulk default variant assignment
-- [ ] Image optimization pipeline
-
----
-
-### Milestone 3.2: Testing & Optimization
-**Deliverables:**
-- [ ] End-to-end purchase flow testing
-- [ ] Mobile responsiveness audit
-- [ ] Page speed optimization (<3s load)
-- [ ] SEO metadata for all pages
-- [ ] Error handling & fallbacks
-
----
-
-### Milestone 3.3: Launch Preparation
-**Deliverables:**
-- [ ] Production database backup strategy
-- [ ] Monitoring & alerts setup
-- [ ] Customer support email templates
-- [ ] Returns/refunds policy pages
-- [ ] Privacy policy & terms of service
-
----
-
-## 📊 Project Management Structure
-
-### Weekly Rhythm
-**Mondays:**
-- Sprint planning (assign tasks for the week)
-- Review blockers from previous week
-
-**Wednesdays:**
-- Mid-week check-in (async updates)
-- Share progress screenshots/demos
-
-**Fridays:**
-- Sprint review (what shipped this week)
-- Retrospective (what to improve)
-- Plan next week's priorities
-
----
-
-### Built-in Accountability System
-
-**Task Status Workflow:**
-\`\`\`
-TODO → IN PROGRESS → REVIEW → COMPLETED
-          ↓
-       BLOCKED (with reason + unblock plan)
-\`\`\`
-
-**Automated Reminders:**
-- Tasks overdue by 2 days → Slack/email notification
-- Tasks in REVIEW >24 hours → Notify reviewer
-- BLOCKED tasks >48 hours → Escalate to team
-
-**Progress Dashboard:**
-- Burndown chart (tasks completed vs remaining)
-- Velocity tracking (tasks/week)
-- Blockers visualization
-- Individual contributor metrics
-
----
-
-## 🚦 Decision Checkpoints
-
-### Before We Build Anything:
-1. **Is this aligned with the core mission?**
-   - Does it help artists share their stories?
-   - Does it make buying posters easier?
-   - Does it support multi-platform flexibility?
-
-2. **Does this create technical debt?**
-   - Can we scale this to 1M+ artworks?
-   - Will this lock us into one platform?
-   - Is this maintainable long-term?
-
-3. **What's the MVP version?**
-   - What can we cut and still ship value?
-   - What can be manual for the first 10 customers?
-
----
-
-## 🎯 Success Criteria
-
-### Atlas Catalog Launch (Week 5)
-- [ ] 50+ artworks cataloged
-- [ ] 3 team members trained & using daily
-- [ ] Products syncing to Shopify automatically
-- [ ] Zero manual product entry in Shopify
-
-### atlasposters.com Launch (Week 8)
-- [ ] Coming soon page live with email capture
-- [ ] 1 partner page (SNB) published
-- [ ] 5 marketing landing pages generated
-- [ ] First test order completed end-to-end
-
-### 90-Day Vision (Week 12)
-- [ ] 500+ products in catalog
-- [ ] 2+ brand partners onboarded
-- [ ] 10+ marketing campaigns running
-- [ ] All product management in Atlas Catalog (Shopify is just fulfillment layer)`,
-  },
-];
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useRoadmapVersions, useRoadmapWithProgress } from "@/hooks/useRoadmap";
+import { CheckCircle2, Circle, Clock, AlertCircle, ArrowRight, Calendar, Target } from "lucide-react";
+import { format } from "date-fns";
 
 const Roadmap = () => {
-  const [selectedVersion, setSelectedVersion] = useState(roadmapVersions[0].version);
-  const currentRoadmap = roadmapVersions.find((v) => v.version === selectedVersion) || roadmapVersions[0];
+  const { data: versions, isLoading: versionsLoading } = useRoadmapVersions();
+  const [selectedVersionId, setSelectedVersionId] = useState<string>("");
+  
+  const currentVersionId = selectedVersionId || versions?.find(v => v.status === 'current')?.id;
+  const selectedVersion = versions?.find(v => v.id === currentVersionId);
+  
+  const { data: phasesWithProgress, isLoading: progressLoading } = useRoadmapWithProgress(
+    currentVersionId
+  );
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "completed":
+        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+      case "in_progress":
+        return <Clock className="h-5 w-5 text-blue-500" />;
+      case "blocked":
+        return <AlertCircle className="h-5 w-5 text-red-500" />;
+      default:
+        return <Circle className="h-5 w-5 text-muted-foreground" />;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+      completed: "default",
+      in_progress: "secondary",
+      blocked: "destructive",
+      not_started: "outline",
+      planned: "outline",
+      on_hold: "destructive",
+    };
+    
+    const labels: Record<string, string> = {
+      completed: "Completed",
+      in_progress: "In Progress",
+      blocked: "Blocked",
+      not_started: "Not Started",
+      planned: "Planned",
+      on_hold: "On Hold",
+    };
+    
+    return (
+      <Badge variant={variants[status] || "outline"}>
+        {labels[status] || status}
+      </Badge>
+    );
+  };
+
+  const getVersionBadge = (status: string) => {
+    const variants: Record<string, "default" | "secondary" | "outline"> = {
+      current: "default",
+      draft: "secondary",
+      archived: "outline",
+    };
+    
+    return (
+      <Badge variant={variants[status] || "outline"} className="capitalize">
+        {status}
+      </Badge>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
+      <main className="container mx-auto px-4 py-16">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">Atlas Posters Roadmap</h1>
-            <p className="text-muted-foreground">
-              Comprehensive implementation plan and version tracking
-            </p>
-          </div>
-          
-          <div className="flex gap-3">
-            <Link to="/changelog">
-              <Button variant="outline" className="gap-2">
-                <History className="w-4 h-4" />
-                Changelog
-              </Button>
-            </Link>
-            <Link to="/techstack">
-              <Button variant="outline" className="gap-2">
-                <FileText className="w-4 h-4" />
-                Tech Stack
-              </Button>
-            </Link>
-          </div>
+        <div className="mb-12 text-center">
+          <h1 className="text-5xl font-bold mb-4">
+            Atlas Posters Roadmap
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Track our journey from concept to reality. See what we're building, what's coming next, 
+            and the progress we're making on each milestone.
+          </p>
         </div>
 
         {/* Version Selector */}
-        <div className="bg-card border border-border rounded-lg p-6 mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex items-center gap-3">
-              <label htmlFor="version" className="text-sm font-medium text-foreground">
-                Version:
-              </label>
-              <Select value={selectedVersion} onValueChange={setSelectedVersion}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
+        {versionsLoading ? (
+          <div className="flex justify-center mb-12">
+            <Skeleton className="h-12 w-80" />
+          </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-12">
+            <div className="flex items-center gap-4">
+              <Select
+                value={currentVersionId}
+                onValueChange={setSelectedVersionId}
+              >
+                <SelectTrigger className="w-80">
+                  <SelectValue placeholder="Select version" />
                 </SelectTrigger>
                 <SelectContent>
-                  {roadmapVersions.map((version) => (
-                    <SelectItem key={version.version} value={version.version}>
-                      v{version.version}
+                  {versions?.map((version) => (
+                    <SelectItem key={version.id} value={version.id}>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono">v{version.version}</span>
+                        <span>·</span>
+                        <span>{version.title}</span>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <Badge variant="secondary">{currentRoadmap.date}</Badge>
+              {selectedVersion && getVersionBadge(selectedVersion.status)}
             </div>
             
-            {selectedVersion === roadmapVersions[0].version && (
-              <Badge className="bg-primary text-primary-foreground">Current</Badge>
+            {selectedVersion?.release_date && (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                <span className="text-sm">
+                  Target: {format(new Date(selectedVersion.release_date), "MMMM d, yyyy")}
+                </span>
+              </div>
             )}
           </div>
-        </div>
+        )}
 
-        {/* Roadmap Content */}
-        <div className="bg-card border border-border rounded-lg p-8">
-          <div className="prose prose-slate dark:prose-invert max-w-none">
-            <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
-              {currentRoadmap.content}
-            </pre>
+        {/* Version Description */}
+        {selectedVersion?.description && (
+          <Card className="mb-12">
+            <CardContent className="pt-6">
+              <p className="text-lg text-center text-muted-foreground">
+                {selectedVersion.description}
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Phases and Milestones */}
+        {progressLoading ? (
+          <div className="space-y-8">
+            {[1, 2].map((i) => (
+              <Skeleton key={i} className="h-96 w-full" />
+            ))}
           </div>
+        ) : (
+          <div className="space-y-12">
+            {phasesWithProgress?.map((phase: any, phaseIndex: number) => (
+              <Card key={phase.id} className="overflow-hidden">
+                <CardHeader className="bg-muted/50">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-3xl font-bold text-primary">
+                          {phase.phase_number}
+                        </span>
+                        <CardTitle className="text-2xl">
+                          {phase.name}
+                        </CardTitle>
+                      </div>
+                      <CardDescription className="text-base">
+                        {phase.description}
+                      </CardDescription>
+                    </div>
+                    {getStatusBadge(phase.status)}
+                  </div>
+                  
+                  {(phase.start_date || phase.target_end_date) && (
+                    <div className="flex gap-4 text-sm text-muted-foreground mt-4">
+                      {phase.start_date && (
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          <span>Started: {format(new Date(phase.start_date), "MMM d, yyyy")}</span>
+                        </div>
+                      )}
+                      {phase.target_end_date && (
+                        <div className="flex items-center gap-2">
+                          <Target className="h-4 w-4" />
+                          <span>Target: {format(new Date(phase.target_end_date), "MMM d, yyyy")}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardHeader>
+                
+                <CardContent className="pt-6">
+                  <div className="space-y-6">
+                    {phase.milestones?.map((milestone: any, milestoneIndex: number) => (
+                      <div
+                        key={milestone.id}
+                        className="border rounded-lg p-6 hover:border-primary/50 transition-colors"
+                      >
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              {getStatusIcon(milestone.status)}
+                              <h4 className="text-xl font-semibold">
+                                Milestone {milestone.milestone_number}: {milestone.name}
+                              </h4>
+                            </div>
+                            <p className="text-muted-foreground">
+                              {milestone.description}
+                            </p>
+                          </div>
+                          {getStatusBadge(milestone.status)}
+                        </div>
+
+                        {/* Deliverables */}
+                        {milestone.deliverables && milestone.deliverables.length > 0 && (
+                          <div className="mb-4">
+                            <h5 className="text-sm font-semibold mb-2">Key Deliverables:</h5>
+                            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                              {milestone.deliverables.map((item: string, idx: number) => (
+                                <li key={idx}>{item}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {/* Progress Bar */}
+                        {milestone.progress && milestone.progress.total > 0 ? (
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="font-medium">Task Progress</span>
+                              <span className="text-muted-foreground">
+                                {milestone.progress.completed}/{milestone.progress.total} tasks completed
+                              </span>
+                            </div>
+                            <Progress 
+                              value={milestone.progress.percentage} 
+                              className="h-3"
+                            />
+                            <div className="flex flex-wrap gap-4 text-xs">
+                              <span className="flex items-center gap-1">
+                                <CheckCircle2 className="h-3 w-3 text-green-500" />
+                                {milestone.progress.completed} completed
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock className="h-3 w-3 text-blue-500" />
+                                {milestone.progress.inProgress} in progress
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Circle className="h-3 w-3 text-muted-foreground" />
+                                {milestone.progress.total - milestone.progress.completed - milestone.progress.inProgress} todo
+                              </span>
+                              {milestone.progress.blocked > 0 && (
+                                <span className="flex items-center gap-1 text-destructive">
+                                  <AlertCircle className="h-3 w-3" />
+                                  {milestone.progress.blocked} blocked
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-sm text-muted-foreground italic">
+                            No tasks assigned yet
+                          </div>
+                        )}
+
+                        {/* Dates */}
+                        {(milestone.due_date || milestone.target_week) && (
+                          <div className="flex gap-4 text-sm text-muted-foreground mt-4 pt-4 border-t">
+                            {milestone.target_week && (
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4" />
+                                <span>Week {milestone.target_week}</span>
+                              </div>
+                            )}
+                            {milestone.due_date && (
+                              <div className="flex items-center gap-2">
+                                <Target className="h-4 w-4" />
+                                <span>Due: {format(new Date(milestone.due_date), "MMM d, yyyy")}</span>
+                              </div>
+                            )}
+                            {milestone.completed_date && (
+                              <div className="flex items-center gap-2 text-green-600">
+                                <CheckCircle2 className="h-4 w-4" />
+                                <span>Completed: {format(new Date(milestone.completed_date), "MMM d, yyyy")}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Footer CTA */}
+        <div className="mt-16 text-center">
+          <Card className="bg-primary/5 border-primary/20">
+            <CardContent className="pt-8 pb-8">
+              <h3 className="text-2xl font-bold mb-4">
+                Want to see the details?
+              </h3>
+              <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+                Explore our technical documentation and changelog to see what we're building behind the scenes.
+              </p>
+              <div className="flex gap-4 justify-center flex-wrap">
+                <Link to="/techstack">
+                  <Button variant="outline" size="lg">
+                    View Tech Stack
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link to="/changelog">
+                  <Button variant="outline" size="lg">
+                    Read Changelog
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>
