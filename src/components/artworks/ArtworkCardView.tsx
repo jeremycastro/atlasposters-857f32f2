@@ -8,10 +8,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Eye, MoreVertical, Edit, Archive, Image } from 'lucide-react';
+import { Eye, MoreVertical, Edit, Archive, Image, Building2 } from 'lucide-react';
 import { format } from 'date-fns';
 
-type Artwork = Database['public']['Tables']['artworks']['Row'];
+type Artwork = Database['public']['Tables']['artworks']['Row'] & {
+  partner_profile?: {
+    full_name: string | null;
+    email: string;
+    partner_company_name: string | null;
+  };
+};
 
 interface ArtworkCardViewProps {
   artworks: Artwork[];
@@ -102,6 +108,12 @@ export const ArtworkCardView = ({
             )}
 
             <div className="space-y-2 text-xs text-muted-foreground">
+              {artwork.partner_profile?.partner_company_name && (
+                <div className="flex items-center gap-2 text-xs">
+                  <Building2 className="h-3 w-3" />
+                  <span className="font-medium">{artwork.partner_profile.partner_company_name}</span>
+                </div>
+              )}
               {artwork.art_medium && (
                 <div className="flex justify-between">
                   <span>Medium:</span>

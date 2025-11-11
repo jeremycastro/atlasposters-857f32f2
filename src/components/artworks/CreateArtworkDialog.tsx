@@ -18,15 +18,25 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useArtworkMutations } from '@/hooks/useArtworkMutations';
+import { usePartners } from '@/hooks/useProfiles';
+import { useAuth } from '@/hooks/useAuth';
 
 const currentYear = new Date().getFullYear();
 
 const artworkSchema = z.object({
+  partner_id: z.string().optional(),
   title: z.string().min(1, 'Title is required').max(200),
   artist_name: z.string().min(1, 'Artist name is required').max(200),
   description: z.string().optional(),
@@ -48,7 +58,11 @@ interface CreateArtworkDialogProps {
 
 export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogProps) => {
   const { createArtwork } = useArtworkMutations();
+  const { activeRole } = useAuth();
+  const { data: partners, isLoading: partnersLoading } = usePartners();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isAdmin = activeRole === 'admin';
 
   const form = useForm<ArtworkFormValues>({
     resolver: zodResolver(artworkSchema),
@@ -58,6 +72,7 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
       description: '',
       art_medium: '',
       is_exclusive: false,
+      partner_id: undefined,
     },
   });
 
@@ -70,17 +85,21 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
         : null;
 
       await createArtwork.mutateAsync({
-        title: values.title,
-        artist_name: values.artist_name,
-        description: values.description || null,
-        art_medium: values.art_medium || null,
-        year_created: values.year_created || null,
-        original_dimensions: values.original_dimensions || null,
-        tags: tagsArray,
-        is_exclusive: values.is_exclusive,
-        rights_start_date: values.rights_start_date || null,
-        rights_end_date: values.rights_end_date || null,
-        status: 'draft',
+        artwork: {
+          title: values.title,
+          artist_name: values.artist_name,
+          description: values.description || null,
+          art_medium: values.art_medium || null,
+          year_created: values.year_created || null,
+          original_dimensions: values.original_dimensions || null,
+          tags: tagsArray,
+          is_exclusive: values.is_exclusive,
+          rights_start_date: values.rights_start_date || null,
+          rights_end_date: values.rights_end_date || null,
+          status: 'draft',
+          partner_id: null as any, // Will be overridden by partnerId param
+        },
+        partnerId: values.partner_id, // Only used if admin
       });
 
       form.reset();
@@ -104,6 +123,40 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {isAdmin && (
+              <FormField
+                control={form.control}
+                name="partner_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Partner *</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a partner" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {partnersLoading ? (
+                          <SelectItem value="loading" disabled>Loading partners...</SelectItem>
+                        ) : partners && partners.length > 0 ? (
+                          partners.map((partner) => (
+                            <SelectItem key={partner.id} value={partner.id}>
+                              {partner.partner_company_name || partner.full_name || partner.email}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="none" disabled>No partners found</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>Select the partner who owns this artwork</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <div className="grid gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}

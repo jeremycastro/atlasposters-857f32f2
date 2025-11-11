@@ -15,3 +15,19 @@ export const useProfiles = () => {
     },
   });
 };
+
+export const usePartners = () => {
+  return useQuery({
+    queryKey: ['partners'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, partner_company_name')
+        .eq('partner_status', 'active')
+        .order('partner_company_name');
+
+      if (error) throw error;
+      return data;
+    },
+  });
+};

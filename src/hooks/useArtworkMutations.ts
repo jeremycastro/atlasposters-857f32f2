@@ -6,14 +6,22 @@ import { Database } from '@/integrations/supabase/types';
 type ArtworkInsert = Database['public']['Tables']['artworks']['Insert'];
 type ArtworkUpdate = Database['public']['Tables']['artworks']['Update'];
 
+interface CreateArtworkInput {
+  artwork: Omit<ArtworkInsert, 'asc_code' | 'sequence_number'>;
+  partnerId?: string; // Optional partner ID for admins
+}
+
 export const useArtworkMutations = () => {
   const queryClient = useQueryClient();
 
   const createArtwork = useMutation({
-    mutationFn: async (artwork: Omit<ArtworkInsert, 'asc_code' | 'sequence_number' | 'partner_id'>) => {
+    mutationFn: async ({ artwork, partnerId }: CreateArtworkInput) => {
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
+
+      // Use provided partnerId (for admins) or current user's ID (for partners)
+      const targetPartnerId = partnerId || user.id;
 
       // Generate ASC code
       const { data: ascData, error: ascError } = await supabase
@@ -32,7 +40,7 @@ export const useArtworkMutations = () => {
           ...artwork,
           asc_code: ascCode,
           sequence_number: sequenceNumber,
-          partner_id: user.id,
+          partner_id: targetPartnerId,
           created_by: user.id,
           status: artwork.status || 'draft',
         })

@@ -2,7 +2,7 @@ import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { RoleSwitcher } from '@/components/RoleSwitcher';
-import { LayoutDashboard, CheckSquare, Users, LogOut, Map, GitBranch, Code2 } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Users, LogOut, Map, GitBranch, Code2, Image } from 'lucide-react';
 
 export default function AdminLayout() {
   const { profile, activeRole, signOut } = useAuth();
@@ -55,12 +55,21 @@ export default function AdminLayout() {
           </Link>
           
           {activeRole === 'admin' && (
-            <Link to="/admin/users">
-              <Button variant="ghost" className="w-full justify-start">
-                <Users className="mr-2 h-4 w-4" />
-                User Management
-              </Button>
-            </Link>
+            <>
+              <Link to="/admin/artworks">
+                <Button variant="ghost" className="w-full justify-start">
+                  <Image className="mr-2 h-4 w-4" />
+                  Artwork Catalog
+                </Button>
+              </Link>
+              
+              <Link to="/admin/users">
+                <Button variant="ghost" className="w-full justify-start">
+                  <Users className="mr-2 h-4 w-4" />
+                  User Management
+                </Button>
+              </Link>
+            </>
           )}
         </nav>
 
