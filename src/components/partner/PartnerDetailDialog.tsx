@@ -32,13 +32,13 @@ export const PartnerDetailDialog = ({ partnerId, open, onOpenChange }: PartnerDe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{partner.partner_name}</DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="info" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+        <Tabs defaultValue="info" className="w-full flex flex-col flex-1 overflow-hidden">
+          <TabsList className="grid w-full grid-cols-5 flex-shrink-0">
             <TabsTrigger value="info">Info</TabsTrigger>
             <TabsTrigger value="brands">Brands</TabsTrigger>
             <TabsTrigger value="agreements">Agreements</TabsTrigger>
@@ -46,25 +46,27 @@ export const PartnerDetailDialog = ({ partnerId, open, onOpenChange }: PartnerDe
             <TabsTrigger value="addresses">Addresses</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="info">
-            <PartnerInfoTab partner={partner} />
-          </TabsContent>
+          <div className="flex-1 overflow-y-auto">
+            <TabsContent value="info" className="h-full">
+              <PartnerInfoTab partner={partner} />
+            </TabsContent>
 
-          <TabsContent value="brands">
-            <BrandsTab partnerId={partner.id} brands={partner.brands || []} />
-          </TabsContent>
+            <TabsContent value="brands" className="h-full">
+              <BrandsTab partnerId={partner.id} brands={partner.brands || []} />
+            </TabsContent>
 
-          <TabsContent value="agreements">
-            <AgreementsTab partnerId={partner.id} agreements={partner.partner_agreements || []} />
-          </TabsContent>
+            <TabsContent value="agreements" className="h-full">
+              <AgreementsTab partnerId={partner.id} agreements={partner.partner_agreements || []} />
+            </TabsContent>
 
-          <TabsContent value="contacts">
-            <ContactsTab partnerId={partner.id} contacts={partner.partner_contacts || []} />
-          </TabsContent>
+            <TabsContent value="contacts" className="h-full">
+              <ContactsTab partnerId={partner.id} contacts={partner.partner_contacts || []} />
+            </TabsContent>
 
-          <TabsContent value="addresses">
-            <AddressesTab partnerId={partner.id} addresses={partner.partner_addresses || []} />
-          </TabsContent>
+            <TabsContent value="addresses" className="h-full">
+              <AddressesTab partnerId={partner.id} addresses={partner.partner_addresses || []} />
+            </TabsContent>
+          </div>
         </Tabs>
       </DialogContent>
     </Dialog>
