@@ -71,11 +71,27 @@ export const useTaskMutations = () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("Not authenticated");
 
+      // Filter out joined fields that aren't actual columns
+      const validColumnFields: Record<string, any> = {};
+      const joinedFields = ['assigned_to_profile', 'created_by_profile', 'phase_data', 'milestone_data'];
+      
+      Object.keys(updates).forEach((key) => {
+        if (!joinedFields.includes(key)) {
+          validColumnFields[key] = updates[key as keyof TaskUpdate];
+        }
+      });
+
       const { data, error } = await supabase
         .from("project_tasks")
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...validColumnFields, updated_at: new Date().toISOString() })
         .eq("id", id)
-        .select()
+        .select(`
+          *,
+          assigned_to_profile:profiles!project_tasks_assigned_to_fkey(id, full_name, email),
+          created_by_profile:profiles!project_tasks_created_by_fkey(id, full_name, email),
+          phase_data:roadmap_phases(id, name, phase_number),
+          milestone_data:roadmap_milestones(id, name, milestone_number)
+        `)
         .single();
 
       if (error) throw error;
