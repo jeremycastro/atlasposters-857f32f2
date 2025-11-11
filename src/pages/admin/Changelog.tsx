@@ -12,7 +12,7 @@ interface ChangelogEntry {
 
 const changelogData: ChangelogEntry[] = [
   {
-    version: "1.1.0",
+    version: "0.4.0",
     date: "2024-11-10",
     changes: [
       {
@@ -66,7 +66,7 @@ const changelogData: ChangelogEntry[] = [
     ],
   },
   {
-    version: "1.0.0",
+    version: "0.3.0",
     date: "2024-11-01",
     changes: [
       {
@@ -253,8 +253,8 @@ const Changelog = () => {
         {/* Footer Note */}
         <div className="mt-12 p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground text-center">
-            Following semantic versioning: Major.Minor.Patch (v1.0.0). 
-            Each version represents milestones in the Atlas Platform journey to MVP launch.
+            Following semantic versioning: Major.Minor.Patch (v0.x.x). 
+            Pre-1.0 versions represent feature development toward MVP launch at v1.0.0.
           </p>
         </div>
       </main>
