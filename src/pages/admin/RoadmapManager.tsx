@@ -11,11 +11,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CheckCircle2, Circle, Clock, AlertCircle, ChevronDown, ChevronRight } from "lucide-react";
+import { TaskDetailDialog } from "@/components/tasks/TaskDetailDialog";
 
 const RoadmapManager = () => {
   const { data: versions, isLoading: versionsLoading } = useRoadmapVersions();
   const [selectedVersionId, setSelectedVersionId] = useState<string>("");
   const [expandedMilestones, setExpandedMilestones] = useState<Set<string>>(new Set());
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const { toggleDeliverable } = useRoadmapMutations();
   
   const { data: phasesWithProgress, isLoading: progressLoading } = useRoadmapWithProgress(
@@ -37,6 +40,11 @@ const RoadmapManager = () => {
       }
       return newSet;
     });
+  };
+
+  const handleTaskClick = (taskId: string) => {
+    setSelectedTaskId(taskId);
+    setDetailDialogOpen(true);
   };
 
   const handleToggleDeliverable = (milestoneId: string, deliverableIndex: number) => {
@@ -240,7 +248,11 @@ const RoadmapManager = () => {
                                 </TableHeader>
                                 <TableBody>
                                   {milestoneTasks.map((task) => (
-                                    <TableRow key={task.id}>
+                                    <TableRow 
+                                      key={task.id}
+                                      onClick={() => handleTaskClick(task.id)}
+                                      className="cursor-pointer hover:bg-muted/50"
+                                    >
                                       <TableCell>
                                         {getStatusBadge(task.status)}
                                       </TableCell>
@@ -282,6 +294,13 @@ const RoadmapManager = () => {
             ))}
           </div>
         )}
+
+        {/* Task Detail Dialog */}
+        <TaskDetailDialog
+          open={detailDialogOpen}
+          onOpenChange={setDetailDialogOpen}
+          taskId={selectedTaskId}
+        />
       </main>
     </div>
   );
