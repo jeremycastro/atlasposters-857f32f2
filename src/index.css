@@ -28,12 +28,21 @@
     --ring: 43 96% 56%;
     --radius: 0.5rem;
     
-    /* Atlas Brand Colors */
-    --atlas-gold: 43 96% 56%;           /* PMS 7408 C */
-    --atlas-ocean: 200 100% 40%;        /* PMS 3015 C */
-    --atlas-charcoal: 0 0% 15%;         /* PMS Black 6 C */
-    --atlas-warm-gray: 30 5% 92%;       /* PMS Warm Gray 1 C */
-    --atlas-cream: 43 30% 96%;          /* PMS 7499 C */
+    /* Atlas Brand Colors with Pantone References */
+    /* Gold - Primary brand color for luxury and excellence */
+    --atlas-gold: 43 96% 56%;           /* Approximate: PMS 7408 C | RGB: 252, 186, 3 */
+    
+    /* Ocean - Secondary brand color for depth and trust */
+    --atlas-ocean: 200 100% 40%;        /* Approximate: PMS 3015 C | RGB: 0, 128, 204 */
+    
+    /* Charcoal - Dark neutral for text and contrast */
+    --atlas-charcoal: 0 0% 15%;         /* Approximate: PMS Black 6 C | RGB: 38, 38, 38 */
+    
+    /* Warm Gray - Soft background and UI elements */
+    --atlas-warm-gray: 30 5% 92%;       /* Approximate: PMS Warm Gray 1 C | RGB: 237, 234, 232 */
+    
+    /* Cream - Light background for warmth */
+    --atlas-cream: 43 30% 96%;          /* Approximate: PMS 7499 C | RGB: 250, 247, 242 */
 
 
     --sidebar-background: 0 0% 98%;
