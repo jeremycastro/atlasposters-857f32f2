@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -274,7 +273,20 @@ const RoadmapManager = () => {
                                 {milestone.description}
                               </p>
                             </div>
-                            {getStatusBadge(milestone.status)}
+                            <Badge 
+                              variant={
+                                milestone.status === "completed" ? "completed" :
+                                milestone.status === "in_progress" ? "in_progress" :
+                                milestone.status === "blocked" ? "blocked" :
+                                "backlog"
+                              }
+                              className="px-4 py-2 text-sm font-semibold"
+                            >
+                              {milestone.status.replace("_", " ")}
+                              {milestone.progress && milestone.progress.total > 0 && 
+                                ` • ${milestone.progress.completed}/${milestone.progress.total}`
+                              }
+                            </Badge>
                           </div>
 
                           {/* Summary when collapsed */}
@@ -316,26 +328,6 @@ const RoadmapManager = () => {
                               </div>
                             </div>
                           )}
-
-                        {milestone.progress && milestone.progress.total > 0 && (
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-muted-foreground">Progress</span>
-                              <span className="font-medium">
-                                {milestone.progress.completed}/{milestone.progress.total} tasks ({milestone.progress.percentage}%)
-                              </span>
-                            </div>
-                            <Progress value={milestone.progress.percentage} />
-                            <div className="flex gap-4 text-xs text-muted-foreground">
-                              <span>✓ {milestone.progress.completed} completed</span>
-                              <span>⧗ {milestone.progress.inProgress} in progress</span>
-                              <span>☐ {milestone.progress.total - milestone.progress.completed - milestone.progress.inProgress} todo</span>
-                              {milestone.progress.blocked > 0 && (
-                                <span className="text-destructive">⊗ {milestone.progress.blocked} blocked</span>
-                              )}
-                            </div>
-                          </div>
-                        )}
 
                         {milestone.progress?.total === 0 && !isExpanded && (
                           <p className="text-sm text-muted-foreground">
