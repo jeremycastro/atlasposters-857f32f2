@@ -61,6 +61,8 @@ export const ArtworkDetailDialog = ({
       return data.map(file => ({
         ...file,
         url: supabase.storage.from('brand-assets').getPublicUrl(file.file_path).data.publicUrl,
+        tags: file.tags as any,
+        print_specifications: file.print_specifications as any,
       }));
     },
     enabled: !!artwork?.id && open,

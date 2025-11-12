@@ -10,6 +10,14 @@ export interface UploadedFile {
   mime_type: string;
   is_primary: boolean;
   url: string;
+  tags?: {
+    structured: Record<string, string[]>;
+    custom: string[];
+    matches_variants: Record<string, string[]>;
+  };
+  print_specifications?: Record<string, any>;
+  version_number?: number;
+  is_latest?: boolean;
 }
 
 export const useArtworkFileUpload = () => {
@@ -19,7 +27,13 @@ export const useArtworkFileUpload = () => {
   const uploadFile = async (
     file: File,
     artworkId: string,
-    isPrimary: boolean = false
+    isPrimary: boolean = false,
+    tags?: {
+      structured: Record<string, string[]>;
+      custom: string[];
+      matches_variants: Record<string, string[]>;
+    },
+    printSpecifications?: Record<string, any>
   ): Promise<UploadedFile | null> => {
     try {
       setUploading(true);
@@ -60,6 +74,12 @@ export const useArtworkFileUpload = () => {
           file_size: file.size,
           mime_type: file.type,
           is_primary: isPrimary,
+          tags: tags || {
+            structured: {},
+            custom: [],
+            matches_variants: {},
+          },
+          print_specifications: printSpecifications || {},
         })
         .select()
         .single();
@@ -81,6 +101,10 @@ export const useArtworkFileUpload = () => {
         mime_type: fileRecord.mime_type,
         is_primary: fileRecord.is_primary,
         url: urlData.publicUrl,
+        tags: fileRecord.tags as any,
+        print_specifications: fileRecord.print_specifications as any,
+        version_number: fileRecord.version_number,
+        is_latest: fileRecord.is_latest,
       };
     } catch (error: any) {
       console.error('Upload error:', error);

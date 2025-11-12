@@ -81,11 +81,16 @@ export type Database = {
           file_size: number | null
           file_type: string
           id: string
+          is_latest: boolean | null
           is_primary: boolean | null
           metadata: Json | null
           mime_type: string | null
+          print_specifications: Json | null
+          replaced_by: string | null
+          tags: Json | null
           uploaded_at: string | null
           uploaded_by: string | null
+          version_number: number | null
         }
         Insert: {
           artwork_id: string
@@ -97,11 +102,16 @@ export type Database = {
           file_size?: number | null
           file_type: string
           id?: string
+          is_latest?: boolean | null
           is_primary?: boolean | null
           metadata?: Json | null
           mime_type?: string | null
+          print_specifications?: Json | null
+          replaced_by?: string | null
+          tags?: Json | null
           uploaded_at?: string | null
           uploaded_by?: string | null
+          version_number?: number | null
         }
         Update: {
           artwork_id?: string
@@ -113,11 +123,16 @@ export type Database = {
           file_size?: number | null
           file_type?: string
           id?: string
+          is_latest?: boolean | null
           is_primary?: boolean | null
           metadata?: Json | null
           mime_type?: string | null
+          print_specifications?: Json | null
+          replaced_by?: string | null
+          tags?: Json | null
           uploaded_at?: string | null
           uploaded_by?: string | null
+          version_number?: number | null
         }
         Relationships: [
           {
@@ -125,6 +140,13 @@ export type Database = {
             columns: ["artwork_id"]
             isOneToOne: false
             referencedRelation: "artworks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artwork_files_replaced_by_fkey"
+            columns: ["replaced_by"]
+            isOneToOne: false
+            referencedRelation: "artwork_files"
             referencedColumns: ["id"]
           },
           {
@@ -377,6 +399,42 @@ export type Database = {
         }
         Relationships: []
       }
+      file_tags: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          display_name: string
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          tag_value: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          display_name: string
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          tag_value: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          display_name?: string
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          tag_value?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       financial_agreements: {
         Row: {
           agreement_type: string
@@ -539,6 +597,66 @@ export type Database = {
             columns: ["suggested_product_type_id"]
             isOneToOne: false
             referencedRelation: "product_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_print_files: {
+        Row: {
+          created_at: string | null
+          file_snapshot: Json
+          file_version_number: number
+          id: string
+          manufacturer_id: string | null
+          manufacturing_status: string | null
+          order_id: string
+          print_file_id: string
+          print_specifications: Json | null
+          product_variant_id: string
+          sent_to_manufacturer_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_snapshot: Json
+          file_version_number: number
+          id?: string
+          manufacturer_id?: string | null
+          manufacturing_status?: string | null
+          order_id: string
+          print_file_id: string
+          print_specifications?: Json | null
+          product_variant_id: string
+          sent_to_manufacturer_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          file_snapshot?: Json
+          file_version_number?: number
+          id?: string
+          manufacturer_id?: string | null
+          manufacturing_status?: string | null
+          order_id?: string
+          print_file_id?: string
+          print_specifications?: Json | null
+          product_variant_id?: string
+          sent_to_manufacturer_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_print_files_print_file_id_fkey"
+            columns: ["print_file_id"]
+            isOneToOne: false
+            referencedRelation: "artwork_files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_print_files_product_variant_id_fkey"
+            columns: ["product_variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
         ]
@@ -928,6 +1046,8 @@ export type Database = {
           inventory_qty: number | null
           is_active: boolean | null
           metadata: Json | null
+          print_file_id: string | null
+          print_specifications: Json | null
           product_id: string
           reorder_point: number | null
           reserved_qty: number | null
@@ -947,6 +1067,8 @@ export type Database = {
           inventory_qty?: number | null
           is_active?: boolean | null
           metadata?: Json | null
+          print_file_id?: string | null
+          print_specifications?: Json | null
           product_id: string
           reorder_point?: number | null
           reserved_qty?: number | null
@@ -966,6 +1088,8 @@ export type Database = {
           inventory_qty?: number | null
           is_active?: boolean | null
           metadata?: Json | null
+          print_file_id?: string | null
+          print_specifications?: Json | null
           product_id?: string
           reorder_point?: number | null
           reserved_qty?: number | null
@@ -977,6 +1101,13 @@ export type Database = {
           wholesale_price?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "product_variants_print_file_id_fkey"
+            columns: ["print_file_id"]
+            isOneToOne: false
+            referencedRelation: "artwork_files"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "product_variants_product_id_fkey"
             columns: ["product_id"]
@@ -2059,10 +2190,24 @@ export type Database = {
         }
         Returns: string
       }
+      create_file_version: {
+        Args: { p_new_file_data: Json; p_original_file_id: string }
+        Returns: string
+      }
       generate_next_asc: { Args: never; Returns: string }
       get_active_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
+      }
+      get_print_file_suggestions: {
+        Args: { p_artwork_id: string; p_variant_codes: string[] }
+        Returns: {
+          file_id: string
+          file_name: string
+          match_reasons: string[]
+          match_score: number
+          tags: Json
+        }[]
       }
       get_user_roles: {
         Args: { _user_id: string }
