@@ -29,7 +29,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigationMutations } from '@/hooks/useNavigationMutations';
 import { Database } from '@/integrations/supabase/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type NavigationItem = Database['public']['Tables']['admin_navigation']['Row'];
 
@@ -65,17 +65,7 @@ export const NavigationItemDialog = ({ item, open, onOpenChange }: NavigationIte
 
   const form = useForm<NavItemFormValues>({
     resolver: zodResolver(navItemSchema),
-    defaultValues: item ? {
-      label: item.label,
-      icon: item.icon,
-      route: item.route,
-      group_name: item.group_name || undefined,
-      order_index: item.order_index,
-      is_active: item.is_active,
-      visible_to_admin: item.visible_to_roles.includes('admin'),
-      visible_to_editor: item.visible_to_roles.includes('editor'),
-      visible_to_viewer: item.visible_to_roles.includes('viewer'),
-    } : {
+    defaultValues: {
       label: '',
       icon: 'LayoutDashboard',
       route: '/admin/',
@@ -86,6 +76,36 @@ export const NavigationItemDialog = ({ item, open, onOpenChange }: NavigationIte
       visible_to_viewer: false,
     },
   });
+
+  // Reset form when item or dialog open state changes
+  useEffect(() => {
+    if (open) {
+      if (item) {
+        form.reset({
+          label: item.label,
+          icon: item.icon,
+          route: item.route,
+          group_name: item.group_name || undefined,
+          order_index: item.order_index,
+          is_active: item.is_active,
+          visible_to_admin: item.visible_to_roles.includes('admin'),
+          visible_to_editor: item.visible_to_roles.includes('editor'),
+          visible_to_viewer: item.visible_to_roles.includes('viewer'),
+        });
+      } else {
+        form.reset({
+          label: '',
+          icon: 'LayoutDashboard',
+          route: '/admin/',
+          order_index: 0,
+          is_active: true,
+          visible_to_admin: true,
+          visible_to_editor: false,
+          visible_to_viewer: false,
+        });
+      }
+    }
+  }, [item, open, form]);
 
   const onSubmit = async (values: NavItemFormValues) => {
     setIsSubmitting(true);
