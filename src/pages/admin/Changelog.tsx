@@ -16,6 +16,10 @@ const changelogData: ChangelogEntry[] = [
     date: "2024-11-12",
     changes: [
       {
+        type: "added",
+        description: "Partner Pricing & Payment Models - Comprehensive partner agreement system with multiple payment models (royalty, commission, flat fee, advance), marketing attribution caps, and flexible payment terms",
+      },
+      {
         type: "changed",
         description: "Roadmap UI Refinement - Removed progress bars from milestone cards to reduce visual clutter and emphasize minimalist design",
       },
