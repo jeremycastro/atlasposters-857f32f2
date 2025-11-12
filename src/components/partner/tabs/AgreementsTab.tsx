@@ -235,44 +235,47 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
             {/* Basic Information */}
             <div className="border rounded-lg p-4 space-y-2">
               <h4 className="font-medium text-sm text-muted-foreground mb-3">Basic Information</h4>
-              <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
-                <Label htmlFor="agreement_type" className="text-sm text-right">Agreement Type *</Label>
-                <Select
-                  value={formData.agreement_type}
-                  onValueChange={(value) => setFormData({ ...formData, agreement_type: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="royalty">Royalty</SelectItem>
-                    <SelectItem value="wholesale">Wholesale</SelectItem>
-                    <SelectItem value="commission">Commission</SelectItem>
-                    <SelectItem value="licensing">Licensing</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
-                <Label htmlFor="status" className="text-sm text-right">Status</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) => setFormData({ ...formData, status: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="expired">Expired</SelectItem>
-                    <SelectItem value="terminated">Terminated</SelectItem>
-                  </SelectContent>
-                </Select>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
+                  <Label htmlFor="status" className="text-sm text-right">Status</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value) => setFormData({ ...formData, status: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="expired">Expired</SelectItem>
+                      <SelectItem value="terminated">Terminated</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
+                  <Label htmlFor="agreement_type" className="text-sm text-right">Agreement Type *</Label>
+                  <Select
+                    value={formData.agreement_type}
+                    onValueChange={(value) => setFormData({ ...formData, agreement_type: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="royalty">Royalty</SelectItem>
+                      <SelectItem value="wholesale">Wholesale</SelectItem>
+                      <SelectItem value="commission">Commission</SelectItem>
+                      <SelectItem value="licensing">Licensing</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
+                <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
                   <Label htmlFor="effective_date" className="text-sm text-right">Effective Date *</Label>
                   <Input
                     id="effective_date"
