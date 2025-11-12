@@ -14,6 +14,9 @@ import { Copy, Edit, Archive, Calendar, Tag, Ruler, Palette } from 'lucide-react
 import { format } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 import { useArtworkMutations } from '@/hooks/useArtworkMutations';
+import { ArtworkFileUpload } from './ArtworkFileUpload';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 type Artwork = Database['public']['Tables']['artworks']['Row'];
 
@@ -39,6 +42,29 @@ export const ArtworkDetailDialog = ({
 }: ArtworkDetailDialogProps) => {
   const { archiveArtwork } = useArtworkMutations();
   const [isArchiving, setIsArchiving] = useState(false);
+
+  // Fetch artwork files
+  const { data: artworkFiles = [] } = useQuery({
+    queryKey: ['artwork-files', artwork?.id],
+    queryFn: async () => {
+      if (!artwork?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('artwork_files')
+        .select('*')
+        .eq('artwork_id', artwork.id)
+        .order('is_primary', { ascending: false });
+
+      if (error) throw error;
+
+      // Add public URLs to files
+      return data.map(file => ({
+        ...file,
+        url: supabase.storage.from('brand-assets').getPublicUrl(file.file_path).data.publicUrl,
+      }));
+    },
+    enabled: !!artwork?.id && open,
+  });
 
   if (!artwork) return null;
 
@@ -88,8 +114,9 @@ export const ArtworkDetailDialog = ({
         </div>
 
         <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="files">Files ({artworkFiles.length})</TabsTrigger>
             <TabsTrigger value="metadata">Metadata</TabsTrigger>
           </TabsList>
 
@@ -187,6 +214,13 @@ export const ArtworkDetailDialog = ({
                 )}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="files" className="space-y-4">
+            <ArtworkFileUpload
+              artworkId={artwork.id}
+              existingFiles={artworkFiles}
+            />
           </TabsContent>
 
           <TabsContent value="metadata" className="space-y-4">

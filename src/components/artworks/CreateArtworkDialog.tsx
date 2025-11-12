@@ -33,6 +33,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useArtworkMutations } from '@/hooks/useArtworkMutations';
 import { usePartners } from '@/hooks/usePartnerManagement';
 import { useAuth } from '@/hooks/useAuth';
+import { ArtworkFileUpload } from './ArtworkFileUpload';
+import { UploadedFile } from '@/hooks/useArtworkFileUpload';
 
 const currentYear = new Date().getFullYear();
 
@@ -62,6 +64,8 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
   const { activeRole } = useAuth();
   const { data: partners, isLoading: partnersLoading } = usePartners();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createdArtworkId, setCreatedArtworkId] = useState<string | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
 
   const isAdmin = activeRole === 'admin';
 
@@ -85,7 +89,7 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
         ? values.tags.split(',').map(tag => tag.trim()).filter(Boolean)
         : null;
 
-      await createArtwork.mutateAsync({
+      const result = await createArtwork.mutateAsync({
         artwork: {
           title: values.title,
           artist_name: values.artist_name,
@@ -103,8 +107,15 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
         partnerId: values.partner_id, // Only used if admin
       });
 
-      form.reset();
-      onOpenChange(false);
+      // Store the created artwork ID for file uploads
+      if (result?.id) {
+        setCreatedArtworkId(result.id);
+      } else {
+        form.reset();
+        setUploadedFiles([]);
+        setCreatedArtworkId(null);
+        onOpenChange(false);
+      }
     } catch (error) {
       console.error('Error creating artwork:', error);
     } finally {
@@ -112,8 +123,17 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
     }
   };
 
+  const handleDialogClose = (open: boolean) => {
+    if (!open) {
+      form.reset();
+      setUploadedFiles([]);
+      setCreatedArtworkId(null);
+    }
+    onOpenChange(open);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleDialogClose}>
       <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0">
         <div className="px-6 pt-6 pb-4 border-b">
           <DialogHeader>
@@ -362,6 +382,24 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
                   )}
                 />
               </div>
+
+              {/* File Uploads Section - Only shown after artwork is created */}
+              {createdArtworkId ? (
+                <div className="border rounded-lg p-4 space-y-2">
+                  <h4 className="font-medium text-sm text-muted-foreground mb-3">Artwork Files</h4>
+                  <ArtworkFileUpload
+                    artworkId={createdArtworkId}
+                    existingFiles={uploadedFiles}
+                    onFilesChange={setUploadedFiles}
+                  />
+                </div>
+              ) : (
+                <div className="border rounded-lg p-4 bg-muted/50">
+                  <p className="text-sm text-muted-foreground text-center">
+                    Create the artwork first to upload files
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Sticky Footer */}
@@ -369,14 +407,20 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => onOpenChange(false)}
+                onClick={() => handleDialogClose(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                {createdArtworkId ? 'Close' : 'Cancel'}
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Creating...' : 'Create Artwork'}
-              </Button>
+              {!createdArtworkId ? (
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Creating...' : 'Create Artwork'}
+                </Button>
+              ) : (
+                <Button onClick={() => handleDialogClose(false)}>
+                  Done
+                </Button>
+              )}
             </div>
           </form>
         </Form>
