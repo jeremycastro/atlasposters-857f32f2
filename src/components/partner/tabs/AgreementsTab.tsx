@@ -241,7 +241,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               <h4 className="font-medium text-sm text-muted-foreground mb-3">Basic Information</h4>
               
               <div className="grid grid-cols-2 gap-3">
-                <div className="grid grid-cols-[80px_1fr] gap-2 items-center">
+                <div className="grid grid-cols-[90px_1fr] gap-2 items-center">
                   <Label htmlFor="status" className="text-sm text-right">Status *</Label>
                   <Select
                     value={formData.status}
@@ -260,7 +260,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                   </Select>
                 </div>
                 
-                <div className="grid grid-cols-[110px_1fr] gap-2 items-center">
+                <div className="grid grid-cols-[130px_1fr] gap-2 items-center">
                   <Label htmlFor="agreement_type" className="text-sm text-right">Agreement Type *</Label>
                   <Select
                     value={formData.agreement_type}
@@ -281,7 +281,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="grid grid-cols-[80px_1fr] gap-2 items-center">
+                <div className="grid grid-cols-[105px_1fr] gap-2 items-center">
                   <Label htmlFor="effective_date" className="text-sm text-right">Effective Date *</Label>
                   <Input
                     id="effective_date"
@@ -291,7 +291,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                     required
                   />
                 </div>
-                <div className="grid grid-cols-[110px_1fr] gap-2 items-center">
+                <div className="grid grid-cols-[130px_1fr] gap-2 items-center">
                   <Label htmlFor="expiration_date" className="text-sm text-right">Expiration Date</Label>
                   <Input
                     id="expiration_date"
