@@ -19,13 +19,10 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -65,6 +62,7 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
   const { data: brands, isLoading: brandsLoading } = useBrands();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [brandOpen, setBrandOpen] = useState(false);
 
   const isAdmin = activeRole === 'admin';
 
@@ -213,34 +211,58 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
                       <FormItem>
                         <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
                           <FormLabel className="text-sm text-right">Brand *</FormLabel>
-                          <Select 
-                            onValueChange={(value) => {
-                              field.onChange(value);
-                              handleBrandChange(value);
-                            }} 
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select a brand" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {brandsLoading ? (
-                                <SelectItem value="loading" disabled>Loading brands...</SelectItem>
-                              ) : brands && brands.length > 0 ? (
-                                brands.map((brand) => (
-                                  <SelectItem key={brand.id} value={brand.id}>
-                                    {brand.brand_name} ({brand.partner?.partner_name || 'Unknown Partner'})
-                                  </SelectItem>
-                                ))
-                              ) : (
-                                <SelectItem value="no-brands" disabled>
-                                  No brands available
-                                </SelectItem>
-                              )}
-                            </SelectContent>
-                          </Select>
+                          <Popover open={brandOpen} onOpenChange={setBrandOpen}>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  aria-expanded={brandOpen}
+                                  className={cn(
+                                    "w-full justify-between",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value
+                                    ? brands?.find((brand) => brand.id === field.value)?.brand_name +
+                                      ' (' + (brands?.find((brand) => brand.id === field.value)?.partner?.partner_name || 'Unknown Partner') + ')'
+                                    : "Select a brand"}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0" align="start">
+                              <Command>
+                                <CommandInput placeholder="Search brands..." />
+                                <CommandList>
+                                  <CommandEmpty>
+                                    {brandsLoading ? 'Loading brands...' : 'No brands found.'}
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    {brands?.map((brand) => (
+                                      <CommandItem
+                                        key={brand.id}
+                                        value={`${brand.brand_name} ${brand.partner?.partner_name || ''}`}
+                                        onSelect={() => {
+                                          field.onChange(brand.id);
+                                          handleBrandChange(brand.id);
+                                          setBrandOpen(false);
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            field.value === brand.id ? "opacity-100" : "opacity-0"
+                                          )}
+                                        />
+                                        {brand.brand_name} ({brand.partner?.partner_name || 'Unknown Partner'})
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                         </div>
                         <FormMessage className="ml-[122px]" />
                       </FormItem>
