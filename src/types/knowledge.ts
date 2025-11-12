@@ -75,5 +75,15 @@ export const knowledgeArticles: KnowledgeArticle[] = [
     icon: "Palette",
     lastUpdated: "2025-11-12",
     tags: ["Brand", "Design System", "Typography", "Colors", "Components", "Admin UI"]
+  },
+  {
+    id: "brand-story",
+    title: "Atlas Brand Story & Messaging Guide",
+    description: "Complete brand narrative, positioning, target audiences, messaging pillars, voice guidelines, and content frameworks for all marketing campaigns",
+    category: "Brand & Design",
+    route: "/admin/knowledge/brand-story",
+    icon: "BookOpen",
+    lastUpdated: "2025-11-12",
+    tags: ["Brand", "Story", "Messaging", "Marketing", "Content", "Voice", "Positioning", "Campaigns"]
   }
 ];
