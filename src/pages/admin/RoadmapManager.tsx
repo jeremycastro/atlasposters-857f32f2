@@ -166,17 +166,18 @@ const RoadmapManager = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      completed: "default",
-      in_progress: "secondary",
-      blocked: "destructive",
-      not_started: "outline",
-      planned: "outline",
-      on_hold: "destructive",
+    const variantMap: Record<string, any> = {
+      completed: "completed",
+      in_progress: "in_progress",
+      blocked: "blocked",
+      not_started: "backlog",
+      backlog: "backlog",
+      planned: "backlog",
+      on_hold: "blocked",
     };
     
     return (
-      <Badge variant={variants[status] || "outline"}>
+      <Badge variant={variantMap[status] || "backlog"}>
         {status.replace("_", " ")}
       </Badge>
     );
