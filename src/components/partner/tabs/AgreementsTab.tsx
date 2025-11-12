@@ -412,7 +412,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
             {/* Marketing Attribution Cap */}
             <div className="border rounded-lg p-4 space-y-2">
               <h4 className="font-medium text-sm text-muted-foreground mb-3">Profit Calculation Settings</h4>
-              <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
+              <div className="grid grid-cols-[150px_1fr] gap-3 items-center">
                 <Label htmlFor="marketing_attribution_cap_percent" className="text-sm text-right flex items-center gap-1">
                   Marketing Cap (%)
                   <Info className="h-3 w-3 text-muted-foreground" />
@@ -434,7 +434,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-[110px_1fr] gap-3 items-start">
+              <div className="grid grid-cols-[150px_1fr] gap-3 items-start">
                 <Label htmlFor="calculation_basis" className="text-sm text-right pt-2">Calculation Basis</Label>
                 <Textarea
                   id="calculation_basis"
