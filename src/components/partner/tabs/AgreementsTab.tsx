@@ -237,7 +237,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               <h4 className="font-medium text-sm text-muted-foreground mb-3">Basic Information</h4>
               
               <div className="grid grid-cols-2 gap-3">
-                <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
+                <div className="grid grid-cols-[80px_1fr] gap-2 items-center">
                   <Label htmlFor="status" className="text-sm text-right">Status</Label>
                   <Select
                     value={formData.status}
@@ -255,7 +255,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                   </Select>
                 </div>
                 
-                <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
+                <div className="grid grid-cols-[110px_1fr] gap-2 items-center">
                   <Label htmlFor="agreement_type" className="text-sm text-right">Agreement Type *</Label>
                   <Select
                     value={formData.agreement_type}
@@ -275,7 +275,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
+                <div className="grid grid-cols-[80px_1fr] gap-2 items-center">
                   <Label htmlFor="effective_date" className="text-sm text-right">Effective Date *</Label>
                   <Input
                     id="effective_date"
@@ -285,7 +285,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                     required
                   />
                 </div>
-                <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
+                <div className="grid grid-cols-[110px_1fr] gap-2 items-center">
                   <Label htmlFor="expiration_date" className="text-sm text-right">Expiration Date</Label>
                   <Input
                     id="expiration_date"
@@ -300,7 +300,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
             {/* Payment Model */}
             <div className="border rounded-lg p-4 space-y-2">
               <h4 className="font-medium text-sm text-muted-foreground mb-3">Payment Model</h4>
-              <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+              <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
                 <Label htmlFor="payment_model" className="text-sm text-right">Payment Model</Label>
                 <Select
                   value={formData.payment_model}
@@ -320,7 +320,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
 
               {/* Conditional fields based on payment model */}
               {(formData.payment_model === 'royalty_profit' || formData.payment_model === 'royalty_revenue') && (
-                <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+                <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
                   <Label htmlFor="royalty_rate" className="text-sm text-right">Royalty Rate (%) *</Label>
                   <Input
                     id="royalty_rate"
@@ -337,8 +337,8 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               )}
 
               {formData.payment_model === 'flat_fee' && (
-                <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
-                  <Label htmlFor="flat_fee_amount" className="text-sm text-right">Flat Fee Amount (£) *</Label>
+                <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
+                  <Label htmlFor="flat_fee_amount" className="text-sm text-right">Flat Fee (£) *</Label>
                   <Input
                     id="flat_fee_amount"
                     type="number"
@@ -354,7 +354,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
 
               {formData.payment_model === 'advance' && (
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
+                  <div className="grid grid-cols-[90px_1fr] gap-2 items-center">
                     <Label htmlFor="advance_amount" className="text-sm text-right">Advance (£) *</Label>
                     <Input
                       id="advance_amount"
@@ -367,7 +367,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                       required={formData.payment_model === 'advance'}
                     />
                   </div>
-                  <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
+                  <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
                     <Label htmlFor="advance_recoupment_rate" className="text-sm text-right">Recoupment (%) *</Label>
                     <Input
                       id="advance_recoupment_rate"
@@ -384,7 +384,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                 </div>
               )}
 
-              <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+              <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
                 <Label htmlFor="payment_period" className="text-sm text-right">Payment Period</Label>
                 <Select
                   value={formData.payment_period}
@@ -406,7 +406,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
             {/* Marketing Attribution Cap */}
             <div className="border rounded-lg p-4 space-y-2">
               <h4 className="font-medium text-sm text-muted-foreground mb-3">Profit Calculation Settings</h4>
-              <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+              <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
                 <Label htmlFor="marketing_attribution_cap_percent" className="text-sm text-right flex items-center gap-1">
                   Marketing Cap (%)
                   <Info className="h-3 w-3 text-muted-foreground" />
@@ -428,7 +428,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-[140px_1fr] gap-3 items-start">
+              <div className="grid grid-cols-[110px_1fr] gap-3 items-start">
                 <Label htmlFor="calculation_basis" className="text-sm text-right pt-2">Calculation Basis</Label>
                 <Textarea
                   id="calculation_basis"
