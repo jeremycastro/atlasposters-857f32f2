@@ -88,8 +88,8 @@ export const ArtworkDetailDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl h-[80vh] flex flex-col overflow-hidden">
+        <DialogHeader className="flex-shrink-0">
           <div className="flex items-start justify-between">
             <div className="space-y-2">
               <DialogTitle className="text-2xl">{artwork.title}</DialogTitle>
@@ -103,7 +103,7 @@ export const ArtworkDetailDialog = ({
           </div>
         </DialogHeader>
 
-        <div className="flex items-center gap-2 bg-muted p-4 rounded-lg">
+        <div className="flex items-center gap-2 bg-muted p-4 rounded-lg flex-shrink-0">
           <div className="flex-1">
             <p className="text-xs text-muted-foreground mb-1">ASC Code</p>
             <p className="text-2xl font-mono font-bold">{artwork.asc_code}</p>
@@ -113,14 +113,14 @@ export const ArtworkDetailDialog = ({
           </Button>
         </div>
 
-        <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs defaultValue="details" className="w-full flex flex-col flex-1 overflow-hidden">
+          <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="files">Files ({artworkFiles.length})</TabsTrigger>
             <TabsTrigger value="metadata">Metadata</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="details" className="space-y-6">
+          <TabsContent value="details" className="space-y-6 overflow-y-auto flex-1">
             {artwork.description && (
               <div>
                 <h4 className="text-sm font-medium mb-2">Description</h4>
@@ -216,14 +216,14 @@ export const ArtworkDetailDialog = ({
             )}
           </TabsContent>
 
-          <TabsContent value="files" className="space-y-4">
+          <TabsContent value="files" className="space-y-4 overflow-y-auto flex-1">
             <ArtworkFileUpload
               artworkId={artwork.id}
               existingFiles={artworkFiles}
             />
           </TabsContent>
 
-          <TabsContent value="metadata" className="space-y-4">
+          <TabsContent value="metadata" className="space-y-4 overflow-y-auto flex-1">
             <div className="grid gap-4">
               <div>
                 <p className="text-xs text-muted-foreground">Artwork ID</p>
@@ -249,7 +249,7 @@ export const ArtworkDetailDialog = ({
           </TabsContent>
         </Tabs>
 
-        <div className="flex justify-between pt-4 border-t">
+        <div className="flex justify-between pt-4 border-t flex-shrink-0">
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => onEdit(artwork)}>
               <Edit className="mr-2 h-4 w-4" />
