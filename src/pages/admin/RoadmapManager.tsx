@@ -159,6 +159,7 @@ const SortableTaskRow = ({ task, getStatusBadge, handleTaskClick, updateTask, pr
 const RoadmapManager = () => {
   const { data: currentVersion, isLoading: versionLoading } = useCurrentRoadmapVersion();
   const [expandedMilestones, setExpandedMilestones] = useState<Set<string>>(new Set());
+  const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const { toggleDeliverable } = useRoadmapMutations();
@@ -186,6 +187,18 @@ const RoadmapManager = () => {
         newSet.delete(milestoneId);
       } else {
         newSet.add(milestoneId);
+      }
+      return newSet;
+    });
+  };
+
+  const togglePhase = (phaseId: string) => {
+    setExpandedPhases((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(phaseId)) {
+        newSet.delete(phaseId);
+      } else {
+        newSet.add(phaseId);
       }
       return newSet;
     });
@@ -283,22 +296,36 @@ const RoadmapManager = () => {
           </div>
         ) : (
           <div className="space-y-8">
-            {phasesWithProgress?.map((phase: any) => (
-              <Card key={phase.id}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-2xl">
-                        Phase {phase.phase_number}: {phase.name}
-                      </CardTitle>
-                      <CardDescription className="mt-2">
-                        {phase.description}
-                      </CardDescription>
+            {phasesWithProgress?.map((phase: any) => {
+              const isPhaseExpanded = expandedPhases.has(phase.id);
+              
+              return (
+                <Card key={phase.id}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <button
+                        onClick={() => togglePhase(phase.id)}
+                        className="flex items-start gap-3 flex-1 text-left hover:opacity-70 transition-opacity"
+                      >
+                        {isPhaseExpanded ? (
+                          <ChevronDown className="h-6 w-6 text-muted-foreground mt-1 flex-shrink-0" />
+                        ) : (
+                          <ChevronRight className="h-6 w-6 text-muted-foreground mt-1 flex-shrink-0" />
+                        )}
+                        <div>
+                          <CardTitle className="text-2xl">
+                            Phase {phase.phase_number}: {phase.name}
+                          </CardTitle>
+                          <CardDescription className="mt-2">
+                            {phase.description}
+                          </CardDescription>
+                        </div>
+                      </button>
+                      {getStatusBadge(phase.status)}
                     </div>
-                    {getStatusBadge(phase.status)}
-                  </div>
-                </CardHeader>
-                <CardContent>
+                  </CardHeader>
+                  {isPhaseExpanded && (
+                    <CardContent>
                   <div className="space-y-6">
                     {phase.milestones?.map((milestone: any) => {
                       const milestoneTasks = allTasks?.filter(task => task.milestone_id === milestone.id) || [];
@@ -441,8 +468,10 @@ const RoadmapManager = () => {
                     )})}
                   </div>
                 </CardContent>
+                  )}
               </Card>
-            ))}
+              );
+            })}
           </div>
         )}
 
