@@ -6,8 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, FileText } from "lucide-react";
 import { useCreateAgreement, useUpdateAgreement, useDeleteAgreement } from "@/hooks/usePartnerMutations";
+import { AgreementDocumentUpload } from "@/components/partner/AgreementDocumentUpload";
 
 interface Agreement {
   id: string;
@@ -256,6 +257,22 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               </SelectContent>
             </Select>
           </div>
+
+            {/* Agreement Documents */}
+            {editingAgreement && (
+              <div className="space-y-4">
+                <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Agreement Documents
+                </h4>
+                <AgreementDocumentUpload agreementId={editingAgreement.id} />
+              </div>
+            )}
+            {!editingAgreement && (
+              <p className="text-sm text-muted-foreground">
+                Save the agreement first to upload documents
+              </p>
+            )}
 
           </form>
         </div>
