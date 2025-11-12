@@ -29,11 +29,11 @@
     --radius: 0.5rem;
     
     /* Atlas Brand Colors */
-    --atlas-gold: 43 96% 56%;
-    --atlas-ocean: 200 100% 40%;
-    --atlas-charcoal: 0 0% 15%;
-    --atlas-warm-gray: 30 5% 92%;
-    --atlas-cream: 43 30% 96%;
+    --atlas-gold: 43 96% 56%;           /* PMS 7408 C */
+    --atlas-ocean: 200 100% 40%;        /* PMS 3015 C */
+    --atlas-charcoal: 0 0% 15%;         /* PMS Black 6 C */
+    --atlas-warm-gray: 30 5% 92%;       /* PMS Warm Gray 1 C */
+    --atlas-cream: 43 30% 96%;          /* PMS 7499 C */
 
 
     --sidebar-background: 0 0% 98%;
