@@ -33,6 +33,7 @@ import PartnerDashboard from "./pages/partner/Dashboard";
 import ArtworkCatalog from "./pages/partner/ArtworkCatalog";
 import NavigationManager from "./pages/admin/NavigationManager";
 import PartnerManagement from "./pages/admin/PartnerManagement";
+import Payouts from "./pages/admin/Payouts";
 import CustomerDashboard from "./pages/customer/Dashboard";
 
 const queryClient = new QueryClient();
@@ -82,6 +83,7 @@ const App = () => (
               <Route path="users" element={<UserManagement />} />
               <Route path="navigation" element={<NavigationManager />} />
               <Route path="partners" element={<PartnerManagement />} />
+              <Route path="payouts" element={<Payouts />} />
             </Route>
             
             {/* Partner routes */}

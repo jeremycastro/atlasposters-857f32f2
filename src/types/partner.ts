@@ -73,6 +73,14 @@ export interface PartnerAgreement {
   created_at: string;
   updated_at: string;
   created_by?: string;
+  // New payment model fields (v0.4.1 - Milestone 1.21a)
+  payment_model?: 'royalty_profit' | 'royalty_revenue' | 'flat_fee' | 'advance';
+  flat_fee_amount?: number;
+  advance_amount?: number;
+  advance_balance?: number;
+  advance_recoupment_rate?: number;
+  marketing_attribution_cap_percent?: number;
+  calculation_basis?: string;
 }
 
 export interface PartnerContact {
