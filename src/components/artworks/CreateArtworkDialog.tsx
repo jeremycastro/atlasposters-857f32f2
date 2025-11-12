@@ -31,7 +31,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useArtworkMutations } from '@/hooks/useArtworkMutations';
-import { usePartners } from '@/hooks/useProfiles';
+import { usePartners } from '@/hooks/usePartnerManagement';
 import { useAuth } from '@/hooks/useAuth';
 
 const currentYear = new Date().getFullYear();
@@ -150,7 +150,7 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
                               ) : partners && partners.length > 0 ? (
                                 partners.map((partner) => (
                                   <SelectItem key={partner.id} value={partner.id}>
-                                    {partner.partner_company_name || partner.full_name || partner.email}
+                                    {partner.partner_name}
                                   </SelectItem>
                                 ))
                               ) : (
