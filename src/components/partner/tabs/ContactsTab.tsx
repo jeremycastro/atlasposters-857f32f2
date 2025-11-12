@@ -244,7 +244,7 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
     email: "",
     country_code: "+1",
     mobile_phone: "",
-    designation: "other",
+    designation: "",
   });
 
   const createContact = useCreateContact();
@@ -253,6 +253,10 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.designation) {
+      return;
+    }
     
     if (editingContact) {
       updateContact.mutate(
@@ -285,7 +289,7 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
       email: "",
       country_code: "+1",
       mobile_phone: "",
-      designation: "other",
+      designation: "",
     });
   };
 
@@ -398,13 +402,14 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
           </div>
 
           <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
-            <Label htmlFor="designation" className="text-sm text-right">Designation</Label>
+            <Label htmlFor="designation" className="text-sm text-right">Designation *</Label>
             <Select
               value={formData.designation}
               onValueChange={(value) => setFormData({ ...formData, designation: value })}
+              required
             >
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Please select" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="point_of_contact">Point of Contact</SelectItem>
