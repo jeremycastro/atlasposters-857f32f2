@@ -85,8 +85,20 @@ export const useBrands = () => {
         .from("brands")
         .select(`
           *,
-          partner:partners(id, partner_name)
+          partner:partners(
+            id, 
+            partner_name,
+            partner_agreements(
+              id,
+              agreement_type,
+              status,
+              effective_date,
+              expiration_date,
+              payment_model
+            )
+          )
         `)
+        .eq('is_active', true)
         .order("brand_name");
 
       if (error) throw error;

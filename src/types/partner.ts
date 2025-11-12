@@ -49,6 +49,7 @@ export interface Brand {
   partner?: {
     id: string;
     partner_name: string;
+    partner_agreements?: PartnerAgreement[];
   };
   artworks?: Array<{
     id: string;

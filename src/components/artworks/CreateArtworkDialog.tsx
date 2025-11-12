@@ -31,7 +31,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useArtworkMutations } from '@/hooks/useArtworkMutations';
-import { usePartners } from '@/hooks/usePartnerManagement';
+import { useBrands } from '@/hooks/usePartnerManagement';
 import { useAuth } from '@/hooks/useAuth';
 import { ArtworkFilePicker } from './ArtworkFilePicker';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,7 +39,7 @@ import { supabase } from '@/integrations/supabase/client';
 const currentYear = new Date().getFullYear();
 
 const artworkSchema = z.object({
-  partner_id: z.string().optional(),
+  brand_id: z.string().min(1, 'Brand is required'),
   title: z.string().min(1, 'Title is required').max(200),
   artist_name: z.string().min(1, 'Artist name is required').max(200),
   description: z.string().optional(),
@@ -62,7 +62,7 @@ interface CreateArtworkDialogProps {
 export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogProps) => {
   const { createArtwork } = useArtworkMutations();
   const { activeRole } = useAuth();
-  const { data: partners, isLoading: partnersLoading } = usePartners();
+  const { data: brands, isLoading: brandsLoading } = useBrands();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
@@ -76,13 +76,41 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
       description: '',
       art_medium: '',
       is_exclusive: false,
-      partner_id: undefined,
+      brand_id: '',
+      rights_start_date: '',
+      rights_end_date: '',
     },
   });
+
+  const handleBrandChange = (brandId: string) => {
+    const selectedBrand = brands?.find(b => b.id === brandId);
+    if (!selectedBrand?.partner?.partner_agreements) return;
+    
+    // Find active agreement
+    const activeAgreement = selectedBrand.partner.partner_agreements.find(
+      (agreement) => agreement.status === 'active'
+    );
+    
+    if (activeAgreement) {
+      // Auto-populate rights dates from agreement
+      if (activeAgreement.effective_date) {
+        form.setValue('rights_start_date', activeAgreement.effective_date);
+      }
+      if (activeAgreement.expiration_date) {
+        form.setValue('rights_end_date', activeAgreement.expiration_date);
+      }
+    }
+  };
 
   const onSubmit = async (values: ArtworkFormValues) => {
     setIsSubmitting(true);
     try {
+      // Find the selected brand to get partner_id
+      const selectedBrand = brands?.find(b => b.id === values.brand_id);
+      if (!selectedBrand?.partner?.id) {
+        throw new Error('Brand must have an associated partner');
+      }
+
       // Convert tags string to array
       const tagsArray = values.tags
         ? values.tags.split(',').map(tag => tag.trim()).filter(Boolean)
@@ -101,9 +129,10 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
           rights_start_date: values.rights_start_date || null,
           rights_end_date: values.rights_end_date || null,
           status: 'draft',
+          brand_id: values.brand_id,
           partner_id: null as any, // Will be overridden by partnerId param
         },
-        partnerId: values.partner_id, // Only used if admin
+        partnerId: selectedBrand.partner.id, // Extract from brand
       });
 
       // Upload pending files if artwork was created
@@ -173,40 +202,42 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-              {/* Partner Selection (Admin Only) */}
+              {/* Brand Selection (Admin Only) */}
               {isAdmin && (
                 <div className="border rounded-lg p-4 space-y-2">
-                  <h4 className="font-medium text-sm text-muted-foreground mb-3">Partner Assignment</h4>
+                  <h4 className="font-medium text-sm text-muted-foreground mb-3">Brand Assignment</h4>
                   <FormField
                     control={form.control}
-                    name="partner_id"
+                    name="brand_id"
                     render={({ field }) => (
                       <FormItem>
                         <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
-                          <FormLabel className="text-sm text-right">Partner *</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <FormLabel className="text-sm text-right">Brand *</FormLabel>
+                          <Select 
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              handleBrandChange(value);
+                            }} 
+                            value={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select a partner" />
+                                <SelectValue placeholder="Select a brand" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {partnersLoading ? (
-                                <SelectItem value="loading" disabled>Loading partners...</SelectItem>
-                              ) : partners && partners.length > 0 ? (
-                                partners.map((partner) => (
-                                  <SelectItem key={partner.id} value={partner.id}>
-                                    {partner.partner_name}
+                              {brandsLoading ? (
+                                <SelectItem value="loading" disabled>Loading brands...</SelectItem>
+                              ) : brands && brands.length > 0 ? (
+                                brands.map((brand) => (
+                                  <SelectItem key={brand.id} value={brand.id}>
+                                    {brand.brand_name} ({brand.partner?.partner_name || 'Unknown Partner'})
                                   </SelectItem>
                                 ))
                               ) : (
-                                <Link 
-                                  to="/admin/partners" 
-                                  className="block px-2 py-1.5 text-sm text-foreground underline hover:text-foreground/80 cursor-pointer"
-                                  onClick={() => onOpenChange(false)}
-                                >
-                                  No partners found - Create one
-                                </Link>
+                                <SelectItem value="no-brands" disabled>
+                                  No brands available
+                                </SelectItem>
                               )}
                             </SelectContent>
                           </Select>
@@ -387,6 +418,9 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
                           <Input type="date" {...field} />
                         </FormControl>
                       </div>
+                      <FormDescription className="ml-[122px] text-xs">
+                        Auto-populated from partner agreement (can be overridden)
+                      </FormDescription>
                       <FormMessage className="ml-[122px]" />
                     </FormItem>
                   )}
@@ -403,6 +437,9 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
                           <Input type="date" {...field} />
                         </FormControl>
                       </div>
+                      <FormDescription className="ml-[122px] text-xs">
+                        Auto-populated from partner agreement (can be overridden)
+                      </FormDescription>
                       <FormMessage className="ml-[122px]" />
                     </FormItem>
                   )}
