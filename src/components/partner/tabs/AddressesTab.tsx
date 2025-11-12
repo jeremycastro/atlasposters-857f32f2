@@ -86,7 +86,7 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState<Address | null>(null);
   const [formData, setFormData] = useState({
-    designation: "ship_to",
+    designation: "",
     contact_selection: "",
     contact_id: "",
     contact_name: "",
@@ -152,7 +152,7 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
 
   const resetForm = () => {
     setFormData({
-      designation: "ship_to",
+      designation: "",
       contact_selection: "",
       contact_id: "",
       contact_name: "",
@@ -220,13 +220,13 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
           <h3 className="text-lg font-medium mb-2">{editingAddress ? "Edit Address" : "Add Address"}</h3>
           <form onSubmit={handleSubmit} className="space-y-2" id="address-form">
           <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
-            <Label htmlFor="designation" className="text-sm text-right">Designation *</Label>
+            <Label htmlFor="designation" className="text-sm text-right">Address Type *</Label>
             <Select
               value={formData.designation}
               onValueChange={(value) => setFormData({ ...formData, designation: value })}
             >
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Select Type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ship_to">Ship To</SelectItem>
