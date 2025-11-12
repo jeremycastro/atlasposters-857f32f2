@@ -515,8 +515,9 @@ export function BrandsTab({
 
             {/* Brand Logo Upload */}
             <div className="space-y-4">
-              <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">Brand Files<Palette className="h-4 w-4" />
-                Brand Logo
+              <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
+                <Palette className="h-4 w-4" />
+                Brand Files
               </h4>
               {editingBrand && <BrandLogoUpload brandId={editingBrand.id} currentLogoUrl={formData.logo_url} onLogoChange={url => setFormData(prev => ({
               ...prev,

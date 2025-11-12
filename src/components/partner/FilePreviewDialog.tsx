@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download, ExternalLink } from "lucide-react";
 
@@ -28,11 +28,14 @@ export const FilePreviewDialog = ({
   const displayName = file.name.replace(/^\d+-/, '');
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="truncate pr-4">{displayName}</DialogTitle>
+          <DialogTitle className="truncate pr-4">{displayName}</DialogTitle>
+          <DialogDescription className="sr-only">
+            Preview of {displayName}
+          </DialogDescription>
+          <div className="flex items-center justify-between pt-2">
             <div className="flex gap-2">
               {onDownload && (
                 <Button
