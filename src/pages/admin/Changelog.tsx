@@ -12,6 +12,24 @@ interface ChangelogEntry {
 
 const changelogData: ChangelogEntry[] = [
   {
+    version: "0.4.1",
+    date: "2024-11-12",
+    changes: [
+      {
+        type: "changed",
+        description: "Roadmap UI Refinement - Removed progress bars from milestone cards to reduce visual clutter and emphasize minimalist design",
+      },
+      {
+        type: "changed",
+        description: "Enhanced Status Badges - Made milestone status badges larger and more prominent with integrated progress information (e.g., 'In Progress • 5/10 tasks')",
+      },
+      {
+        type: "changed",
+        description: "Improved Status Indicators - Status icons and color-coded badges now serve as primary visual indicators instead of progress bars",
+      },
+    ],
+  },
+  {
     version: "0.4.0",
     date: "2024-11-10",
     changes: [
