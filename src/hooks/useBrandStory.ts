@@ -78,26 +78,57 @@ export const useBrandStoryComponentVersions = (componentId: string) => {
 };
 
 export const useBrandTimeline = (
-  brandId?: string | null,
+  brandIds?: string[],
   options?: {
-    scope?: BrandStoryScope;
+    includeGlobal?: boolean;
     publishedOnly?: boolean;
   }
 ) => {
   return useQuery({
-    queryKey: ["brandTimeline", brandId, options],
+    queryKey: ["brandTimeline", brandIds, options],
     queryFn: async () => {
       let query = supabase
         .from("brand_story_timeline")
-        .select("*")
+        .select(`
+          *,
+          brands!brand_story_timeline_brand_id_fkey (
+            id,
+            brand_name,
+            primary_color
+          )
+        `)
         .order("event_date", { ascending: false });
 
-      if (brandId) {
-        query = query.eq("brand_id", brandId);
+      // Build conditions for filtering
+      const conditions: string[] = [];
+
+      if (brandIds && brandIds.length > 0) {
+        const brandIdList = brandIds.map(id => `brand_id.eq.${id}`).join(',');
+        conditions.push(`or(${brandIdList})`);
       }
 
-      if (options?.scope) {
-        query = query.eq("scope", options.scope);
+      if (options?.includeGlobal) {
+        conditions.push("scope.eq.atlas_global");
+      }
+
+      // Apply OR conditions if any
+      if (conditions.length > 0) {
+        if (conditions.length === 1) {
+          // Single condition, use it directly
+          const condition = conditions[0];
+          if (condition.startsWith('or(')) {
+            query = query.or(condition.replace('or(', '').replace(')', ''));
+          } else {
+            query = query.eq("scope", "atlas_global");
+          }
+        } else {
+          // Multiple conditions, combine with OR
+          const brandCondition = conditions.find(c => c.startsWith('or('));
+          if (brandCondition && options?.includeGlobal) {
+            const brandIds = brandCondition.replace('or(', '').replace(')', '');
+            query = query.or(`${brandIds},scope.eq.atlas_global`);
+          }
+        }
       }
 
       if (options?.publishedOnly) {

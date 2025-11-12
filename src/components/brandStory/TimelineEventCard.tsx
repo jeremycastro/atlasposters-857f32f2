@@ -7,17 +7,36 @@ import { Button } from "@/components/ui/button";
 
 interface TimelineEventCardProps {
   event: BrandTimelineEvent;
+  brandName?: string;
+  brandColor?: string | null;
   onView?: (event: BrandTimelineEvent) => void;
   onEdit?: (event: BrandTimelineEvent) => void;
 }
 
-export const TimelineEventCard = ({ event, onView, onEdit }: TimelineEventCardProps) => {
+export const TimelineEventCard = ({ event, brandName, brandColor, onView, onEdit }: TimelineEventCardProps) => {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              {brandName && (
+                <Badge 
+                  variant="outline" 
+                  className="text-xs border-2"
+                  style={{ 
+                    borderColor: brandColor || "hsl(var(--border))",
+                    color: brandColor || "hsl(var(--foreground))"
+                  }}
+                >
+                  {brandName}
+                </Badge>
+              )}
+              {event.scope === "atlas_global" && !brandName && (
+                <Badge variant="outline" className="text-xs">
+                  Atlas Global
+                </Badge>
+              )}
               <Badge variant="outline" className="text-xs">
                 {EVENT_TYPE_LABELS[event.event_type]}
               </Badge>

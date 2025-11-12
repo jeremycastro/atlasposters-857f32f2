@@ -17,7 +17,7 @@ export default function BrandStoryDashboard() {
 
   const { data: stats } = useBrandStoryStats(selectedBrandId);
   const { data: recentComponents = [] } = useBrandStoryComponents(selectedBrandId);
-  const { data: recentTimeline = [] } = useBrandTimeline(selectedBrandId);
+  const { data: recentTimeline = [] } = useBrandTimeline(selectedBrandId ? [selectedBrandId] : undefined);
 
   return (
     <div className="space-y-6">

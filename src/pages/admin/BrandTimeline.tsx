@@ -1,24 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Filter } from "lucide-react";
-import { BrandSelector } from "@/components/brandStory/BrandSelector";
+import { BrandMultiSelector } from "@/components/brandStory/BrandMultiSelector";
 import { CreateTimelineDialog } from "@/components/brandStory/CreateTimelineDialog";
 import { TimelineEventCard } from "@/components/brandStory/TimelineEventCard";
 import { useBrandTimeline } from "@/hooks/useBrandStory";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BrandEventType, EVENT_TYPE_LABELS } from "@/types/brandStory";
-import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 export default function BrandTimeline() {
-  const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
-  const [timelineDialogOpen, setTimelineDialogOpen] = useState(false);
-  const [filterEventType, setFilterEventType] = useState<BrandEventType | "all">("all");
-  const [showDrafts, setShowDrafts] = useState(true);
-
-  const { data: events = [] } = useBrandTimeline(selectedBrandId, {
-    publishedOnly: !showDrafts,
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Initialize state from URL params
+  const [selectedBrandIds, setSelectedBrandIds] = useState<string[]>(() => {
+    const brands = searchParams.get("brands");
+    return brands ? brands.split(",").filter(Boolean) : [];
   });
+  
+  const [includeGlobal, setIncludeGlobal] = useState(() => {
+    return searchParams.get("global") === "true";
+  });
+  
+  const [timelineDialogOpen, setTimelineDialogOpen] = useState(false);
+  const [filterEventType, setFilterEventType] = useState<BrandEventType | "all">(() => {
+    return (searchParams.get("type") as BrandEventType) || "all";
+  });
+  
+  const [showDrafts, setShowDrafts] = useState(() => {
+    return searchParams.get("drafts") !== "false";
+  });
+
+  // Update URL params when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    
+    if (selectedBrandIds.length > 0) {
+      params.set("brands", selectedBrandIds.join(","));
+    }
+    
+    if (includeGlobal) {
+      params.set("global", "true");
+    }
+    
+    if (filterEventType !== "all") {
+      params.set("type", filterEventType);
+    }
+    
+    if (!showDrafts) {
+      params.set("drafts", "false");
+    }
+    
+    setSearchParams(params, { replace: true });
+  }, [selectedBrandIds, includeGlobal, filterEventType, showDrafts, setSearchParams]);
+
+  const { data: events = [] } = useBrandTimeline(
+    selectedBrandIds.length > 0 ? selectedBrandIds : undefined,
+    {
+      includeGlobal,
+      publishedOnly: !showDrafts,
+    }
+  );
 
   const filteredEvents = events.filter((event) => {
     if (filterEventType !== "all" && event.event_type !== filterEventType) {
@@ -46,7 +90,12 @@ export default function BrandTimeline() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <BrandSelector value={selectedBrandId} onChange={setSelectedBrandId} />
+          <BrandMultiSelector
+            selectedBrandIds={selectedBrandIds}
+            onChange={setSelectedBrandIds}
+            includeGlobal={includeGlobal}
+            onIncludeGlobalChange={setIncludeGlobal}
+          />
           <Button onClick={() => setTimelineDialogOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Add Event
@@ -113,13 +162,21 @@ export default function BrandTimeline() {
               <div className="space-y-4 pl-16">
                 {groupedByYear[year]
                   .sort((a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime())
-                  .map((event) => (
-                    <div key={event.id} className="relative">
-                      <div className="absolute -left-[52px] top-6 h-2 w-2 rounded-full bg-primary" />
-                      <div className="absolute -left-12 top-8 w-8 h-px bg-border" />
-                      <TimelineEventCard event={event} />
-                    </div>
-                  ))}
+                  .map((event) => {
+                    const brand = (event as any).brands;
+                    const dotColor = brand?.primary_color || "hsl(var(--primary))";
+                    
+                    return (
+                      <div key={event.id} className="relative">
+                        <div 
+                          className="absolute -left-[52px] top-6 h-2 w-2 rounded-full border"
+                          style={{ backgroundColor: dotColor }}
+                        />
+                        <div className="absolute -left-12 top-8 w-8 h-px bg-border" />
+                        <TimelineEventCard event={event} brandName={brand?.brand_name} brandColor={brand?.primary_color} />
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           ))}
