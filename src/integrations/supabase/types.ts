@@ -598,15 +598,22 @@ export type Database = {
       }
       partner_agreements: {
         Row: {
+          advance_amount: number | null
+          advance_balance: number | null
+          advance_recoupment_rate: number | null
           agreement_document_path: string | null
           agreement_type: string
+          calculation_basis: string | null
           commission_rate: number | null
           created_at: string | null
           created_by: string | null
           effective_date: string
           expiration_date: string | null
+          flat_fee_amount: number | null
           id: string
+          marketing_attribution_cap_percent: number | null
           partner_id: string
+          payment_model: Database["public"]["Enums"]["payment_model"] | null
           payment_period: string | null
           royalty_rate: number | null
           status: string | null
@@ -614,15 +621,22 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          advance_amount?: number | null
+          advance_balance?: number | null
+          advance_recoupment_rate?: number | null
           agreement_document_path?: string | null
           agreement_type: string
+          calculation_basis?: string | null
           commission_rate?: number | null
           created_at?: string | null
           created_by?: string | null
           effective_date: string
           expiration_date?: string | null
+          flat_fee_amount?: number | null
           id?: string
+          marketing_attribution_cap_percent?: number | null
           partner_id: string
+          payment_model?: Database["public"]["Enums"]["payment_model"] | null
           payment_period?: string | null
           royalty_rate?: number | null
           status?: string | null
@@ -630,15 +644,22 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          advance_amount?: number | null
+          advance_balance?: number | null
+          advance_recoupment_rate?: number | null
           agreement_document_path?: string | null
           agreement_type?: string
+          calculation_basis?: string | null
           commission_rate?: number | null
           created_at?: string | null
           created_by?: string | null
           effective_date?: string
           expiration_date?: string | null
+          flat_fee_amount?: number | null
           id?: string
+          marketing_attribution_cap_percent?: number | null
           partner_id?: string
+          payment_model?: Database["public"]["Enums"]["payment_model"] | null
           payment_period?: string | null
           royalty_rate?: number | null
           status?: string | null
@@ -2048,6 +2069,11 @@ export type Database = {
       asc_history_status: "assigned" | "voided" | "transferred"
       import_method: "csv" | "syncio" | "api" | "manual"
       import_status: "pending" | "mapped" | "imported" | "error" | "skipped"
+      payment_model:
+        | "royalty_profit"
+        | "royalty_revenue"
+        | "flat_fee"
+        | "advance"
       roadmap_milestone_status:
         | "not_started"
         | "in_progress"
@@ -2199,6 +2225,12 @@ export const Constants = {
       asc_history_status: ["assigned", "voided", "transferred"],
       import_method: ["csv", "syncio", "api", "manual"],
       import_status: ["pending", "mapped", "imported", "error", "skipped"],
+      payment_model: [
+        "royalty_profit",
+        "royalty_revenue",
+        "flat_fee",
+        "advance",
+      ],
       roadmap_milestone_status: [
         "not_started",
         "in_progress",
