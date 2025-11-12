@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { Link } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -153,7 +154,13 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
                                   </SelectItem>
                                 ))
                               ) : (
-                                <SelectItem value="none" disabled>No partners found</SelectItem>
+                                <Link 
+                                  to="/admin/partners" 
+                                  className="block px-2 py-1.5 text-sm text-primary hover:text-primary/80 hover:underline cursor-pointer"
+                                  onClick={() => onOpenChange(false)}
+                                >
+                                  No partners found - Create one
+                                </Link>
                               )}
                             </SelectContent>
                           </Select>
