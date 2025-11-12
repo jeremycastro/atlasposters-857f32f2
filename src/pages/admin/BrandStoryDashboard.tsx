@@ -21,14 +21,11 @@ export default function BrandStoryDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Brand Story Management</h1>
-          <p className="text-muted-foreground">
-            Build and manage your brand narrative, messaging, and content guidelines
-          </p>
-        </div>
-        <BrandSelector value={selectedBrandId} onChange={setSelectedBrandId} />
+      <div>
+        <h1 className="text-3xl font-bold">Brand Story Management</h1>
+        <p className="text-muted-foreground">
+          Build and manage your brand narrative, messaging, and content guidelines
+        </p>
       </div>
 
       {/* Stats Cards */}
@@ -86,7 +83,8 @@ export default function BrandStoryDashboard() {
           <CardTitle>Quick Actions</CardTitle>
           <CardDescription>Get started building your brand story</CardDescription>
         </CardHeader>
-        <CardContent className="flex gap-2">
+        <CardContent className="flex items-center gap-2">
+          <BrandSelector value={selectedBrandId} onChange={setSelectedBrandId} />
           <Button onClick={() => setComponentDialogOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Create Component
