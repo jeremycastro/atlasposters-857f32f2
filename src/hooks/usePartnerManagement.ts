@@ -11,7 +11,20 @@ export const usePartners = () => {
         .select(`
           *,
           atlas_manager:profiles!partners_atlas_manager_id_fkey(id, full_name, email),
-          brands(id, brand_name, is_active),
+          brands(
+            id, 
+            brand_name, 
+            description,
+            logo_url,
+            primary_color,
+            secondary_color,
+            accent_color,
+            tagline,
+            brand_story,
+            website_url,
+            social_links,
+            is_active
+          ),
           partner_contacts(id, full_name, email, designation, is_primary),
           partner_agreements(id, agreement_type, status, effective_date, expiration_date)
         `)
@@ -37,7 +50,15 @@ export const usePartnerById = (partnerId: string | null) => {
           brands(
             id, 
             brand_name, 
-            description, 
+            description,
+            logo_url,
+            primary_color,
+            secondary_color,
+            accent_color,
+            tagline,
+            brand_story,
+            website_url,
+            social_links,
             is_active,
             artworks(id, title, asc_code, status)
           ),
