@@ -10,6 +10,8 @@ import { useBrandTimeline } from "@/hooks/useBrandStory";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BrandEventType, EVENT_TYPE_LABELS } from "@/types/brandStory";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 export default function BrandTimeline() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -116,13 +118,19 @@ export default function BrandTimeline() {
                 ))}
               </SelectContent>
             </Select>
-            <Button
-              variant={showDrafts ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowDrafts(!showDrafts)}
-            >
-              {showDrafts ? "Showing Drafts" : "Published Only"}
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="show-drafts"
+                checked={showDrafts}
+                onCheckedChange={(checked) => setShowDrafts(!!checked)}
+              />
+              <Label
+                htmlFor="show-drafts"
+                className="text-sm font-normal cursor-pointer"
+              >
+                Include drafts
+              </Label>
+            </div>
             <div className="ml-auto">
               <Button onClick={() => setTimelineDialogOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
