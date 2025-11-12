@@ -252,7 +252,7 @@ const RoadmapManager = () => {
                                 )}
                                 {getStatusIcon(milestone.status)}
                                 <h4 className="font-semibold">
-                                  Milestone {milestone.milestone_number}: {milestone.name}
+                                  {milestone.milestone_number}: {milestone.name}
                                 </h4>
                               </button>
                               <p className="text-sm text-muted-foreground ml-10">

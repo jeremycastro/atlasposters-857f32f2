@@ -98,7 +98,8 @@ export const useRoadmapWithProgress = (versionId?: string) => {
       let phasesQuery = supabase
         .from("roadmap_phases")
         .select("*, milestones:roadmap_milestones(*)")
-        .order("order_index", { ascending: true });
+        .order("order_index", { ascending: true })
+        .order("milestones(order_index)", { ascending: true });
 
       if (versionId) {
         phasesQuery = phasesQuery.eq("version_id", versionId);
