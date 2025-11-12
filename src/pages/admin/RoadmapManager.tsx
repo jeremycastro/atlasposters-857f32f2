@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCurrentRoadmapVersion, useRoadmapWithProgress, useRoadmapMutations } from "@/hooks/useRoadmap";
 import { useTasks } from "@/hooks/useTasks";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
@@ -176,6 +176,13 @@ const RoadmapManager = () => {
   const { data: phasesWithProgress, isLoading: progressLoading } = useRoadmapWithProgress(
     currentVersion?.id
   );
+
+  // Initialize all phases as expanded by default
+  useEffect(() => {
+    if (phasesWithProgress && expandedPhases.size === 0) {
+      setExpandedPhases(new Set(phasesWithProgress.map((phase: any) => phase.id)));
+    }
+  }, [phasesWithProgress]);
 
   // Fetch all tasks to show in milestone tables
   const { data: allTasks } = useTasks();
