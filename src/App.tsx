@@ -37,6 +37,8 @@ import PartnerManagement from "./pages/admin/PartnerManagement";
 import Payouts from "./pages/admin/Payouts";
 import CustomerDashboard from "./pages/customer/Dashboard";
 import BrandStory from "./pages/admin/knowledge/BrandStory";
+import BrandStoryDashboard from "./pages/admin/BrandStoryDashboard";
+import BrandTimeline from "./pages/admin/BrandTimeline";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +85,8 @@ const App = () => (
               <Route path="knowledge/artwork-catalog" element={<ArtworkCatalogKB />} />
               <Route path="knowledge/admin-brand-guide" element={<AdminBrandGuide />} />
               <Route path="knowledge/brand-story" element={<BrandStory />} />
+              <Route path="brand-story" element={<BrandStoryDashboard />} />
+              <Route path="brand-story/timeline" element={<BrandTimeline />} />
               <Route path="artworks" element={<ArtworkCatalog />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="navigation" element={<NavigationManager />} />
