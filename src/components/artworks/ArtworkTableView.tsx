@@ -275,10 +275,11 @@ export function ArtworkTableView({ artworks, onView, onEdit, onArchive }: Artwor
   const getThumbnailUrl = (artwork: Artwork) => {
     if (!artwork.artwork_files || artwork.artwork_files.length === 0) return null;
 
-    const primaryImage = artwork.artwork_files.find(
-      f => f.is_primary && f.file_type === "image"
+    // Look for primary file first, then any image file
+    const primaryImage = artwork.artwork_files.find(f => f.is_primary);
+    const fallbackImage = artwork.artwork_files.find(f => 
+      f.mime_type?.startsWith('image/')
     );
-    const fallbackImage = artwork.artwork_files.find(f => f.file_type === "image");
     const file = primaryImage || fallbackImage;
 
     if (!file) return null;
