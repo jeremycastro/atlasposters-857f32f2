@@ -98,8 +98,7 @@ export const useRoadmapWithProgress = (versionId?: string) => {
       let phasesQuery = supabase
         .from("roadmap_phases")
         .select("*, milestones:roadmap_milestones(*)")
-        .order("order_index", { ascending: true })
-        .order("milestones(order_index)", { ascending: true });
+        .order("order_index", { ascending: true });
 
       if (versionId) {
         phasesQuery = phasesQuery.eq("version_id", versionId);
@@ -107,6 +106,13 @@ export const useRoadmapWithProgress = (versionId?: string) => {
 
       const { data: phases, error: phasesError } = await phasesQuery;
       if (phasesError) throw phasesError;
+
+      // Sort milestones within each phase by order_index
+      phases?.forEach(phase => {
+        if (phase.milestones) {
+          phase.milestones.sort((a: any, b: any) => a.order_index - b.order_index);
+        }
+      });
 
       // Fetch task counts for each milestone
       const phasesWithProgress = await Promise.all(
