@@ -104,6 +104,8 @@ export interface PartnerAddress {
   id: string;
   partner_id: string;
   designation: 'ship_to' | 'bill_to' | 'headquarters' | 'warehouse' | 'other';
+  contact_id?: string;
+  contact_name?: string;
   address_line1: string;
   address_line2?: string;
   city: string;

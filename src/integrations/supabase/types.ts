@@ -548,6 +548,8 @@ export type Database = {
           address_line1: string
           address_line2: string | null
           city: string
+          contact_id: string | null
+          contact_name: string | null
           country: string
           created_at: string | null
           designation: string
@@ -562,6 +564,8 @@ export type Database = {
           address_line1: string
           address_line2?: string | null
           city: string
+          contact_id?: string | null
+          contact_name?: string | null
           country?: string
           created_at?: string | null
           designation: string
@@ -576,6 +580,8 @@ export type Database = {
           address_line1?: string
           address_line2?: string | null
           city?: string
+          contact_id?: string | null
+          contact_name?: string | null
           country?: string
           created_at?: string | null
           designation?: string
@@ -587,6 +593,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "partner_addresses_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "partner_contacts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "partner_addresses_partner_id_fkey"
             columns: ["partner_id"]

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,10 +8,14 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Badge } from "@/components/ui/badge";
 import { Plus, Star, Trash2 } from "lucide-react";
 import { useCreateAddress, useUpdateAddress, useDeleteAddress } from "@/hooks/usePartnerMutations";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Address {
   id: string;
   designation?: string;
+  contact_name?: string;
+  contact_id?: string;
   address_line1: string;
   address_line2?: string;
   city: string;
@@ -26,6 +30,56 @@ interface AddressesTabProps {
   addresses: Address[];
 }
 
+const COUNTRIES = [
+  "USA",
+  "Canada",
+  "United Kingdom",
+  "Australia",
+  "Germany",
+  "France",
+  "Italy",
+  "Spain",
+  "Netherlands",
+  "Belgium",
+  "Switzerland",
+  "Austria",
+  "Sweden",
+  "Norway",
+  "Denmark",
+  "Finland",
+  "Ireland",
+  "Portugal",
+  "Greece",
+  "Poland",
+  "Czech Republic",
+  "Japan",
+  "South Korea",
+  "Singapore",
+  "New Zealand",
+  "Mexico",
+  "Brazil",
+  "Argentina",
+  "Chile",
+];
+
+const US_STATES = [
+  "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+  "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+  "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+  "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+  "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+];
+
+const CANADIAN_PROVINCES = [
+  "AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"
+];
+
+const getStatesForCountry = (country: string) => {
+  if (country === "USA") return US_STATES;
+  if (country === "Canada") return CANADIAN_PROVINCES;
+  return [];
+};
+
 export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
   const [showForm, setShowForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -33,6 +87,9 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
   const [addressToDelete, setAddressToDelete] = useState<Address | null>(null);
   const [formData, setFormData] = useState({
     designation: "ship_to",
+    contact_selection: "other",
+    contact_id: "",
+    contact_name: "",
     address_line1: "",
     address_line2: "",
     city: "",
@@ -40,6 +97,27 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
     postal_code: "",
     country: "USA",
   });
+
+  const { data: partnerContacts = [] } = useQuery({
+    queryKey: ["partner-contacts", partnerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("partner_contacts")
+        .select("id, full_name, first_name, last_name, email")
+        .eq("partner_id", partnerId)
+        .order("is_primary", { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  useEffect(() => {
+    // Reset state when country changes
+    if (formData.country && !getStatesForCountry(formData.country).includes(formData.state)) {
+      setFormData(prev => ({ ...prev, state: "" }));
+    }
+  }, [formData.country]);
 
   const createAddress = useCreateAddress();
   const updateAddress = useUpdateAddress();
@@ -75,6 +153,9 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
   const resetForm = () => {
     setFormData({
       designation: "ship_to",
+      contact_selection: "other",
+      contact_id: "",
+      contact_name: "",
       address_line1: "",
       address_line2: "",
       city: "",
@@ -89,6 +170,9 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
       setEditingAddress(address);
       setFormData({
         designation: address.designation || "ship_to",
+        contact_selection: address.contact_id ? address.contact_id : "other",
+        contact_id: address.contact_id || "",
+        contact_name: address.contact_name || "",
         address_line1: address.address_line1,
         address_line2: address.address_line2 || "",
         city: address.city,
@@ -155,6 +239,50 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="contact">Contact</Label>
+            <Select
+              value={formData.contact_selection}
+              onValueChange={(value) => {
+                if (value === "other") {
+                  setFormData({ ...formData, contact_selection: value, contact_id: "", contact_name: "" });
+                } else {
+                  const contact = partnerContacts.find(c => c.id === value);
+                  setFormData({ 
+                    ...formData, 
+                    contact_selection: value, 
+                    contact_id: value,
+                    contact_name: contact?.full_name || `${contact?.first_name} ${contact?.last_name}`.trim()
+                  });
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select contact" />
+              </SelectTrigger>
+              <SelectContent>
+                {partnerContacts.map((contact) => (
+                  <SelectItem key={contact.id} value={contact.id}>
+                    {contact.full_name || `${contact.first_name} ${contact.last_name}`.trim()}
+                  </SelectItem>
+                ))}
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {formData.contact_selection === "other" && (
+            <div className="space-y-2">
+              <Label htmlFor="contact_name">Contact Name</Label>
+              <Input
+                id="contact_name"
+                value={formData.contact_name}
+                onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
+                placeholder="Enter contact name"
+              />
+            </div>
+          )}
+
+          <div className="space-y-2">
             <Label htmlFor="address_line1">Address Line 1 *</Label>
             <Input
               id="address_line1"
@@ -173,6 +301,25 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="country">Country *</Label>
+            <Select
+              value={formData.country}
+              onValueChange={(value) => setFormData({ ...formData, country: value })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRIES.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="city">City *</Label>
@@ -184,34 +331,42 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="state">State</Label>
-              <Input
-                id="state"
-                value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              />
+              <Label htmlFor="state">State/Province</Label>
+              {getStatesForCountry(formData.country).length > 0 ? (
+                <Select
+                  value={formData.state}
+                  onValueChange={(value) => setFormData({ ...formData, state: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select state/province" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getStatesForCountry(formData.country).map((state) => (
+                      <SelectItem key={state} value={state}>
+                        {state}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="state"
+                  value={formData.state}
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                  placeholder="Enter state/province/region"
+                />
+              )}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="postal_code">Postal Code *</Label>
-              <Input
-                id="postal_code"
-                value={formData.postal_code}
-                onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="country">Country *</Label>
-              <Input
-                id="country"
-                value={formData.country}
-                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                required
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="postal_code">Postal Code *</Label>
+            <Input
+              id="postal_code"
+              value={formData.postal_code}
+              onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
+              required
+            />
           </div>
 
           </form>
