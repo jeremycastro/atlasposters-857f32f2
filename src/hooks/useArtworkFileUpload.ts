@@ -56,7 +56,7 @@ export const useArtworkFileUpload = () => {
           artwork_id: artworkId,
           file_name: file.name,
           file_path: filePath,
-          file_type: file.type.startsWith('image/') ? 'image' : 'document',
+          file_type: 'original',
           file_size: file.size,
           mime_type: file.type,
           is_primary: isPrimary,
