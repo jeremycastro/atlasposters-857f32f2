@@ -22,8 +22,15 @@ export const useArtworks = (filters?: ArtworkFilters) => {
         .from('artworks')
         .select(`
           *,
-          created_by_profile:profiles!artworks_created_by_fkey(full_name, email),
-          partner_profile:profiles!artworks_partner_id_fkey(full_name, email, partner_company_name)
+          brand:brands(
+            id,
+            brand_name,
+            partner:partners(
+              id,
+              partner_name
+            )
+          ),
+          created_by_profile:profiles!artworks_created_by_fkey(full_name, email)
         `)
         .order('created_at', { ascending: false });
 

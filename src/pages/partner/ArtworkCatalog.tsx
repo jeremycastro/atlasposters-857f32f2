@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useArtworks } from '@/hooks/useArtworks';
 import { ArtworkStats } from '@/components/artworks/ArtworkStats';
-import { ArtworkCardView } from '@/components/artworks/ArtworkCardView';
+import { ArtworkTableView } from '@/components/artworks/ArtworkTableView';
 import { CreateArtworkDialog } from '@/components/artworks/CreateArtworkDialog';
 import { ArtworkDetailDialog } from '@/components/artworks/ArtworkDetailDialog';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,20 @@ import { Input } from '@/components/ui/input';
 import { Plus, Search } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 
-type Artwork = Database['public']['Tables']['artworks']['Row'];
+type Artwork = Database['public']['Tables']['artworks']['Row'] & {
+  brand?: {
+    id: string;
+    brand_name: string;
+    partner?: {
+      id: string;
+      partner_name: string;
+    };
+  } | null;
+  created_by_profile?: {
+    full_name: string | null;
+    email: string;
+  } | null;
+};
 
 export default function ArtworkCatalog() {
   const [search, setSearch] = useState('');
@@ -66,13 +79,13 @@ export default function ArtworkCatalog() {
         </div>
       </div>
 
-      {/* Artwork Grid */}
+      {/* Artwork Table */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
       ) : (
-        <ArtworkCardView
+        <ArtworkTableView
           artworks={artworks || []}
           onView={handleView}
           onEdit={handleEdit}
