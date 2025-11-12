@@ -387,10 +387,18 @@ export function BrandsTab({
         </div>
         <div className="space-y-2">
           <Label>Tagline</Label>
-          <Input value={formData.tagline} onChange={e => setFormData(prev => ({
-          ...prev,
-          tagline: e.target.value
-        }))} placeholder="Short brand tagline" />
+          <Input 
+            value={formData.tagline} 
+            onChange={e => {
+              console.log('Tagline changed to:', e.target.value);
+              setFormData(prev => {
+                const newState = {...prev, tagline: e.target.value};
+                console.log('New formData after tagline change:', newState);
+                return newState;
+              });
+            }} 
+            placeholder="Short brand tagline" 
+          />
         </div>
       </div>
       <div className="space-y-2">
@@ -402,10 +410,19 @@ export function BrandsTab({
       </div>
       <div className="space-y-2">
         <Label>Brand Story</Label>
-        <Textarea value={formData.brand_story} onChange={e => setFormData(prev => ({
-        ...prev,
-        brand_story: e.target.value
-      }))} rows={3} placeholder="Detailed brand story for landing pages" />
+        <Textarea 
+          value={formData.brand_story} 
+          onChange={e => {
+            console.log('Brand story changed to:', e.target.value);
+            setFormData(prev => {
+              const newState = {...prev, brand_story: e.target.value};
+              console.log('New formData after brand story change:', newState);
+              return newState;
+            });
+          }} 
+          rows={3} 
+          placeholder="Detailed brand story for landing pages" 
+        />
               </div>
             </div>
 
