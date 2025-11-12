@@ -225,57 +225,55 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
     
     return (
       <div className="flex flex-col h-full">
-        <div className="flex-1 overflow-y-auto space-y-6 pb-20">
-          <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
+        <div className="flex-1 overflow-y-auto space-y-2 pb-20">
+          <Button onClick={handleBack} variant="ghost" size="sm" className="mb-1">
             ← Back to Agreements
           </Button>
-          <h3 className="text-lg font-medium">{editingAgreement ? "Edit Agreement" : "Add Agreement"}</h3>
+          <h3 className="text-lg font-medium mb-2">{editingAgreement ? "Edit Agreement" : "Add Agreement"}</h3>
           
-          <form onSubmit={handleSubmit} className="space-y-6" id="agreement-form">
+          <form onSubmit={handleSubmit} className="space-y-4" id="agreement-form">
             {/* Basic Information */}
-            <div className="space-y-4">
+            <div className="space-y-2">
               <h4 className="font-medium text-sm text-muted-foreground">Basic Information</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="agreement_type">Agreement Type *</Label>
-                  <Select
-                    value={formData.agreement_type}
-                    onValueChange={(value) => setFormData({ ...formData, agreement_type: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="royalty">Royalty</SelectItem>
-                      <SelectItem value="wholesale">Wholesale</SelectItem>
-                      <SelectItem value="commission">Commission</SelectItem>
-                      <SelectItem value="licensing">Licensing</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value) => setFormData({ ...formData, status: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="expired">Expired</SelectItem>
-                      <SelectItem value="terminated">Terminated</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+                <Label htmlFor="agreement_type" className="text-sm text-right">Agreement Type *</Label>
+                <Select
+                  value={formData.agreement_type}
+                  onValueChange={(value) => setFormData({ ...formData, agreement_type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="royalty">Royalty</SelectItem>
+                    <SelectItem value="wholesale">Wholesale</SelectItem>
+                    <SelectItem value="commission">Commission</SelectItem>
+                    <SelectItem value="licensing">Licensing</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="effective_date">Effective Date *</Label>
+              <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+                <Label htmlFor="status" className="text-sm text-right">Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => setFormData({ ...formData, status: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="expired">Expired</SelectItem>
+                    <SelectItem value="terminated">Terminated</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
+                  <Label htmlFor="effective_date" className="text-sm text-right">Effective Date *</Label>
                   <Input
                     id="effective_date"
                     type="date"
@@ -284,8 +282,8 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="expiration_date">Expiration Date</Label>
+                <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
+                  <Label htmlFor="expiration_date" className="text-sm text-right">Expiration Date</Label>
                   <Input
                     id="expiration_date"
                     type="date"
@@ -297,10 +295,10 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
             </div>
 
             {/* Payment Model */}
-            <div className="space-y-4">
+            <div className="space-y-2">
               <h4 className="font-medium text-sm text-muted-foreground">Payment Model</h4>
-              <div className="space-y-2">
-                <Label htmlFor="payment_model">Payment Model</Label>
+              <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+                <Label htmlFor="payment_model" className="text-sm text-right">Payment Model</Label>
                 <Select
                   value={formData.payment_model}
                   onValueChange={(value) => setFormData({ ...formData, payment_model: value })}
@@ -319,8 +317,8 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
 
               {/* Conditional fields based on payment model */}
               {(formData.payment_model === 'royalty_profit' || formData.payment_model === 'royalty_revenue') && (
-                <div className="space-y-2">
-                  <Label htmlFor="royalty_rate">Royalty Rate (%) *</Label>
+                <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+                  <Label htmlFor="royalty_rate" className="text-sm text-right">Royalty Rate (%) *</Label>
                   <Input
                     id="royalty_rate"
                     type="number"
@@ -336,8 +334,8 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               )}
 
               {formData.payment_model === 'flat_fee' && (
-                <div className="space-y-2">
-                  <Label htmlFor="flat_fee_amount">Flat Fee Amount (£) *</Label>
+                <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+                  <Label htmlFor="flat_fee_amount" className="text-sm text-right">Flat Fee Amount (£) *</Label>
                   <Input
                     id="flat_fee_amount"
                     type="number"
@@ -352,9 +350,9 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               )}
 
               {formData.payment_model === 'advance' && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="advance_amount">Advance Amount (£) *</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
+                    <Label htmlFor="advance_amount" className="text-sm text-right">Advance (£) *</Label>
                     <Input
                       id="advance_amount"
                       type="number"
@@ -366,8 +364,8 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                       required={formData.payment_model === 'advance'}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="advance_recoupment_rate">Recoupment Rate (%) *</Label>
+                  <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
+                    <Label htmlFor="advance_recoupment_rate" className="text-sm text-right">Recoupment (%) *</Label>
                     <Input
                       id="advance_recoupment_rate"
                       type="number"
@@ -383,8 +381,8 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="payment_period">Payment Period</Label>
+              <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+                <Label htmlFor="payment_period" className="text-sm text-right">Payment Period</Label>
                 <Select
                   value={formData.payment_period}
                   onValueChange={(value) => setFormData({ ...formData, payment_period: value })}
@@ -403,30 +401,32 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
             </div>
 
             {/* Marketing Attribution Cap */}
-            <div className="space-y-4">
+            <div className="space-y-2">
               <h4 className="font-medium text-sm text-muted-foreground">Profit Calculation Settings</h4>
-              <div className="space-y-2">
-                <Label htmlFor="marketing_attribution_cap_percent" className="flex items-center gap-2">
-                  Marketing Attribution Cap (%)
+              <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+                <Label htmlFor="marketing_attribution_cap_percent" className="text-sm text-right flex items-center gap-1">
+                  Marketing Cap (%)
                   <Info className="h-3 w-3 text-muted-foreground" />
                 </Label>
-                <Input
-                  id="marketing_attribution_cap_percent"
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="100"
-                  value={formData.marketing_attribution_cap_percent}
-                  onChange={(e) => setFormData({ ...formData, marketing_attribution_cap_percent: e.target.value })}
-                  placeholder="25.0"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Maximum % of net revenue that can be deducted for marketing costs in profit calculations. Recommended: 15-30%
-                </p>
+                <div className="space-y-1">
+                  <Input
+                    id="marketing_attribution_cap_percent"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    value={formData.marketing_attribution_cap_percent}
+                    onChange={(e) => setFormData({ ...formData, marketing_attribution_cap_percent: e.target.value })}
+                    placeholder="25.0"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Max % of net revenue for marketing in profit calculations. Recommended: 15-30%
+                  </p>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="calculation_basis">Calculation Basis</Label>
+              <div className="grid grid-cols-[140px_1fr] gap-3 items-start">
+                <Label htmlFor="calculation_basis" className="text-sm text-right pt-2">Calculation Basis</Label>
                 <Textarea
                   id="calculation_basis"
                   value={formData.calculation_basis}
@@ -438,22 +438,20 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
             </div>
 
             {/* Legacy fields */}
-            <div className="space-y-4">
+            <div className="space-y-2">
               <h4 className="font-medium text-sm text-muted-foreground">Legacy Fields (Optional)</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="commission_rate">Commission Rate (%)</Label>
-                  <Input
-                    id="commission_rate"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    max="100"
-                    value={formData.commission_rate}
-                    onChange={(e) => setFormData({ ...formData, commission_rate: e.target.value })}
-                    placeholder="15.00"
-                  />
-                </div>
+              <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+                <Label htmlFor="commission_rate" className="text-sm text-right">Commission Rate (%)</Label>
+                <Input
+                  id="commission_rate"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  value={formData.commission_rate}
+                  onChange={(e) => setFormData({ ...formData, commission_rate: e.target.value })}
+                  placeholder="15.00"
+                />
               </div>
             </div>
 

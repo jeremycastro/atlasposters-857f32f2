@@ -126,15 +126,15 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
   if (showForm) {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex-1 overflow-y-auto space-y-4 pb-20">
-          <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
+        <div className="flex-1 overflow-y-auto space-y-2 pb-20">
+          <Button onClick={handleBack} variant="ghost" size="sm" className="mb-1">
             ← Back to Contacts
           </Button>
-          <h3 className="text-lg font-medium">{editingContact ? "Edit Contact" : "Add Contact"}</h3>
-          <form onSubmit={handleSubmit} className="space-y-4" id="contact-form">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="first_name">First Name *</Label>
+          <h3 className="text-lg font-medium mb-2">{editingContact ? "Edit Contact" : "Add Contact"}</h3>
+          <form onSubmit={handleSubmit} className="space-y-2" id="contact-form">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+              <Label htmlFor="first_name" className="text-sm text-right">First Name *</Label>
               <Input
                 id="first_name"
                 value={formData.first_name}
@@ -142,8 +142,8 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="last_name">Last Name</Label>
+            <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+              <Label htmlFor="last_name" className="text-sm text-right">Last Name</Label>
               <Input
                 id="last_name"
                 value={formData.last_name}
@@ -152,8 +152,8 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
+          <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+            <Label htmlFor="email" className="text-sm text-right">Email *</Label>
             <Input
               id="email"
               type="email"
@@ -163,9 +163,9 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="country_code">Country Code</Label>
+          <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+            <Label className="text-sm text-right">Phone</Label>
+            <div className="grid grid-cols-[140px_1fr] gap-2">
               <Select
                 value={formData.country_code}
                 onValueChange={(value) => setFormData({ ...formData, country_code: value })}
@@ -182,9 +182,6 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
                   <SelectItem value="+91">+91 (IN)</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div className="space-y-2 col-span-2">
-              <Label htmlFor="mobile_phone">Mobile Phone</Label>
               <Input
                 id="mobile_phone"
                 value={formData.mobile_phone}
@@ -194,8 +191,8 @@ export function ContactsTab({ partnerId, contacts }: ContactsTabProps) {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="designation">Designation</Label>
+          <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+            <Label htmlFor="designation" className="text-sm text-right">Designation</Label>
             <Select
               value={formData.designation}
               onValueChange={(value) => setFormData({ ...formData, designation: value })}
