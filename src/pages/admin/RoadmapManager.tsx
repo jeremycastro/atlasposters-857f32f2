@@ -2,14 +2,21 @@ import { useState } from "react";
 import { useCurrentRoadmapVersion, useRoadmapWithProgress, useRoadmapMutations } from "@/hooks/useRoadmap";
 import { useTasks } from "@/hooks/useTasks";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
+import { useProfiles } from "@/hooks/useProfiles";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CheckCircle2, Circle, Clock, AlertCircle, ChevronDown, ChevronRight, GripVertical } from "lucide-react";
 import { TaskDetailDialog } from "@/components/tasks/TaskDetailDialog";
 import {
@@ -31,7 +38,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 // Sortable Row Component
-const SortableTaskRow = ({ task, getStatusBadge, handleTaskClick }: any) => {
+const SortableTaskRow = ({ task, getStatusBadge, handleTaskClick, updateTask, profiles }: any) => {
   const {
     attributes,
     listeners,
@@ -47,12 +54,35 @@ const SortableTaskRow = ({ task, getStatusBadge, handleTaskClick }: any) => {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const handleStatusChange = (newStatus: string) => {
+    updateTask.mutate({
+      id: task.id,
+      updates: { status: newStatus },
+      oldData: task,
+    });
+  };
+
+  const handlePriorityChange = (newPriority: string) => {
+    updateTask.mutate({
+      id: task.id,
+      updates: { priority: newPriority },
+      oldData: task,
+    });
+  };
+
+  const handleAssigneeChange = (newAssignee: string) => {
+    updateTask.mutate({
+      id: task.id,
+      updates: { assigned_to: newAssignee === "unassigned" ? null : newAssignee },
+      oldData: task,
+    });
+  };
+
   return (
     <TableRow
       ref={setNodeRef}
       style={style}
-      onClick={() => handleTaskClick(task.id)}
-      className="cursor-pointer hover:bg-muted/50"
+      className="hover:bg-muted/50"
     >
       <TableCell>
         <div
@@ -64,25 +94,64 @@ const SortableTaskRow = ({ task, getStatusBadge, handleTaskClick }: any) => {
           <GripVertical className="h-4 w-4" />
         </div>
       </TableCell>
-      <TableCell>{getStatusBadge(task.status)}</TableCell>
-      <TableCell className="font-medium">{task.title}</TableCell>
-      <TableCell>
-        <Badge
-          variant={
-            task.priority === "urgent"
-              ? "destructive"
-              : task.priority === "high"
-              ? "default"
-              : task.priority === "medium"
-              ? "secondary"
-              : "outline"
-          }
-        >
-          {task.priority}
-        </Badge>
+      <TableCell onClick={(e) => e.stopPropagation()}>
+        <Select value={task.status} onValueChange={handleStatusChange}>
+          <SelectTrigger className="w-32 h-8">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="backlog">Backlog</SelectItem>
+            <SelectItem value="todo">To Do</SelectItem>
+            <SelectItem value="in_progress">In Progress</SelectItem>
+            <SelectItem value="blocked">Blocked</SelectItem>
+            <SelectItem value="review">Review</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+          </SelectContent>
+        </Select>
       </TableCell>
-      <TableCell>{task.assigned_to_profile?.full_name || "Unassigned"}</TableCell>
-      <TableCell className="text-right">{task.estimated_hours || "-"}</TableCell>
+      <TableCell 
+        className="font-medium cursor-pointer"
+        onClick={() => handleTaskClick(task.id)}
+      >
+        {task.title}
+      </TableCell>
+      <TableCell onClick={(e) => e.stopPropagation()}>
+        <Select value={task.priority} onValueChange={handlePriorityChange}>
+          <SelectTrigger className="w-28 h-8">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="low">Low</SelectItem>
+            <SelectItem value="medium">Medium</SelectItem>
+            <SelectItem value="high">High</SelectItem>
+            <SelectItem value="urgent">Urgent</SelectItem>
+          </SelectContent>
+        </Select>
+      </TableCell>
+      <TableCell onClick={(e) => e.stopPropagation()}>
+        <Select 
+          value={task.assigned_to || "unassigned"} 
+          onValueChange={handleAssigneeChange}
+        >
+          <SelectTrigger className="w-40 h-8">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="unassigned">Unassigned</SelectItem>
+            {profiles?.map((profile: any) => (
+              <SelectItem key={profile.id} value={profile.id}>
+                {profile.full_name || profile.email}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </TableCell>
+      <TableCell 
+        className="text-right cursor-pointer"
+        onClick={() => handleTaskClick(task.id)}
+      >
+        {task.estimated_hours || "-"}
+      </TableCell>
     </TableRow>
   );
 };
@@ -93,7 +162,8 @@ const RoadmapManager = () => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const { toggleDeliverable } = useRoadmapMutations();
-  const { reorderTasks } = useTaskMutations();
+  const { reorderTasks, updateTask } = useTaskMutations();
+  const { data: profiles } = useProfiles();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -347,12 +417,14 @@ const RoadmapManager = () => {
                                   >
                                     <TableBody>
                                       {milestoneTasks.map((task) => (
-                                        <SortableTaskRow
-                                          key={task.id}
-                                          task={task}
-                                          getStatusBadge={getStatusBadge}
-                                          handleTaskClick={handleTaskClick}
-                                        />
+                                    <SortableTaskRow
+                                      key={task.id}
+                                      task={task}
+                                      getStatusBadge={getStatusBadge}
+                                      handleTaskClick={handleTaskClick}
+                                      updateTask={updateTask}
+                                      profiles={profiles}
+                                    />
                                       ))}
                                     </TableBody>
                                   </SortableContext>
