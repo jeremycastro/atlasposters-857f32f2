@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Database } from '@/integrations/supabase/types';
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -7,32 +6,60 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Eye, Edit, Archive, Copy } from 'lucide-react';
-import { format } from 'date-fns';
-import { toast } from 'sonner';
+  DropdownMenuCheckboxItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical, ArrowUpDown, Copy, Settings2, GripVertical, Image as ImageIcon } from "lucide-react";
+import { format } from "date-fns";
+import { toast } from "sonner";
+import type { Database } from "@/integrations/supabase/types";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  horizontalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
-type Artwork = Database['public']['Tables']['artworks']['Row'] & {
+type Artwork = Database["public"]["Tables"]["artworks"]["Row"] & {
   brand?: {
     id: string;
     brand_name: string;
     partner?: {
       id: string;
       partner_name: string;
-    };
+    } | null;
   } | null;
   created_by_profile?: {
     full_name: string | null;
     email: string;
   } | null;
+  artwork_files?: Array<{
+    id: string;
+    file_path: string;
+    is_primary: boolean;
+    file_type: string;
+    mime_type: string | null;
+  }>;
 };
 
 interface ArtworkTableViewProps {
@@ -42,187 +69,432 @@ interface ArtworkTableViewProps {
   onArchive: (artwork: Artwork) => void;
 }
 
-type SortField = 'asc_code' | 'title' | 'artist_name' | 'status' | 'created_at';
-type SortDirection = 'asc' | 'desc';
+type SortField = "asc_code" | "title" | "artist_name" | "status" | "created_at" | null;
+type SortDirection = "asc" | "desc";
 
-export function ArtworkTableView({
-  artworks,
-  onView,
-  onEdit,
-  onArchive,
-}: ArtworkTableViewProps) {
-  const [sortField, setSortField] = useState<SortField>('created_at');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+interface ColumnConfig {
+  id: string;
+  label: string;
+  visible: boolean;
+  canHide: boolean;
+  sortable: boolean;
+  sortField?: SortField;
+}
 
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
+const DEFAULT_COLUMNS: ColumnConfig[] = [
+  { id: "thumbnail", label: "Thumbnail", visible: true, canHide: false, sortable: false },
+  { id: "asc_code", label: "ASC Code", visible: true, canHide: false, sortable: true, sortField: "asc_code" },
+  { id: "title", label: "Title", visible: true, canHide: true, sortable: true, sortField: "title" },
+  { id: "artist_name", label: "Artist", visible: true, canHide: true, sortable: true, sortField: "artist_name" },
+  { id: "brand", label: "Brand", visible: true, canHide: true, sortable: false },
+  { id: "partner", label: "Partner", visible: true, canHide: true, sortable: false },
+  { id: "status", label: "Status", visible: true, canHide: true, sortable: true, sortField: "status" },
+  { id: "year_created", label: "Year", visible: true, canHide: true, sortable: false },
+  { id: "rights_period", label: "Rights Period", visible: true, canHide: true, sortable: false },
+  { id: "created_at", label: "Created", visible: true, canHide: true, sortable: true, sortField: "created_at" },
+  { id: "actions", label: "Actions", visible: true, canHide: false, sortable: false },
+];
+
+const STORAGE_KEY = "artwork-table-columns";
+
+interface SortableHeaderProps {
+  column: ColumnConfig;
+  sortField: SortField;
+  sortDirection: SortDirection;
+  onSort: (field: SortField) => void;
+}
+
+function SortableHeader({ column, sortField, sortDirection, onSort }: SortableHeaderProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: column.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <TableHead ref={setNodeRef} style={style} className="relative group">
+      <div className="flex items-center gap-2">
+        <button
+          className="opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing text-muted-foreground"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+        {column.sortable ? (
+          <button
+            onClick={() => onSort(column.sortField!)}
+            className="flex items-center gap-1 hover:text-foreground"
+          >
+            {column.label}
+            {sortField === column.sortField && (
+              <ArrowUpDown className="h-4 w-4" />
+            )}
+          </button>
+        ) : (
+          <span>{column.label}</span>
+        )}
+      </div>
+    </TableHead>
+  );
+}
+
+export function ArtworkTableView({ artworks, onView, onEdit, onArchive }: ArtworkTableViewProps) {
+  const [sortField, setSortField] = useState<SortField>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [columns, setColumns] = useState<ColumnConfig[]>(DEFAULT_COLUMNS);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Load column preferences from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const { order, visibility } = JSON.parse(stored);
+        
+        // Restore order and visibility
+        const restoredColumns = order.map((id: string) => {
+          const defaultCol = DEFAULT_COLUMNS.find(c => c.id === id);
+          if (!defaultCol) return null;
+          return {
+            ...defaultCol,
+            visible: visibility[id] ?? defaultCol.visible,
+          };
+        }).filter(Boolean);
+
+        // Add any new columns that weren't in stored config
+        DEFAULT_COLUMNS.forEach(col => {
+          if (!order.includes(col.id)) {
+            restoredColumns.push(col);
+          }
+        });
+
+        setColumns(restoredColumns);
+      } catch (e) {
+        console.error("Failed to restore column preferences", e);
+      }
+    }
+  }, []);
+
+  // Save column preferences to localStorage
+  const saveColumnPreferences = (cols: ColumnConfig[]) => {
+    const order = cols.map(c => c.id);
+    const visibility = cols.reduce((acc, col) => {
+      acc[col.id] = col.visible;
+      return acc;
+    }, {} as Record<string, boolean>);
+    
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ order, visibility }));
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setColumns((cols) => {
+        const oldIndex = cols.findIndex(c => c.id === active.id);
+        const newIndex = cols.findIndex(c => c.id === over.id);
+        const newColumns = arrayMove(cols, oldIndex, newIndex);
+        saveColumnPreferences(newColumns);
+        return newColumns;
+      });
     }
   };
 
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const toggleColumnVisibility = (columnId: string) => {
+    setColumns(cols => {
+      const newColumns = cols.map(col =>
+        col.id === columnId ? { ...col, visible: !col.visible } : col
+      );
+      saveColumnPreferences(newColumns);
+      return newColumns;
+    });
+  };
+
+  const resetColumns = () => {
+    setColumns(DEFAULT_COLUMNS);
+    localStorage.removeItem(STORAGE_KEY);
+    toast.success("Column settings reset to default");
+  };
+
   const sortedArtworks = [...artworks].sort((a, b) => {
+    if (!sortField) return 0;
+
     let aVal: any = a[sortField];
     let bVal: any = b[sortField];
-
-    if (sortField === 'artist_name') {
-      aVal = a.artist_name || '';
-      bVal = b.artist_name || '';
-    }
 
     if (aVal === null || aVal === undefined) return 1;
     if (bVal === null || bVal === undefined) return -1;
 
-    if (typeof aVal === 'string') {
-      return sortDirection === 'asc'
-        ? aVal.localeCompare(bVal)
-        : bVal.localeCompare(aVal);
-    }
+    if (typeof aVal === "string") aVal = aVal.toLowerCase();
+    if (typeof bVal === "string") bVal = bVal.toLowerCase();
 
-    return sortDirection === 'asc' ? (aVal > bVal ? 1 : -1) : aVal < bVal ? 1 : -1;
+    if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
+    return 0;
   });
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success('Copied to clipboard');
+    toast.success("Copied to clipboard");
   };
 
   const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'default';
-      case 'draft':
-        return 'secondary';
-      case 'archived':
-        return 'outline';
+    const variants: Record<string, any> = {
+      draft: "outline",
+      active: "default",
+      archived: "secondary",
+    };
+    return variants[status] || "outline";
+  };
+
+  const getThumbnailUrl = (artwork: Artwork) => {
+    if (!artwork.artwork_files || artwork.artwork_files.length === 0) return null;
+
+    const primaryImage = artwork.artwork_files.find(
+      f => f.is_primary && f.file_type === "image"
+    );
+    const fallbackImage = artwork.artwork_files.find(f => f.file_type === "image");
+    const file = primaryImage || fallbackImage;
+
+    if (!file) return null;
+
+    const { data } = supabase.storage.from("brand-assets").getPublicUrl(file.file_path);
+    return data.publicUrl;
+  };
+
+  const visibleColumns = columns.filter(c => c.visible);
+
+  const renderCell = (column: ColumnConfig, artwork: Artwork) => {
+    switch (column.id) {
+      case "thumbnail":
+        const thumbnailUrl = getThumbnailUrl(artwork);
+        return (
+          <TableCell onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => onView(artwork)}
+              className="w-12 h-12 rounded border border-border flex items-center justify-center overflow-hidden bg-muted hover:border-primary transition-colors"
+            >
+              {thumbnailUrl ? (
+                <img
+                  src={thumbnailUrl}
+                  alt={artwork.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <ImageIcon className="h-6 w-6 text-muted-foreground" />
+              )}
+            </button>
+          </TableCell>
+        );
+
+      case "asc_code":
+        return (
+          <TableCell className="font-mono">
+            <div className="flex items-center gap-2">
+              <span>{artwork.asc_code}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copyToClipboard(artwork.asc_code);
+                }}
+              >
+                <Copy className="h-3 w-3" />
+              </Button>
+            </div>
+          </TableCell>
+        );
+
+      case "title":
+        return <TableCell className="font-medium">{artwork.title}</TableCell>;
+
+      case "artist_name":
+        return <TableCell>{artwork.artist_name || "—"}</TableCell>;
+
+      case "brand":
+        return <TableCell>{artwork.brand?.brand_name || "—"}</TableCell>;
+
+      case "partner":
+        return <TableCell>{artwork.brand?.partner?.partner_name || "—"}</TableCell>;
+
+      case "status":
+        return (
+          <TableCell>
+            <Badge variant={getStatusVariant(artwork.status || "draft")}>
+              {artwork.status}
+            </Badge>
+          </TableCell>
+        );
+
+      case "year_created":
+        return <TableCell>{artwork.year_created || "—"}</TableCell>;
+
+      case "rights_period":
+        return (
+          <TableCell>
+            {artwork.rights_start_date && artwork.rights_end_date
+              ? `${format(new Date(artwork.rights_start_date), "MMM yyyy")} - ${format(new Date(artwork.rights_end_date), "MMM yyyy")}`
+              : "—"}
+          </TableCell>
+        );
+
+      case "created_at":
+        return (
+          <TableCell>
+            {format(new Date(artwork.created_at!), "MMM d, yyyy")}
+          </TableCell>
+        );
+
+      case "actions":
+        return (
+          <TableCell className="text-right">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onView(artwork);
+                  }}
+                >
+                  View
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(artwork);
+                  }}
+                >
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onArchive(artwork);
+                  }}
+                  className="text-destructive"
+                >
+                  Archive
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TableCell>
+        );
+
       default:
-        return 'secondary';
+        return <TableCell>—</TableCell>;
     }
   };
 
-  if (artworks.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-muted-foreground">No artworks found</p>
-        <p className="text-sm text-muted-foreground mt-1">
-          Create your first artwork to get started
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead
-              className="cursor-pointer hover:text-foreground"
-              onClick={() => handleSort('asc_code')}
-            >
-              ASC Code {sortField === 'asc_code' && (sortDirection === 'asc' ? '↑' : '↓')}
-            </TableHead>
-            <TableHead
-              className="cursor-pointer hover:text-foreground"
-              onClick={() => handleSort('title')}
-            >
-              Title {sortField === 'title' && (sortDirection === 'asc' ? '↑' : '↓')}
-            </TableHead>
-            <TableHead
-              className="cursor-pointer hover:text-foreground"
-              onClick={() => handleSort('artist_name')}
-            >
-              Artist {sortField === 'artist_name' && (sortDirection === 'asc' ? '↑' : '↓')}
-            </TableHead>
-            <TableHead>Brand</TableHead>
-            <TableHead>Partner</TableHead>
-            <TableHead
-              className="cursor-pointer hover:text-foreground"
-              onClick={() => handleSort('status')}
-            >
-              Status {sortField === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
-            </TableHead>
-            <TableHead>Year</TableHead>
-            <TableHead>Rights Period</TableHead>
-            <TableHead
-              className="cursor-pointer hover:text-foreground"
-              onClick={() => handleSort('created_at')}
-            >
-              Created {sortField === 'created_at' && (sortDirection === 'asc' ? '↑' : '↓')}
-            </TableHead>
-            <TableHead className="w-[70px]">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedArtworks.map((artwork) => (
-            <TableRow key={artwork.id}>
-              <TableCell className="font-mono text-sm">
-                <div className="flex items-center gap-2">
-                  {artwork.asc_code}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => copyToClipboard(artwork.asc_code)}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                </div>
-              </TableCell>
-              <TableCell className="font-medium max-w-[200px] truncate">
-                {artwork.title}
-              </TableCell>
-              <TableCell>{artwork.artist_name || '-'}</TableCell>
-              <TableCell>{artwork.brand?.brand_name || '-'}</TableCell>
-              <TableCell>{artwork.brand?.partner?.partner_name || '-'}</TableCell>
-              <TableCell>
-                <Badge variant={getStatusVariant(artwork.status)}>
-                  {artwork.status}
-                </Badge>
-              </TableCell>
-              <TableCell>{artwork.year_created || '-'}</TableCell>
-              <TableCell className="text-sm text-muted-foreground">
-                {artwork.rights_start_date && artwork.rights_end_date ? (
-                  <span>
-                    {format(new Date(artwork.rights_start_date), 'MMM yyyy')} -{' '}
-                    {format(new Date(artwork.rights_end_date), 'MMM yyyy')}
-                  </span>
-                ) : (
-                  '-'
-                )}
-              </TableCell>
-              <TableCell className="text-sm text-muted-foreground">
-                {format(new Date(artwork.created_at), 'MMM d, yyyy')}
-              </TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onView(artwork)}>
-                      <Eye className="mr-2 h-4 w-4" />
-                      View
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onEdit(artwork)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onArchive(artwork)}>
-                      <Archive className="mr-2 h-4 w-4" />
-                      Archive
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Settings2 className="h-4 w-4 mr-2" />
+              Columns
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            {columns.filter(c => c.canHide).map(column => (
+              <DropdownMenuCheckboxItem
+                key={column.id}
+                checked={column.visible}
+                onCheckedChange={() => toggleColumnVisibility(column.id)}
+              >
+                {column.label}
+              </DropdownMenuCheckboxItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={resetColumns}>
+              Reset to Default
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <div className="border border-border rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={visibleColumns.map(c => c.id)}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  {visibleColumns.map(column => (
+                    <SortableHeader
+                      key={column.id}
+                      column={column}
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                      onSort={handleSort}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {sortedArtworks.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={visibleColumns.length}
+                  className="text-center text-muted-foreground py-8"
+                >
+                  No artworks found
+                </TableCell>
+              </TableRow>
+            ) : (
+              sortedArtworks.map((artwork) => (
+                <TableRow
+                  key={artwork.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => onView(artwork)}
+                >
+                  {visibleColumns.map(column => renderCell(column, artwork))}
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

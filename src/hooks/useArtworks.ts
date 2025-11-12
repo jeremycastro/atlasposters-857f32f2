@@ -18,21 +18,28 @@ export const useArtworks = (filters?: ArtworkFilters) => {
   return useQuery({
     queryKey: ['artworks', filters],
     queryFn: async () => {
-      let query = supabase
-        .from('artworks')
-        .select(`
-          *,
-          brand:brands(
-            id,
-            brand_name,
-            partner:partners(
-              id,
-              partner_name
-            )
-          ),
-          created_by_profile:profiles!artworks_created_by_fkey(full_name, email)
-        `)
-        .order('created_at', { ascending: false });
+  let query = supabase
+    .from('artworks')
+    .select(`
+      *,
+      brand:brands(
+        id,
+        brand_name,
+        partner:partners(
+          id,
+          partner_name
+        )
+      ),
+      created_by_profile:profiles!artworks_created_by_fkey(full_name, email),
+      artwork_files(
+        id,
+        file_path,
+        is_primary,
+        file_type,
+        mime_type
+      )
+    `)
+    .order('created_at', { ascending: false });
 
       // Apply filters
       if (filters?.search) {
