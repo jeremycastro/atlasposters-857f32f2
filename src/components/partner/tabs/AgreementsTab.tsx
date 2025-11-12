@@ -233,8 +233,8 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
           
           <form onSubmit={handleSubmit} className="space-y-4" id="agreement-form">
             {/* Basic Information */}
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm text-muted-foreground">Basic Information</h4>
+            <div className="border rounded-lg p-4 space-y-2">
+              <h4 className="font-medium text-sm text-muted-foreground mb-3">Basic Information</h4>
               <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
                 <Label htmlFor="agreement_type" className="text-sm text-right">Agreement Type *</Label>
                 <Select
@@ -295,8 +295,8 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
             </div>
 
             {/* Payment Model */}
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm text-muted-foreground">Payment Model</h4>
+            <div className="border rounded-lg p-4 space-y-2">
+              <h4 className="font-medium text-sm text-muted-foreground mb-3">Payment Model</h4>
               <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
                 <Label htmlFor="payment_model" className="text-sm text-right">Payment Model</Label>
                 <Select
@@ -401,8 +401,8 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
             </div>
 
             {/* Marketing Attribution Cap */}
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm text-muted-foreground">Profit Calculation Settings</h4>
+            <div className="border rounded-lg p-4 space-y-2">
+              <h4 className="font-medium text-sm text-muted-foreground mb-3">Profit Calculation Settings</h4>
               <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
                 <Label htmlFor="marketing_attribution_cap_percent" className="text-sm text-right flex items-center gap-1">
                   Marketing Cap (%)
@@ -495,7 +495,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
 
             {/* Agreement Documents */}
             {editingAgreement && (
-              <div className="space-y-4">
+              <div className="border rounded-lg p-4 space-y-4">
                 <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
                   <FileText className="h-4 w-4" />
                   Agreement Documents
@@ -504,9 +504,11 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               </div>
             )}
             {!editingAgreement && (
-              <p className="text-sm text-muted-foreground">
-                Save the agreement first to upload documents
-              </p>
+              <div className="border rounded-lg p-4">
+                <p className="text-sm text-muted-foreground">
+                  Save the agreement first to upload documents
+                </p>
+              </div>
             )}
           </form>
         </div>
