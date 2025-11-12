@@ -18,6 +18,7 @@ import PartnerManagementKB from "./pages/admin/knowledge/PartnerManagement";
 import BrandAssets from "./pages/admin/knowledge/BrandAssets";
 import TaskManagementKB from "./pages/admin/knowledge/TaskManagement";
 import ArtworkCatalogKB from "./pages/admin/knowledge/ArtworkCatalog";
+import AdminBrandGuide from "./pages/admin/knowledge/AdminBrandGuide";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import PartnerAuth from "./pages/PartnerAuth";
@@ -79,6 +80,7 @@ const App = () => (
               <Route path="knowledge/brand-assets" element={<BrandAssets />} />
               <Route path="knowledge/task-management" element={<TaskManagementKB />} />
               <Route path="knowledge/artwork-catalog" element={<ArtworkCatalogKB />} />
+              <Route path="knowledge/admin-brand-guide" element={<AdminBrandGuide />} />
               <Route path="artworks" element={<ArtworkCatalog />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="navigation" element={<NavigationManager />} />

@@ -65,5 +65,15 @@ export const knowledgeArticles: KnowledgeArticle[] = [
     icon: "Image",
     lastUpdated: "2025-11-11",
     tags: ["Artworks", "ASC", "Database", "Architecture", "Components"]
+  },
+  {
+    id: "admin-brand-guide",
+    title: "Atlas Admin Brand Guide",
+    description: "Complete brand system for the Atlas Admin interface including typography, colors, design tokens, and component styling standards",
+    category: "Brand & Design",
+    route: "/admin/knowledge/admin-brand-guide",
+    icon: "Palette",
+    lastUpdated: "2025-11-12",
+    tags: ["Brand", "Design System", "Typography", "Colors", "Components", "Admin UI"]
   }
 ];
