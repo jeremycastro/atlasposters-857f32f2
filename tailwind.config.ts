@@ -93,7 +93,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       fontFamily: {
-        serif: ['Playfair Display', 'serif'],
+        serif: ['acumin-pro', 'Inter', 'sans-serif'],
         sans: ['Inter', 'sans-serif'],
       },
     },
