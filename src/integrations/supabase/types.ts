@@ -310,6 +310,294 @@ export type Database = {
           },
         ]
       }
+      brand_story_assets: {
+        Row: {
+          asset_type: Database["public"]["Enums"]["brand_asset_type"]
+          component_id: string | null
+          description: string | null
+          file_name: string
+          file_path: string
+          file_size: number
+          id: string
+          mime_type: string
+          timeline_event_id: string | null
+          uploaded_at: string
+          uploaded_by: string | null
+          usage_context: string | null
+        }
+        Insert: {
+          asset_type: Database["public"]["Enums"]["brand_asset_type"]
+          component_id?: string | null
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_size: number
+          id?: string
+          mime_type: string
+          timeline_event_id?: string | null
+          uploaded_at?: string
+          uploaded_by?: string | null
+          usage_context?: string | null
+        }
+        Update: {
+          asset_type?: Database["public"]["Enums"]["brand_asset_type"]
+          component_id?: string | null
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          id?: string
+          mime_type?: string
+          timeline_event_id?: string | null
+          uploaded_at?: string
+          uploaded_by?: string | null
+          usage_context?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_story_assets_component_id_fkey"
+            columns: ["component_id"]
+            isOneToOne: false
+            referencedRelation: "brand_story_components"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_story_assets_timeline_event_id_fkey"
+            columns: ["timeline_event_id"]
+            isOneToOne: false
+            referencedRelation: "brand_story_timeline"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_story_assets_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_story_components: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          brand_id: string | null
+          component_type: Database["public"]["Enums"]["brand_component_type"]
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_current_version: boolean
+          metadata: Json | null
+          order_index: number
+          parent_version_id: string | null
+          scope: Database["public"]["Enums"]["brand_story_scope"]
+          status: Database["public"]["Enums"]["brand_story_status"]
+          subtitle: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          version_number: number
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          brand_id?: string | null
+          component_type: Database["public"]["Enums"]["brand_component_type"]
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_current_version?: boolean
+          metadata?: Json | null
+          order_index?: number
+          parent_version_id?: string | null
+          scope?: Database["public"]["Enums"]["brand_story_scope"]
+          status?: Database["public"]["Enums"]["brand_story_status"]
+          subtitle?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          version_number?: number
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          brand_id?: string | null
+          component_type?: Database["public"]["Enums"]["brand_component_type"]
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_current_version?: boolean
+          metadata?: Json | null
+          order_index?: number
+          parent_version_id?: string | null
+          scope?: Database["public"]["Enums"]["brand_story_scope"]
+          status?: Database["public"]["Enums"]["brand_story_status"]
+          subtitle?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_story_components_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_story_components_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_story_components_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_story_components_parent_version_id_fkey"
+            columns: ["parent_version_id"]
+            isOneToOne: false
+            referencedRelation: "brand_story_components"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_story_exports: {
+        Row: {
+          brand_id: string | null
+          description: string | null
+          export_type: Database["public"]["Enums"]["brand_export_type"]
+          file_path: string
+          format: string
+          generated_at: string
+          generated_by: string | null
+          id: string
+          included_components: string[] | null
+          scope: Database["public"]["Enums"]["brand_story_scope"]
+          title: string
+        }
+        Insert: {
+          brand_id?: string | null
+          description?: string | null
+          export_type: Database["public"]["Enums"]["brand_export_type"]
+          file_path: string
+          format: string
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          included_components?: string[] | null
+          scope?: Database["public"]["Enums"]["brand_story_scope"]
+          title: string
+        }
+        Update: {
+          brand_id?: string | null
+          description?: string | null
+          export_type?: Database["public"]["Enums"]["brand_export_type"]
+          file_path?: string
+          format?: string
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          included_components?: string[] | null
+          scope?: Database["public"]["Enums"]["brand_story_scope"]
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_story_exports_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_story_exports_generated_by_fkey"
+            columns: ["generated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_story_timeline: {
+        Row: {
+          brand_id: string | null
+          content: string
+          created_at: string
+          created_by: string | null
+          event_date: string
+          event_type: Database["public"]["Enums"]["brand_event_type"]
+          featured_image_url: string | null
+          id: string
+          is_published: boolean
+          related_components: string[] | null
+          related_tasks: string[] | null
+          scope: Database["public"]["Enums"]["brand_story_scope"]
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          brand_id?: string | null
+          content: string
+          created_at?: string
+          created_by?: string | null
+          event_date: string
+          event_type: Database["public"]["Enums"]["brand_event_type"]
+          featured_image_url?: string | null
+          id?: string
+          is_published?: boolean
+          related_components?: string[] | null
+          related_tasks?: string[] | null
+          scope?: Database["public"]["Enums"]["brand_story_scope"]
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          brand_id?: string | null
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          event_date?: string
+          event_type?: Database["public"]["Enums"]["brand_event_type"]
+          featured_image_url?: string | null
+          id?: string
+          is_published?: boolean
+          related_components?: string[] | null
+          related_tasks?: string[] | null
+          scope?: Database["public"]["Enums"]["brand_story_scope"]
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_story_timeline_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_story_timeline_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brands: {
         Row: {
           accent_color: string | null
@@ -2225,6 +2513,43 @@ export type Database = {
       app_role: "admin" | "editor" | "viewer" | "partner" | "customer"
       artwork_status: "draft" | "active" | "archived" | "discontinued"
       asc_history_status: "assigned" | "voided" | "transferred"
+      brand_asset_type:
+        | "image"
+        | "document"
+        | "presentation"
+        | "video"
+        | "template"
+      brand_component_type:
+        | "origin_story"
+        | "mission"
+        | "vision"
+        | "core_value"
+        | "positioning"
+        | "brand_promise"
+        | "persona"
+        | "brand_personality"
+        | "voice_guideline"
+        | "messaging_pillar"
+        | "writing_example"
+        | "story_narrative"
+        | "content_guideline"
+        | "campaign_template"
+        | "seo_keyword"
+      brand_event_type:
+        | "milestone"
+        | "decision"
+        | "insight"
+        | "launch"
+        | "update"
+        | "retrospective"
+      brand_export_type:
+        | "presentation"
+        | "one_pager"
+        | "brand_guide_pdf"
+        | "messaging_matrix"
+        | "persona_sheet"
+      brand_story_scope: "brand" | "atlas_global"
+      brand_story_status: "draft" | "in_review" | "approved" | "archived"
       import_method: "csv" | "syncio" | "api" | "manual"
       import_status: "pending" | "mapped" | "imported" | "error" | "skipped"
       payment_model:
@@ -2381,6 +2706,47 @@ export const Constants = {
       app_role: ["admin", "editor", "viewer", "partner", "customer"],
       artwork_status: ["draft", "active", "archived", "discontinued"],
       asc_history_status: ["assigned", "voided", "transferred"],
+      brand_asset_type: [
+        "image",
+        "document",
+        "presentation",
+        "video",
+        "template",
+      ],
+      brand_component_type: [
+        "origin_story",
+        "mission",
+        "vision",
+        "core_value",
+        "positioning",
+        "brand_promise",
+        "persona",
+        "brand_personality",
+        "voice_guideline",
+        "messaging_pillar",
+        "writing_example",
+        "story_narrative",
+        "content_guideline",
+        "campaign_template",
+        "seo_keyword",
+      ],
+      brand_event_type: [
+        "milestone",
+        "decision",
+        "insight",
+        "launch",
+        "update",
+        "retrospective",
+      ],
+      brand_export_type: [
+        "presentation",
+        "one_pager",
+        "brand_guide_pdf",
+        "messaging_matrix",
+        "persona_sheet",
+      ],
+      brand_story_scope: ["brand", "atlas_global"],
+      brand_story_status: ["draft", "in_review", "approved", "archived"],
       import_method: ["csv", "syncio", "api", "manual"],
       import_status: ["pending", "mapped", "imported", "error", "skipped"],
       payment_model: [
