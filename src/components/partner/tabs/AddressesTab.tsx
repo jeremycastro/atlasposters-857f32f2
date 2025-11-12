@@ -213,14 +213,14 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
   if (showForm) {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex-1 overflow-y-auto space-y-4 pb-20">
-          <Button onClick={handleBack} variant="ghost" size="sm" className="mb-2">
+        <div className="flex-1 overflow-y-auto space-y-2 pb-20">
+          <Button onClick={handleBack} variant="ghost" size="sm" className="mb-1">
             ← Back to Addresses
           </Button>
-          <h3 className="text-lg font-medium">{editingAddress ? "Edit Address" : "Add Address"}</h3>
-          <form onSubmit={handleSubmit} className="space-y-4" id="address-form">
-          <div className="space-y-2">
-            <Label htmlFor="designation">Designation *</Label>
+          <h3 className="text-lg font-medium mb-2">{editingAddress ? "Edit Address" : "Add Address"}</h3>
+          <form onSubmit={handleSubmit} className="space-y-3" id="address-form">
+          <div className="space-y-1">
+            <Label htmlFor="designation" className="text-sm">Designation *</Label>
             <Select
               value={formData.designation}
               onValueChange={(value) => setFormData({ ...formData, designation: value })}
@@ -238,8 +238,8 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="contact">Contact</Label>
+          <div className="space-y-1">
+            <Label htmlFor="contact" className="text-sm">Contact</Label>
             <Select
               value={formData.contact_selection}
               onValueChange={(value) => {
@@ -271,8 +271,8 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
           </div>
 
           {formData.contact_selection === "other" && (
-            <div className="space-y-2">
-              <Label htmlFor="contact_name">Contact Name</Label>
+            <div className="space-y-1">
+              <Label htmlFor="contact_name" className="text-sm">Contact Name</Label>
               <Input
                 id="contact_name"
                 value={formData.contact_name}
@@ -282,8 +282,8 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             </div>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="address_line1">Address Line 1 *</Label>
+          <div className="space-y-1">
+            <Label htmlFor="address_line1" className="text-sm">Address Line 1 *</Label>
             <Input
               id="address_line1"
               value={formData.address_line1}
@@ -292,8 +292,8 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="address_line2">Address Line 2</Label>
+          <div className="space-y-1">
+            <Label htmlFor="address_line2" className="text-sm">Address Line 2</Label>
             <Input
               id="address_line2"
               value={formData.address_line2}
@@ -301,8 +301,8 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="country">Country *</Label>
+          <div className="space-y-1">
+            <Label htmlFor="country" className="text-sm">Country *</Label>
             <Select
               value={formData.country}
               onValueChange={(value) => setFormData({ ...formData, country: value })}
@@ -320,9 +320,9 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             </Select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="city">City *</Label>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="city" className="text-sm">City *</Label>
               <Input
                 id="city"
                 value={formData.city}
@@ -330,8 +330,8 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="state">State/Province</Label>
+            <div className="space-y-1">
+              <Label htmlFor="state" className="text-sm">State/Province</Label>
               {getStatesForCountry(formData.country).length > 0 ? (
                 <Select
                   value={formData.state}
@@ -359,8 +359,8 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="postal_code">Postal Code *</Label>
+          <div className="space-y-1">
+            <Label htmlFor="postal_code" className="text-sm">Postal Code *</Label>
             <Input
               id="postal_code"
               value={formData.postal_code}
