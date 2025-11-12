@@ -87,7 +87,7 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
   const [addressToDelete, setAddressToDelete] = useState<Address | null>(null);
   const [formData, setFormData] = useState({
     designation: "ship_to",
-    contact_selection: "other",
+    contact_selection: "",
     contact_id: "",
     contact_name: "",
     address_line1: "",
@@ -153,7 +153,7 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
   const resetForm = () => {
     setFormData({
       designation: "ship_to",
-      contact_selection: "other",
+      contact_selection: "",
       contact_id: "",
       contact_name: "",
       address_line1: "",
@@ -257,7 +257,7 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
               }}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select contact" />
+                <SelectValue placeholder="Select Contact" />
               </SelectTrigger>
               <SelectContent>
                 {partnerContacts.map((contact) => (
