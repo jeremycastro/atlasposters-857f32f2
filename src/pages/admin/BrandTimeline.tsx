@@ -82,35 +82,27 @@ export default function BrandTimeline() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Brand Timeline</h1>
-          <p className="text-muted-foreground">
-            Chronicle your brand's evolution, decisions, and milestones
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <BrandMultiSelector
-            selectedBrandIds={selectedBrandIds}
-            onChange={setSelectedBrandIds}
-            includeGlobal={includeGlobal}
-            onIncludeGlobalChange={setIncludeGlobal}
-          />
-          <Button onClick={() => setTimelineDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Event
-          </Button>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold">Brand Timeline</h1>
+        <p className="text-muted-foreground">
+          Chronicle your brand's evolution, decisions, and milestones
+        </p>
       </div>
 
       {/* Filters */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">Filters:</span>
             </div>
+            <BrandMultiSelector
+              selectedBrandIds={selectedBrandIds}
+              onChange={setSelectedBrandIds}
+              includeGlobal={includeGlobal}
+              onIncludeGlobalChange={setIncludeGlobal}
+            />
             <Select value={filterEventType} onValueChange={(val) => setFilterEventType(val as BrandEventType | "all")}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Event Type" />
@@ -131,6 +123,12 @@ export default function BrandTimeline() {
             >
               {showDrafts ? "Showing Drafts" : "Published Only"}
             </Button>
+            <div className="ml-auto">
+              <Button onClick={() => setTimelineDialogOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Event
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
