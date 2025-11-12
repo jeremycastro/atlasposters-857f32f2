@@ -33,8 +33,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useArtworkMutations } from '@/hooks/useArtworkMutations';
 import { usePartners } from '@/hooks/usePartnerManagement';
 import { useAuth } from '@/hooks/useAuth';
-import { ArtworkFileUpload } from './ArtworkFileUpload';
-import { UploadedFile } from '@/hooks/useArtworkFileUpload';
+import { ArtworkFilePicker } from './ArtworkFilePicker';
+import { supabase } from '@/integrations/supabase/client';
 
 const currentYear = new Date().getFullYear();
 
@@ -64,8 +64,7 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
   const { activeRole } = useAuth();
   const { data: partners, isLoading: partnersLoading } = usePartners();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [createdArtworkId, setCreatedArtworkId] = useState<string | null>(null);
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
   const isAdmin = activeRole === 'admin';
 
@@ -107,15 +106,43 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
         partnerId: values.partner_id, // Only used if admin
       });
 
-      // Store the created artwork ID for file uploads
-      if (result?.id) {
-        setCreatedArtworkId(result.id);
-      } else {
-        form.reset();
-        setUploadedFiles([]);
-        setCreatedArtworkId(null);
-        onOpenChange(false);
+      // Upload pending files if artwork was created
+      if (result?.id && pendingFiles.length > 0) {
+        // Upload files using direct Supabase calls
+        for (let i = 0; i < pendingFiles.length; i++) {
+          const file = pendingFiles[i];
+          const isPrimary = i === 0;
+          
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+          const filePath = `${result.id}/${fileName}`;
+
+          // Upload to storage
+          const { error: uploadError } = await supabase.storage
+            .from('brand-assets')
+            .upload(filePath, file);
+
+          if (uploadError) {
+            console.error('File upload error:', uploadError);
+            continue;
+          }
+
+          // Save file metadata
+          await supabase.from('artwork_files').insert({
+            artwork_id: result.id,
+            file_name: file.name,
+            file_path: filePath,
+            file_type: file.type.startsWith('image/') ? 'image' : 'document',
+            file_size: file.size,
+            mime_type: file.type,
+            is_primary: isPrimary,
+          });
+        }
       }
+
+      form.reset();
+      setPendingFiles([]);
+      onOpenChange(false);
     } catch (error) {
       console.error('Error creating artwork:', error);
     } finally {
@@ -126,8 +153,7 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
   const handleDialogClose = (open: boolean) => {
     if (!open) {
       form.reset();
-      setUploadedFiles([]);
-      setCreatedArtworkId(null);
+      setPendingFiles([]);
     }
     onOpenChange(open);
   };
@@ -383,23 +409,15 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
                 />
               </div>
 
-              {/* File Uploads Section - Only shown after artwork is created */}
-              {createdArtworkId ? (
-                <div className="border rounded-lg p-4 space-y-2">
-                  <h4 className="font-medium text-sm text-muted-foreground mb-3">Artwork Files</h4>
-                  <ArtworkFileUpload
-                    artworkId={createdArtworkId}
-                    existingFiles={uploadedFiles}
-                    onFilesChange={setUploadedFiles}
-                  />
-                </div>
-              ) : (
-                <div className="border rounded-lg p-4 bg-muted/50">
-                  <p className="text-sm text-muted-foreground text-center">
-                    Create the artwork first to upload files
-                  </p>
-                </div>
-              )}
+              {/* File Selection */}
+              <div className="border rounded-lg p-4 space-y-2">
+                <h4 className="font-medium text-sm text-muted-foreground mb-3">Artwork Files</h4>
+                <ArtworkFilePicker
+                  files={pendingFiles}
+                  onFilesChange={setPendingFiles}
+                  disabled={isSubmitting}
+                />
+              </div>
             </div>
 
             {/* Sticky Footer */}
@@ -410,17 +428,15 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
                 onClick={() => handleDialogClose(false)}
                 disabled={isSubmitting}
               >
-                {createdArtworkId ? 'Close' : 'Cancel'}
+                Cancel
               </Button>
-              {!createdArtworkId ? (
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Creating...' : 'Create Artwork'}
-                </Button>
-              ) : (
-                <Button onClick={() => handleDialogClose(false)}>
-                  Done
-                </Button>
-              )}
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting
+                  ? pendingFiles.length > 0
+                    ? 'Creating & Uploading...'
+                    : 'Creating...'
+                  : 'Create Artwork'}
+              </Button>
             </div>
           </form>
         </Form>
