@@ -437,24 +437,6 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               </div>
             </div>
 
-            {/* Legacy fields */}
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm text-muted-foreground">Legacy Fields (Optional)</h4>
-              <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
-                <Label htmlFor="commission_rate" className="text-sm text-right">Commission Rate (%)</Label>
-                <Input
-                  id="commission_rate"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max="100"
-                  value={formData.commission_rate}
-                  onChange={(e) => setFormData({ ...formData, commission_rate: e.target.value })}
-                  placeholder="15.00"
-                />
-              </div>
-            </div>
-
             {/* Calculation Preview */}
             {formData.payment_model && formData.marketing_attribution_cap_percent && (
               <Card className="bg-muted/50">
