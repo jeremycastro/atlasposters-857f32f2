@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useRoadmapVersions, useRoadmapWithProgress, useRoadmapMutations } from "@/hooks/useRoadmap";
+import { useCurrentRoadmapVersion, useRoadmapWithProgress, useRoadmapMutations } from "@/hooks/useRoadmap";
 import { useTasks } from "@/hooks/useTasks";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -88,8 +88,7 @@ const SortableTaskRow = ({ task, getStatusBadge, handleTaskClick }: any) => {
 };
 
 const RoadmapManager = () => {
-  const { data: versions, isLoading: versionsLoading } = useRoadmapVersions();
-  const [selectedVersionId, setSelectedVersionId] = useState<string>("");
+  const { data: currentVersion, isLoading: versionLoading } = useCurrentRoadmapVersion();
   const [expandedMilestones, setExpandedMilestones] = useState<Set<string>>(new Set());
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -104,10 +103,8 @@ const RoadmapManager = () => {
   );
   
   const { data: phasesWithProgress, isLoading: progressLoading } = useRoadmapWithProgress(
-    selectedVersionId || versions?.[0]?.id
+    currentVersion?.id
   );
-
-  const currentVersionId = selectedVersionId || versions?.[0]?.id;
 
   // Fetch all tasks to show in milestone tables
   const { data: allTasks } = useTasks();
@@ -195,29 +192,17 @@ const RoadmapManager = () => {
           <p className="text-muted-foreground">
             Manage versions, phases, and milestones with live progress tracking
           </p>
+          {versionLoading ? (
+            <Skeleton className="h-6 w-96 mt-4" />
+          ) : currentVersion ? (
+            <div className="mt-4 flex items-center gap-2">
+              <Badge variant="outline" className="text-base px-3 py-1">
+                v{currentVersion.version}
+              </Badge>
+              <span className="text-lg font-medium">{currentVersion.title}</span>
+            </div>
+          ) : null}
         </div>
-
-        {versionsLoading ? (
-          <Skeleton className="h-10 w-64 mb-8" />
-        ) : (
-          <div className="mb-8">
-            <Select
-              value={currentVersionId}
-              onValueChange={setSelectedVersionId}
-            >
-              <SelectTrigger className="w-64">
-                <SelectValue placeholder="Select version" />
-              </SelectTrigger>
-              <SelectContent>
-                {versions?.map((version) => (
-                  <SelectItem key={version.id} value={version.id}>
-                    v{version.version} - {version.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
 
         {progressLoading ? (
           <div className="space-y-4">

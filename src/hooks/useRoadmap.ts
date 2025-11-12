@@ -17,6 +17,22 @@ export const useRoadmapVersions = () => {
   });
 };
 
+export const useCurrentRoadmapVersion = () => {
+  return useQuery({
+    queryKey: ["roadmap-version-current"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("roadmap_versions")
+        .select("*")
+        .eq("status", "current")
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+};
+
 export const useRoadmapPhases = (versionId?: string) => {
   return useQuery({
     queryKey: ["roadmap-phases", versionId],
