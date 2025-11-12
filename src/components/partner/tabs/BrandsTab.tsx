@@ -283,15 +283,27 @@ export function BrandsTab({
   };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted!');
+    console.log('Current formData:', formData);
+    console.log('Editing brand:', editingBrand);
+    
     if (editingBrand) {
+      console.log('Calling updateBrand mutation with:', {
+        id: editingBrand.id,
+        updates: formData
+      });
       updateBrand.mutate({
         id: editingBrand.id,
         updates: formData
       }, {
         onSuccess: () => {
+          console.log('Brand updated successfully');
           setShowForm(false);
           setEditingBrand(null);
           resetForm();
+        },
+        onError: (error) => {
+          console.error('Error updating brand:', error);
         }
       });
     } else {
