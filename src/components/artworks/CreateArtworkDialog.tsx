@@ -113,7 +113,7 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Create New Artwork</DialogTitle>
           <DialogDescription>
@@ -122,205 +122,241 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {isAdmin && (
-              <FormField
-                control={form.control}
-                name="partner_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Partner *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a partner" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {partnersLoading ? (
-                          <SelectItem value="loading" disabled>Loading partners...</SelectItem>
-                        ) : partners && partners.length > 0 ? (
-                          partners.map((partner) => (
-                            <SelectItem key={partner.id} value={partner.id}>
-                              {partner.partner_company_name || partner.full_name || partner.email}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="none" disabled>No partners found</SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>Select the partner who owns this artwork</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
+            <div className="flex-1 overflow-y-auto space-y-4 pb-20">
+              {/* Partner Selection (Admin Only) */}
+              {isAdmin && (
+                <div className="border rounded-lg p-4 space-y-2">
+                  <h4 className="font-medium text-sm text-muted-foreground mb-3">Partner Assignment</h4>
+                  <FormField
+                    control={form.control}
+                    name="partner_id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
+                          <FormLabel className="text-sm text-right">Partner *</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a partner" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {partnersLoading ? (
+                                <SelectItem value="loading" disabled>Loading partners...</SelectItem>
+                              ) : partners && partners.length > 0 ? (
+                                partners.map((partner) => (
+                                  <SelectItem key={partner.id} value={partner.id}>
+                                    {partner.partner_company_name || partner.full_name || partner.email}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem value="none" disabled>No partners found</SelectItem>
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <FormMessage className="ml-[122px]" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Artwork title" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Basic Information */}
+              <div className="border rounded-lg p-4 space-y-2">
+                <h4 className="font-medium text-sm text-muted-foreground mb-3">Basic Information</h4>
+                
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
+                        <FormLabel className="text-sm text-right">Title *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Artwork title" {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage className="ml-[122px]" />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="artist_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Artist Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Artist name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="artist_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
+                        <FormLabel className="text-sm text-right">Artist Name *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Artist name" {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage className="ml-[122px]" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid grid-cols-[110px_1fr] gap-3 items-start">
+                        <FormLabel className="text-sm text-right pt-2">Description</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Describe the artwork..."
+                            className="min-h-[80px]"
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage className="ml-[122px]" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Artwork Details */}
+              <div className="border rounded-lg p-4 space-y-2">
+                <h4 className="font-medium text-sm text-muted-foreground mb-3">Artwork Details</h4>
+
+                <FormField
+                  control={form.control}
+                  name="art_medium"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
+                        <FormLabel className="text-sm text-right">Art Medium</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Oil on Canvas" {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage className="ml-[122px]" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="year_created"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
+                        <FormLabel className="text-sm text-right">Year Created</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder={currentYear.toString()}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage className="ml-[122px]" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="original_dimensions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
+                        <FormLabel className="text-sm text-right">Dimensions</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., 24x36 inches" {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage className="ml-[122px]" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="tags"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
+                        <FormLabel className="text-sm text-right">Tags</FormLabel>
+                        <FormControl>
+                          <Input placeholder="landscape, nature, mountains" {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage className="ml-[122px]" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Rights & Licensing */}
+              <div className="border rounded-lg p-4 space-y-2">
+                <h4 className="font-medium text-sm text-muted-foreground mb-3">Rights & Licensing</h4>
+
+                <FormField
+                  control={form.control}
+                  name="is_exclusive"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
+                        <FormLabel className="text-sm text-right">Exclusive</FormLabel>
+                        <div className="flex items-center space-x-2">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <span className="text-sm text-muted-foreground">
+                            Mark as exclusive licensing
+                          </span>
+                        </div>
+                      </div>
+                      <FormMessage className="ml-[122px]" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="rights_start_date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
+                        <FormLabel className="text-sm text-right">Rights Start</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage className="ml-[122px]" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="rights_end_date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
+                        <FormLabel className="text-sm text-right">Rights End</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage className="ml-[122px]" />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Describe the artwork..."
-                      className="min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="art_medium"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Art Medium</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Oil on Canvas" {...field} />
-                    </FormControl>
-                    <FormDescription>Type of art medium used</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="year_created"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Year Created</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder={currentYear.toString()}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="original_dimensions"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Original Dimensions</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., 24x36 inches" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="tags"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tags</FormLabel>
-                  <FormControl>
-                    <Input placeholder="landscape, nature, mountains (comma-separated)" {...field} />
-                  </FormControl>
-                  <FormDescription>Comma-separated tags for categorization</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="is_exclusive"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Exclusive Artwork</FormLabel>
-                    <FormDescription>
-                      Mark as exclusive if this artwork has exclusive licensing
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="rights_start_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Rights Start Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="rights_end_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Rights End Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="flex justify-end gap-3">
+            {/* Sticky Footer */}
+            <div className="sticky bottom-0 left-0 right-0 bg-background border-t pt-4 flex justify-end gap-3">
               <Button
                 type="button"
                 variant="outline"
