@@ -113,17 +113,19 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle>Create New Artwork</DialogTitle>
-          <DialogDescription>
-            Add a new artwork to your catalog. An ASC code will be automatically generated.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0">
+        <div className="px-6 pt-6">
+          <DialogHeader>
+            <DialogTitle>Create New Artwork</DialogTitle>
+            <DialogDescription>
+              Add a new artwork to your catalog. An ASC code will be automatically generated.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
-            <div className="flex-1 overflow-y-auto space-y-4 pb-20">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 overflow-y-auto px-6 space-y-4 py-4">
               {/* Partner Selection (Admin Only) */}
               {isAdmin && (
                 <div className="border rounded-lg p-4 space-y-2">
@@ -356,7 +358,7 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
             </div>
 
             {/* Sticky Footer */}
-            <div className="sticky bottom-0 left-0 right-0 bg-background border-t pt-4 flex justify-end gap-3">
+            <div className="sticky bottom-0 left-0 right-0 bg-background border-t px-6 py-4 flex justify-end gap-3">
               <Button
                 type="button"
                 variant="outline"
