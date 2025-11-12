@@ -41,13 +41,13 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [agreementToDelete, setAgreementToDelete] = useState<Agreement | null>(null);
   const [formData, setFormData] = useState({
-    agreement_type: "royalty",
+    agreement_type: "",
     effective_date: "",
     expiration_date: "",
     royalty_rate: "",
     commission_rate: "",
-    payment_period: "monthly",
-    status: "active",
+    payment_period: "",
+    status: "",
     payment_model: "",
     flat_fee_amount: "",
     advance_amount: "",
@@ -62,6 +62,10 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.status) {
+      return;
+    }
     
     const agreementData: any = {
       agreement_type: formData.agreement_type,
@@ -105,13 +109,13 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
 
   const resetForm = () => {
     setFormData({
-      agreement_type: "royalty",
+      agreement_type: "",
       effective_date: "",
       expiration_date: "",
       royalty_rate: "",
       commission_rate: "",
-      payment_period: "monthly",
-      status: "active",
+      payment_period: "",
+      status: "",
       payment_model: "",
       flat_fee_amount: "",
       advance_amount: "",
@@ -238,13 +242,14 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid grid-cols-[80px_1fr] gap-2 items-center">
-                  <Label htmlFor="status" className="text-sm text-right">Status</Label>
+                  <Label htmlFor="status" className="text-sm text-right">Status *</Label>
                   <Select
                     value={formData.status}
                     onValueChange={(value) => setFormData({ ...formData, status: value })}
+                    required
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Select an option" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="draft">Draft</SelectItem>
@@ -260,9 +265,10 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                   <Select
                     value={formData.agreement_type}
                     onValueChange={(value) => setFormData({ ...formData, agreement_type: value })}
+                    required
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Select an option" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="royalty">Royalty</SelectItem>
@@ -391,7 +397,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                   onValueChange={(value) => setFormData({ ...formData, payment_period: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select an option" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="monthly">Monthly</SelectItem>
