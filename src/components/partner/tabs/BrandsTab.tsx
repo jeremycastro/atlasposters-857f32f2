@@ -281,7 +281,7 @@ export function BrandsTab({
       }
     });
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted!');
     console.log('Current formData:', formData);
@@ -292,12 +292,18 @@ export function BrandsTab({
         id: editingBrand.id,
         updates: formData
       });
+      
+      // Store a copy of formData before mutation to avoid closure issues
+      const dataToSubmit = { ...formData };
+      
       updateBrand.mutate({
         id: editingBrand.id,
-        updates: formData
+        updates: dataToSubmit
       }, {
-        onSuccess: () => {
-          console.log('Brand updated successfully');
+        onSuccess: async () => {
+          console.log('Brand updated successfully, waiting for refetch...');
+          // Small delay to ensure database has committed the changes
+          await new Promise(resolve => setTimeout(resolve, 500));
           setShowForm(false);
           setEditingBrand(null);
           resetForm();

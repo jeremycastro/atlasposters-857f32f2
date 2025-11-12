@@ -112,9 +112,10 @@ export const useUpdateBrand = () => {
       if (error) throw error;
       return data as Brand;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["brands"] });
-      queryClient.invalidateQueries({ queryKey: ["partner"] });
+    onSuccess: async () => {
+      // Wait for the refetch to complete before showing success
+      await queryClient.invalidateQueries({ queryKey: ["brands"] });
+      await queryClient.invalidateQueries({ queryKey: ["partner"] });
       toast.success("Brand updated successfully");
     },
     onError: (error) => {
