@@ -69,6 +69,133 @@ const ArtworkCatalog = () => {
           </CardContent>
         </Card>
 
+        {/* Data Hierarchy & Relationships Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <GitBranch className="h-5 w-5" />
+              Data Hierarchy & Relationships
+            </CardTitle>
+            <CardDescription>Understanding the Partner → Brand → Artwork → Product structure</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-3">
+              <h4 className="font-semibold text-lg">Hierarchy Overview</h4>
+              <p className="text-sm text-muted-foreground">
+                The system follows a strict hierarchical structure where each entity is a child of the one above it.
+              </p>
+              <div className="bg-muted/50 p-6 rounded-lg overflow-x-auto">
+                <pre className="text-sm whitespace-pre-wrap font-mono">
+{`┌─────────────────────────────────────────────────────────┐
+│  PARTNER (Top Level)                                    │
+│  Table: partners                                        │
+│  • The organization or individual providing artworks    │
+│  • Required: partner_name, status                       │
+└───────────────────────┬─────────────────────────────────┘
+                        │
+                        ├── partner_id (foreign key)
+                        ↓
+        ┌───────────────────────────────────────┐
+        │  BRAND (Optional)                     │
+        │  Table: brands                        │
+        │  • A partner can have multiple brands │
+        │  • Required: brand_name, partner_id   │
+        └─────────────────┬─────────────────────┘
+                          │
+                          ├── brand_id (optional foreign key)
+                          │   partner_id (required foreign key)
+                          ↓
+          ┌───────────────────────────────────────────┐
+          │  ARTWORK                                  │
+          │  Table: artworks                          │
+          │  • Must belong to a partner               │
+          │  • Can optionally be linked to a brand    │
+          │  • Required: title, partner_id, asc_code  │
+          └─────────────────┬─────────────────────────┘
+                            │
+                            ├── artwork_id (foreign key)
+                            ↓
+            ┌─────────────────────────────────────┐
+            │  PRODUCT                            │
+            │  Table: products                    │
+            │  • Physical products from artworks  │
+            │  • Required: product_name,          │
+            │    artwork_id, product_type_id      │
+            └─────────────────────────────────────┘`}
+                </pre>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-semibold text-lg">Relationship Rules</h4>
+              <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground ml-4">
+                <li>
+                  <strong>Partner → Artwork:</strong> Every artwork must have exactly one partner (partner_id is required).
+                </li>
+                <li>
+                  <strong>Brand → Artwork:</strong> An artwork can optionally belong to a brand. If linked, the brand must belong to the same partner.
+                </li>
+                <li>
+                  <strong>Artwork → Product:</strong> An artwork can have zero or more products created from it (e.g., posters, prints, merchandise).
+                </li>
+                <li>
+                  <strong>Partner → Brand:</strong> A partner can have multiple brands, but a brand belongs to exactly one partner.
+                </li>
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-semibold text-lg">Database References</h4>
+              <p className="text-sm text-muted-foreground mb-3">
+                Foreign key relationships that enforce data integrity:
+              </p>
+              <div className="bg-muted/50 p-4 rounded-lg space-y-2 font-mono text-sm">
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground">→</span>
+                  <div>
+                    <strong>artworks.partner_id</strong> → <strong>partners.id</strong>
+                    <p className="text-xs text-muted-foreground mt-1 font-sans">Every artwork is linked to a partner</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground">→</span>
+                  <div>
+                    <strong>artworks.brand_id</strong> → <strong>brands.id</strong>
+                    <p className="text-xs text-muted-foreground mt-1 font-sans">Optional link to a brand (nullable)</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground">→</span>
+                  <div>
+                    <strong>brands.partner_id</strong> → <strong>partners.id</strong>
+                    <p className="text-xs text-muted-foreground mt-1 font-sans">Every brand belongs to a partner</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground">→</span>
+                  <div>
+                    <strong>products.artwork_id</strong> → <strong>artworks.id</strong>
+                    <p className="text-xs text-muted-foreground mt-1 font-sans">Products are created from artworks</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-semibold text-lg">Practical Example</h4>
+              <div className="bg-muted/50 p-4 rounded-lg space-y-2 text-sm">
+                <p className="font-semibold">Scenario: A partner submits artwork</p>
+                <ol className="list-decimal list-inside space-y-2 text-muted-foreground ml-4">
+                  <li><strong>Partner created:</strong> "ABC Art Studios" (partners table)</li>
+                  <li><strong>Brand created (optional):</strong> "ABC Modern Collection" linked to ABC Art Studios</li>
+                  <li><strong>Artwork submitted:</strong> "Sunset Dreams" linked to ABC Art Studios and optionally to "ABC Modern Collection"</li>
+                  <li><strong>Products created:</strong> "Sunset Dreams Poster 18x24" and "Sunset Dreams Canvas 24x36" both linked to the "Sunset Dreams" artwork</li>
+                </ol>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Database Schema Section */}
         <Card>
           <CardHeader>
