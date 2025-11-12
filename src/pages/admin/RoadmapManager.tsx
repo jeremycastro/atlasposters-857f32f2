@@ -277,39 +277,45 @@ const RoadmapManager = () => {
                             {getStatusBadge(milestone.status)}
                           </div>
 
-                        {/* Deliverables with checkboxes */}
-                        {milestone.deliverables && milestone.deliverables.length > 0 && (
-                          <div className="space-y-2 py-2">
-                            <h5 className="text-sm font-semibold">Deliverables:</h5>
-                            <div className="space-y-2">
-                              {milestone.deliverables.map((deliverable: any, idx: number) => {
-                                const isCompleted = deliverable.completed || false;
-                                const completedCount = milestone.deliverables.filter((d: any) => d.completed).length;
-                                
-                                return (
-                                  <div key={idx} className="flex items-center gap-2">
-                                    <Checkbox
-                                      id={`deliverable-${milestone.id}-${idx}`}
-                                      checked={isCompleted}
-                                      onCheckedChange={() => handleToggleDeliverable(milestone.id, idx)}
-                                    />
-                                    <label
-                                      htmlFor={`deliverable-${milestone.id}-${idx}`}
-                                      className={`text-sm cursor-pointer flex-1 ${
-                                        isCompleted ? "line-through text-muted-foreground" : ""
-                                      }`}
-                                    >
-                                      {deliverable.text || deliverable}
-                                    </label>
-                                  </div>
-                                );
-                              })}
-                              <div className="text-xs text-muted-foreground pt-1">
-                                {milestone.deliverables.filter((d: any) => d.completed).length}/{milestone.deliverables.length} deliverables completed
+                          {/* Summary when collapsed */}
+                          {!isExpanded && milestone.deliverables && milestone.deliverables.length > 0 && (
+                            <div className="text-xs text-muted-foreground ml-10">
+                              {milestone.deliverables.filter((d: any) => d.completed).length}/{milestone.deliverables.length} deliverables completed
+                            </div>
+                          )}
+
+                          {/* Deliverables with checkboxes - Only visible when expanded */}
+                          {isExpanded && milestone.deliverables && milestone.deliverables.length > 0 && (
+                            <div className="space-y-2 py-2 border-t pt-4">
+                              <h5 className="text-sm font-semibold">Deliverables:</h5>
+                              <div className="space-y-2">
+                                {milestone.deliverables.map((deliverable: any, idx: number) => {
+                                  const isCompleted = deliverable.completed || false;
+                                  
+                                  return (
+                                    <div key={idx} className="flex items-center gap-2">
+                                      <Checkbox
+                                        id={`deliverable-${milestone.id}-${idx}`}
+                                        checked={isCompleted}
+                                        onCheckedChange={() => handleToggleDeliverable(milestone.id, idx)}
+                                      />
+                                      <label
+                                        htmlFor={`deliverable-${milestone.id}-${idx}`}
+                                        className={`text-sm cursor-pointer flex-1 ${
+                                          isCompleted ? "line-through text-muted-foreground" : ""
+                                        }`}
+                                      >
+                                        {deliverable.text || deliverable}
+                                      </label>
+                                    </div>
+                                  );
+                                })}
+                                <div className="text-xs text-muted-foreground pt-1">
+                                  {milestone.deliverables.filter((d: any) => d.completed).length}/{milestone.deliverables.length} deliverables completed
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
                         {milestone.progress && milestone.progress.total > 0 && (
                           <div className="space-y-2">
