@@ -107,10 +107,22 @@ export const useRoadmapWithProgress = (versionId?: string) => {
       const { data: phases, error: phasesError } = await phasesQuery;
       if (phasesError) throw phasesError;
 
-      // Sort milestones within each phase by order_index
+      // Sort milestones within each phase by milestone_number
       phases?.forEach(phase => {
         if (phase.milestones) {
-          phase.milestones.sort((a: any, b: any) => a.order_index - b.order_index);
+          phase.milestones.sort((a: any, b: any) => {
+            // Parse milestone numbers like "1.2", "1.21", "1.3"
+            const aParts = a.milestone_number.split('.').map(Number);
+            const bParts = b.milestone_number.split('.').map(Number);
+            
+            // Compare each part
+            for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+              const aVal = aParts[i] || 0;
+              const bVal = bParts[i] || 0;
+              if (aVal !== bVal) return aVal - bVal;
+            }
+            return 0;
+          });
         }
       });
 

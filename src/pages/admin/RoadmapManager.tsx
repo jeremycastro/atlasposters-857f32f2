@@ -307,7 +307,7 @@ const RoadmapManager = () => {
                       return (
                         <div
                           key={milestone.id}
-                          className="border rounded-lg p-4 space-y-3"
+                          className="border rounded-lg p-4 space-y-3 min-h-[120px]"
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
