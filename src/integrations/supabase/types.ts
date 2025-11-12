@@ -222,7 +222,7 @@ export type Database = {
             foreignKeyName: "artworks_partner_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "partners"
             referencedColumns: ["id"]
           },
         ]
