@@ -156,7 +156,7 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
                               ) : (
                                 <Link 
                                   to="/admin/partners" 
-                                  className="block px-2 py-1.5 text-sm text-primary hover:text-primary/80 hover:underline cursor-pointer"
+                                  className="block px-2 py-1.5 text-sm text-foreground underline hover:text-foreground/80 cursor-pointer"
                                   onClick={() => onOpenChange(false)}
                                 >
                                   No partners found - Create one
