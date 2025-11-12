@@ -241,7 +241,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               <h4 className="font-medium text-sm text-muted-foreground mb-3">Basic Information</h4>
               
               <div className="grid grid-cols-2 gap-3">
-                <div className="grid grid-cols-[90px_1fr] gap-2 items-center">
+                <div className="grid grid-cols-[130px_1fr] gap-2 items-center">
                   <Label htmlFor="status" className="text-sm text-right">Status *</Label>
                   <Select
                     value={formData.status}
@@ -281,7 +281,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="grid grid-cols-[105px_1fr] gap-2 items-center">
+                <div className="grid grid-cols-[130px_1fr] gap-2 items-center">
                   <Label htmlFor="effective_date" className="text-sm text-right">Effective Date *</Label>
                   <Input
                     id="effective_date"
