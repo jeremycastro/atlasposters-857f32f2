@@ -218,9 +218,9 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             ← Back to Addresses
           </Button>
           <h3 className="text-lg font-medium mb-2">{editingAddress ? "Edit Address" : "Add Address"}</h3>
-          <form onSubmit={handleSubmit} className="space-y-3" id="address-form">
-          <div className="space-y-1">
-            <Label htmlFor="designation" className="text-sm">Designation *</Label>
+          <form onSubmit={handleSubmit} className="space-y-2" id="address-form">
+          <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+            <Label htmlFor="designation" className="text-sm text-right">Designation *</Label>
             <Select
               value={formData.designation}
               onValueChange={(value) => setFormData({ ...formData, designation: value })}
@@ -238,8 +238,8 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             </Select>
           </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="contact" className="text-sm">Contact</Label>
+          <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+            <Label htmlFor="contact" className="text-sm text-right">Contact</Label>
             <Select
               value={formData.contact_selection}
               onValueChange={(value) => {
@@ -271,8 +271,8 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
           </div>
 
           {formData.contact_selection === "other" && (
-            <div className="space-y-1">
-              <Label htmlFor="contact_name" className="text-sm">Contact Name</Label>
+            <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+              <Label htmlFor="contact_name" className="text-sm text-right">Contact Name</Label>
               <Input
                 id="contact_name"
                 value={formData.contact_name}
@@ -282,8 +282,8 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             </div>
           )}
 
-          <div className="space-y-1">
-            <Label htmlFor="address_line1" className="text-sm">Address Line 1 *</Label>
+          <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+            <Label htmlFor="address_line1" className="text-sm text-right">Address Line 1 *</Label>
             <Input
               id="address_line1"
               value={formData.address_line1}
@@ -292,8 +292,8 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             />
           </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="address_line2" className="text-sm">Address Line 2</Label>
+          <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+            <Label htmlFor="address_line2" className="text-sm text-right">Address Line 2</Label>
             <Input
               id="address_line2"
               value={formData.address_line2}
@@ -301,8 +301,8 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             />
           </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="country" className="text-sm">Country *</Label>
+          <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+            <Label htmlFor="country" className="text-sm text-right">Country *</Label>
             <Select
               value={formData.country}
               onValueChange={(value) => setFormData({ ...formData, country: value })}
@@ -320,47 +320,46 @@ export function AddressesTab({ partnerId, addresses }: AddressesTabProps) {
             </Select>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label htmlFor="city" className="text-sm">City *</Label>
-              <Input
-                id="city"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                required
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="state" className="text-sm">State/Province</Label>
-              {getStatesForCountry(formData.country).length > 0 ? (
-                <Select
-                  value={formData.state}
-                  onValueChange={(value) => setFormData({ ...formData, state: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select state/province" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {getStatesForCountry(formData.country).map((state) => (
-                      <SelectItem key={state} value={state}>
-                        {state}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  id="state"
-                  value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                  placeholder="Enter state/province/region"
-                />
-              )}
-            </div>
+          <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+            <Label htmlFor="city" className="text-sm text-right">City *</Label>
+            <Input
+              id="city"
+              value={formData.city}
+              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              required
+            />
           </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="postal_code" className="text-sm">Postal Code *</Label>
+          <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+            <Label htmlFor="state" className="text-sm text-right">State/Province</Label>
+            {getStatesForCountry(formData.country).length > 0 ? (
+              <Select
+                value={formData.state}
+                onValueChange={(value) => setFormData({ ...formData, state: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select state/province" />
+                </SelectTrigger>
+                <SelectContent>
+                  {getStatesForCountry(formData.country).map((state) => (
+                    <SelectItem key={state} value={state}>
+                      {state}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                id="state"
+                value={formData.state}
+                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                placeholder="Enter state/province/region"
+              />
+            )}
+          </div>
+
+          <div className="grid grid-cols-[140px_1fr] gap-3 items-center">
+            <Label htmlFor="postal_code" className="text-sm text-right">Postal Code *</Label>
             <Input
               id="postal_code"
               value={formData.postal_code}
