@@ -105,6 +105,7 @@ const SortableTaskRow = ({ task, getStatusBadge, handleTaskClick, updateTask, pr
             <SelectItem value="in_progress">In Progress</SelectItem>
             <SelectItem value="blocked">Blocked</SelectItem>
             <SelectItem value="review">Review</SelectItem>
+            <SelectItem value="testing">Testing</SelectItem>
             <SelectItem value="completed">Completed</SelectItem>
           </SelectContent>
         </Select>
@@ -263,6 +264,7 @@ const RoadmapManager = () => {
       completed: "completed",
       in_progress: "in_progress",
       blocked: "blocked",
+      testing: "in_review",
       not_started: "backlog",
       backlog: "backlog",
       planned: "backlog",
