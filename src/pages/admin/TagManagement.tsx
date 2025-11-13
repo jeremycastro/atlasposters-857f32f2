@@ -89,7 +89,7 @@ export default function TagManagement() {
     tag.tag_key.toLowerCase().includes(localSearchTerm.toLowerCase())
   );
 
-  const sortedTags = filteredTags?.sort((a, b) => b.usage_count - a.usage_count);
+  const sortedTags = filteredTags?.sort((a, b) => a.display_name.localeCompare(b.display_name));
 
   const currentCategory = categories?.find(c => c.category_key === selectedCategory);
 
@@ -268,7 +268,14 @@ export default function TagManagement() {
                             </TableHeader>
                             <TableBody>
                               {matchingTags.map((tag) => (
-                                <TableRow key={tag.id}>
+                                <TableRow 
+                                  key={tag.id}
+                                  className="cursor-pointer hover:bg-muted/50"
+                                  onClick={() => {
+                                    setSelectedTag(tag);
+                                    setEditTagOpen(true);
+                                  }}
+                                >
                                   <TableCell className="font-medium">{tag.display_name}</TableCell>
                                   <TableCell className="font-mono text-sm">{tag.tag_key}</TableCell>
                                   <TableCell>
@@ -282,7 +289,8 @@ export default function TagManagement() {
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                          e.stopPropagation();
                                           setSelectedTag(tag);
                                           setEditTagOpen(true);
                                         }}
@@ -292,7 +300,8 @@ export default function TagManagement() {
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                          e.stopPropagation();
                                           setSelectedTag(tag);
                                           setDeleteTagOpen(true);
                                         }}
@@ -375,7 +384,14 @@ export default function TagManagement() {
                             </TableRow>
                           ) : sortedTags && sortedTags.length > 0 ? (
                             sortedTags.map((tag) => (
-                              <TableRow key={tag.id}>
+                              <TableRow 
+                                key={tag.id}
+                                className="cursor-pointer hover:bg-muted/50"
+                                onClick={() => {
+                                  setSelectedTag(tag);
+                                  setEditTagOpen(true);
+                                }}
+                              >
                                 <TableCell className="font-medium">{tag.display_name}</TableCell>
                                 <TableCell className="font-mono text-sm">{tag.tag_key}</TableCell>
                                 <TableCell>
@@ -389,7 +405,8 @@ export default function TagManagement() {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      onClick={() => {
+                                      onClick={(e) => {
+                                        e.stopPropagation();
                                         setSelectedTag(tag);
                                         setEditTagOpen(true);
                                       }}
@@ -399,7 +416,8 @@ export default function TagManagement() {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      onClick={() => {
+                                      onClick={(e) => {
+                                        e.stopPropagation();
                                         setSelectedTag(tag);
                                         setDeleteTagOpen(true);
                                       }}
