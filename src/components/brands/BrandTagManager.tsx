@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useEntityTags, useCategories, useTags, useTagEntity, useRemoveTag } from "@/hooks/useTags";
+import { useEntityTags, useCategories, useTags, useAllTags, useTagEntity, useRemoveTag } from "@/hooks/useTags";
 import { TagPill } from "@/components/tags/TagPill";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,7 +45,8 @@ export const BrandTagManager = ({
   brandName
 }: BrandTagManagerProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [localSearchTerm, setLocalSearchTerm] = useState("");
+  const [globalSearchTerm, setGlobalSearchTerm] = useState("");
   const [createTagOpen, setCreateTagOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     'Core Artwork': true,
@@ -66,6 +67,9 @@ export const BrandTagManager = ({
   const {
     data: availableTags
   } = useTags(selectedCategory || "");
+  const {
+    data: allTags
+  } = useAllTags();
   const tagEntity = useTagEntity();
   const removeTag = useRemoveTag();
 
@@ -86,13 +90,23 @@ export const BrandTagManager = ({
   // Get currently applied tag IDs
   const appliedTagIds = new Set(brandTags?.map(t => t.tag_id) || []);
 
-  // Filter available tags by search term
+  // Filter available tags by local search term (within category)
   const filteredAvailableTags = useMemo(() => {
     if (!availableTags) return [];
-    if (!searchTerm) return availableTags;
-    const searchLower = searchTerm.toLowerCase();
+    if (!localSearchTerm) return availableTags;
+    const searchLower = localSearchTerm.toLowerCase();
     return availableTags.filter(tag => tag.display_name.toLowerCase().includes(searchLower) || tag.tag_key.toLowerCase().includes(searchLower));
-  }, [availableTags, searchTerm]);
+  }, [availableTags, localSearchTerm]);
+
+  // Global search results (across all tags)
+  const globalSearchResults = useMemo(() => {
+    if (!allTags || !globalSearchTerm) return [];
+    const searchLower = globalSearchTerm.toLowerCase();
+    return allTags.filter(tag => 
+      tag.display_name.toLowerCase().includes(searchLower) || 
+      tag.tag_key.toLowerCase().includes(searchLower)
+    );
+  }, [allTags, globalSearchTerm]);
 
   // Count artworks under this brand
   const {
@@ -165,8 +179,17 @@ export const BrandTagManager = ({
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Sidebar - Category Navigation */}
         <aside className="lg:col-span-1 h-full flex flex-col border rounded-lg bg-card">
-          <div className="p-6 pb-4 border-b space-y-2">
+          <div className="p-6 pb-4 border-b space-y-3">
             <h3 className="font-semibold text-base">Browse Categories</h3>
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search all tags..." 
+                value={globalSearchTerm} 
+                onChange={e => setGlobalSearchTerm(e.target.value)} 
+                className="pl-8" 
+              />
+            </div>
           </div>
           <ScrollArea className="flex-1">
             <div className="p-2 space-y-1">
@@ -183,7 +206,11 @@ export const BrandTagManager = ({
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <div className="ml-6 mt-1 space-y-0.5">
-                        {groupCategories?.map(category => <Button key={category.category_key} variant="ghost" size="sm" className={cn("w-full justify-start text-left font-normal", selectedCategory === category.category_key && "bg-muted text-primary font-medium")} onClick={() => setSelectedCategory(category.category_key)}>
+                        {groupCategories?.map(category => <Button key={category.category_key} variant="ghost" size="sm" className={cn("w-full justify-start text-left font-normal", selectedCategory === category.category_key && "bg-muted text-primary font-medium")} onClick={() => {
+                            setSelectedCategory(category.category_key);
+                            setGlobalSearchTerm("");
+                            setLocalSearchTerm("");
+                          }}>
                             <span className="truncate">{category.display_name}</span>
                           </Button>)}
                       </div>
@@ -250,45 +277,124 @@ export const BrandTagManager = ({
 
           {/* Browse & Add Tags */}
           <Card>
-            <CardHeader className="pb-4 space-y-4">
-              <div className="flex items-center justify-between pb-4 border-b">
-                <div>
-                  <CardTitle className="text-base font-semibold">
-                    {selectedCategoryData?.display_name || 'Select a Category'}
-                  </CardTitle>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">
-                    {filteredAvailableTags.length} tags
-                  </Badge>
-                  <Button size="sm" onClick={() => setCreateTagOpen(true)} disabled={!selectedCategory}>
-                    <Plus className="h-4 w-4 mr-1" />
-                    New
-                  </Button>
-                </div>
-              </div>
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search tags..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-8" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              {selectedCategory ? <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                  {filteredAvailableTags.map(tag => {
-                const isApplied = appliedTagIds.has(tag.id);
-                return <Button key={tag.id} variant={isApplied ? "default" : "outline"} size="sm" className={cn("justify-between gap-2", isApplied && "bg-primary text-primary-foreground")} onClick={() => isApplied ? handleRemoveTag(tag.id) : handleAddTag(tag.id)}>
-                        <span className="truncate">{tag.display_name}</span>
-                        <div className="flex items-center gap-1 shrink-0">
-                          {isApplied && <Check className="h-3 w-3" />}
-                          {!isApplied && <Plus className="h-3 w-3" />}
+            {globalSearchTerm ? (
+              // Global Search Results View
+              <>
+                <CardHeader className="pb-4 space-y-4">
+                  <div className="flex items-center justify-between pb-4 border-b">
+                    <div>
+                      <CardTitle className="text-base font-semibold">
+                        Search Results for "{globalSearchTerm}"
+                      </CardTitle>
+                    </div>
+                    <Badge variant="secondary">
+                      {globalSearchResults.length} tag{globalSearchResults.length !== 1 ? 's' : ''}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {globalSearchResults.length > 0 ? (
+                    <div className="space-y-4">
+                      {/* Group results by category */}
+                      {Object.entries(
+                        globalSearchResults.reduce((acc, tag) => {
+                          const categoryName = tag.category?.display_name || 'Uncategorized';
+                          if (!acc[categoryName]) acc[categoryName] = [];
+                          acc[categoryName].push(tag);
+                          return acc;
+                        }, {} as Record<string, typeof globalSearchResults>)
+                      ).map(([categoryName, tags]) => (
+                        <div key={categoryName} className="space-y-2">
+                          <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+                            {categoryName}
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                            {tags.map(tag => {
+                              const isApplied = appliedTagIds.has(tag.id);
+                              return (
+                                <Button 
+                                  key={tag.id} 
+                                  variant={isApplied ? "default" : "outline"} 
+                                  size="sm" 
+                                  className={cn("justify-between gap-2", isApplied && "bg-primary text-primary-foreground")}
+                                  onClick={() => isApplied ? handleRemoveTag(tag.id) : handleAddTag(tag.id)}
+                                >
+                                  <span className="truncate">{tag.display_name}</span>
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    {isApplied && <Check className="h-3 w-3" />}
+                                    {!isApplied && <Plus className="h-3 w-3" />}
+                                  </div>
+                                </Button>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </Button>;
-              })}
-                </div> : <div className="text-center py-12 text-muted-foreground">
-                  <Palette className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                  <p>Select a category from the sidebar to browse tags</p>
-                </div>}
-            </CardContent>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Search className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                      <p>No tags found matching "{globalSearchTerm}"</p>
+                    </div>
+                  )}
+                </CardContent>
+              </>
+            ) : (
+              // Category-Specific View
+              <>
+                <CardHeader className="pb-4 space-y-4">
+                  <div className="flex items-center justify-between pb-4 border-b">
+                    <div>
+                      <CardTitle className="text-base font-semibold">
+                        {selectedCategoryData?.display_name || 'Select a Category'}
+                      </CardTitle>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">
+                        {filteredAvailableTags.length} tags
+                      </Badge>
+                      <Button size="sm" onClick={() => setCreateTagOpen(true)} disabled={!selectedCategory}>
+                        <Plus className="h-4 w-4 mr-1" />
+                        New
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="Search tags..." value={localSearchTerm} onChange={e => setLocalSearchTerm(e.target.value)} className="pl-8" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {selectedCategory ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                      {filteredAvailableTags.map(tag => {
+                        const isApplied = appliedTagIds.has(tag.id);
+                        return (
+                          <Button 
+                            key={tag.id} 
+                            variant={isApplied ? "default" : "outline"} 
+                            size="sm" 
+                            className={cn("justify-between gap-2", isApplied && "bg-primary text-primary-foreground")}
+                            onClick={() => isApplied ? handleRemoveTag(tag.id) : handleAddTag(tag.id)}
+                          >
+                            <span className="truncate">{tag.display_name}</span>
+                            <div className="flex items-center gap-1 shrink-0">
+                              {isApplied && <Check className="h-3 w-3" />}
+                              {!isApplied && <Plus className="h-3 w-3" />}
+                            </div>
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Palette className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                      <p>Select a category from the sidebar to browse tags</p>
+                    </div>
+                  )}
+                </CardContent>
+              </>
+            )}
           </Card>
         </div>
       </div>
