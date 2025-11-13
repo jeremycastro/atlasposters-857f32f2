@@ -153,25 +153,6 @@ export default function BrandStoryDashboard() {
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Get started building your brand story</CardDescription>
-        </CardHeader>
-        <CardContent className="flex items-center gap-2">
-          <BrandSelector value={selectedBrandId} onChange={setSelectedBrandId} />
-          <Button onClick={handleCreateNewComponent}>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Component
-          </Button>
-          <Button variant="outline" onClick={handleCreateNewEvent}>
-            <Calendar className="h-4 w-4 mr-2" />
-            Add Timeline Event
-          </Button>
-        </CardContent>
-      </Card>
-
       {/* Components Table */}
       <Card>
         <CardHeader>
