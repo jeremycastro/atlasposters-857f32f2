@@ -96,7 +96,7 @@ export default function BrandStoryDashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="container py-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Brand Story Management</h1>
         <p className="text-muted-foreground">
