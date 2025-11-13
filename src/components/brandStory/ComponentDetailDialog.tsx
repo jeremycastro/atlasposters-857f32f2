@@ -77,18 +77,6 @@ export const ComponentDetailDialog = ({
       if (!open) setIsEditing(false);
     }}>
       <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col mx-4 w-[calc(100vw-2rem)] sm:w-full">
-        {isEditing && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-4 right-14 z-10 text-destructive hover:text-destructive hover:bg-destructive/10"
-            onClick={handleDelete}
-            disabled={deleteComponent.isPending}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        )}
-
         <DialogHeader className="flex-shrink-0">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
@@ -218,36 +206,49 @@ export const ComponentDetailDialog = ({
 
         <Separator className="flex-shrink-0" />
 
-        <div className="flex items-center justify-end gap-2 flex-shrink-0 pt-4">
-          {component.status === "draft" && (
+        <div className="flex items-center justify-between gap-2 flex-shrink-0 pt-4">
+          {isEditing && (
             <Button
-              variant="default"
-              onClick={handleApprove}
-              disabled={updateComponent.isPending}
+              variant="ghost"
+              onClick={handleDelete}
+              disabled={deleteComponent.isPending}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
             >
-              <CheckCircle2 className="h-4 w-4 mr-2" />
-              Approve
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
             </Button>
           )}
-          {component.status !== "archived" && (
-            <Button
-              variant="outline"
-              onClick={handleArchive}
-              disabled={updateComponent.isPending}
-            >
-              <Archive className="h-4 w-4 mr-2" />
-              Archive
-            </Button>
-          )}
-          {onEdit && (
-            <Button
-              variant="outline"
-              onClick={handleEdit}
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
-          )}
+          <div className="flex items-center gap-2 ml-auto">
+            {component.status === "draft" && (
+              <Button
+                variant="default"
+                onClick={handleApprove}
+                disabled={updateComponent.isPending}
+              >
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Approve
+              </Button>
+            )}
+            {component.status !== "archived" && (
+              <Button
+                variant="outline"
+                onClick={handleArchive}
+                disabled={updateComponent.isPending}
+              >
+                <Archive className="h-4 w-4 mr-2" />
+                Archive
+              </Button>
+            )}
+            {onEdit && (
+              <Button
+                variant="outline"
+                onClick={handleEdit}
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
