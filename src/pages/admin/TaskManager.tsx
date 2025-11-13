@@ -55,25 +55,22 @@ const TaskManager = () => {
 
       <TaskStats tasks={tasks} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-1">
-          <TaskFilters filters={filters} onFiltersChange={setFilters} />
+      <Tabs value={view} onValueChange={(v) => setView(v as "kanban" | "table")}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <TabsList>
+              <TabsTrigger value="kanban" className="flex items-center gap-2">
+                <LayoutGrid className="h-4 w-4" />
+                Kanban
+              </TabsTrigger>
+              <TabsTrigger value="table" className="flex items-center gap-2">
+                <Table className="h-4 w-4" />
+                Table
+              </TabsTrigger>
+            </TabsList>
+            <TaskFilters filters={filters} onFiltersChange={setFilters} />
+          </div>
         </div>
-
-        <div className="lg:col-span-3">
-          <Tabs value={view} onValueChange={(v) => setView(v as "kanban" | "table")}>
-            <div className="flex items-center justify-between mb-4">
-              <TabsList>
-                <TabsTrigger value="kanban" className="flex items-center gap-2">
-                  <LayoutGrid className="h-4 w-4" />
-                  Kanban
-                </TabsTrigger>
-                <TabsTrigger value="table" className="flex items-center gap-2">
-                  <Table className="h-4 w-4" />
-                  Table
-                </TabsTrigger>
-              </TabsList>
-            </div>
 
             <TabsContent value="kanban" className="mt-0">
               {isLoading ? (
@@ -87,20 +84,18 @@ const TaskManager = () => {
               )}
             </TabsContent>
 
-            <TabsContent value="table" className="mt-0">
-              {isLoading ? (
-                <p className="text-center text-muted-foreground py-8">Loading tasks...</p>
-              ) : (
-                <TaskTableView
-                  tasks={tasks}
-                  onEditTask={handleEditTask}
-                  onViewTask={handleViewTask}
-                />
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
+        <TabsContent value="table" className="mt-0">
+          {isLoading ? (
+            <p className="text-center text-muted-foreground py-8">Loading tasks...</p>
+          ) : (
+            <TaskTableView
+              tasks={tasks}
+              onEditTask={handleEditTask}
+              onViewTask={handleViewTask}
+            />
+          )}
+        </TabsContent>
+      </Tabs>
 
       <CreateTaskDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
       <TaskDetailDialog

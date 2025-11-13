@@ -3,7 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Filter, X } from "lucide-react";
 import { useProfiles } from "@/hooks/useProfiles";
 
 interface TaskFiltersProps {
@@ -63,16 +64,29 @@ export const TaskFilters = ({ filters, onFiltersChange }: TaskFiltersProps) => {
     filters.status.length + filters.priority.length + (filters.assigned_to ? 1 : 0);
 
   return (
-    <div className="space-y-4 p-4 bg-card border border-border rounded-lg">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold">Filters</h3>
-        {activeFilterCount > 0 && (
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
-            <X className="h-4 w-4 mr-1" />
-            Clear ({activeFilterCount})
-          </Button>
-        )}
-      </div>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2">
+          <Filter className="h-4 w-4" />
+          Filters
+          {activeFilterCount > 0 && (
+            <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
+              {activeFilterCount}
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80" align="end">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">Filters</h3>
+            {activeFilterCount > 0 && (
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
+                <X className="h-4 w-4 mr-1" />
+                Clear
+              </Button>
+            )}
+          </div>
 
       <div>
         <Label>Search</Label>
@@ -155,6 +169,8 @@ export const TaskFilters = ({ filters, onFiltersChange }: TaskFiltersProps) => {
           )}
         </div>
       </div>
-    </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };
