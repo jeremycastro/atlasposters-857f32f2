@@ -207,7 +207,7 @@ export default function TagManagement() {
                     <CollapsibleTrigger asChild>
                       <Button 
                         variant="ghost" 
-                        className="w-full justify-between text-sm font-bold text-primary hover:text-primary hover:bg-primary/10 py-4"
+                        className="w-full justify-between text-sm font-bold text-primary hover:text-primary hover:bg-primary/10 py-2"
                       >
                         <div className="flex items-center gap-2">
                           <group.icon className="h-4 w-4" />
@@ -216,7 +216,7 @@ export default function TagManagement() {
                         <ChevronDown className={`h-4 w-4 transition-transform ${openGroups[groupName] ? 'rotate-180' : ''}`} />
                       </Button>
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="space-y-0.5 mt-0.5">
+                    <CollapsibleContent className="space-y-0 mt-0">
                       {group.categories.map(categoryKey => {
                         const category = categories?.find(c => c.category_key === categoryKey);
                         
@@ -226,7 +226,7 @@ export default function TagManagement() {
                           <Button
                             key={categoryKey}
                             variant={selectedCategory === categoryKey ? "secondary" : "ghost"}
-                            className="w-full justify-start text-sm pl-8 py-2"
+                            className="w-full justify-start text-sm pl-8 py-1.5 h-auto"
                             onClick={() => {
                               setSelectedCategory(categoryKey);
                               setGlobalSearchTerm("");
