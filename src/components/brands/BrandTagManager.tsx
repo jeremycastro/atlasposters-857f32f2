@@ -211,9 +211,6 @@ export const BrandTagManager = ({ brandId, brandName }: BrandTagManagerProps) =>
                             onClick={() => setSelectedCategory(category.category_key)}
                           >
                             <span className="truncate">{category.display_name}</span>
-                            <Badge variant="secondary" className="ml-auto">
-                              {category.tag_count || 0}
-                            </Badge>
                           </Button>
                         ))}
                       </div>
@@ -298,19 +295,12 @@ export const BrandTagManager = ({ brandId, brandName }: BrandTagManagerProps) =>
           {/* Browse & Add Tags */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">
-                    {selectedCategoryData?.display_name || 'Select a Category'}
-                  </CardTitle>
-                  <CardDescription>
-                    Click tags to add or remove them from this brand
-                  </CardDescription>
-                </div>
-                <Badge variant="secondary">
-                  {filteredAvailableTags.length} tags
-                </Badge>
-              </div>
+              <CardTitle className="text-base">
+                {selectedCategoryData?.display_name || 'Select a Category'}
+              </CardTitle>
+              <CardDescription>
+                Click tags to add or remove them from this brand
+              </CardDescription>
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
