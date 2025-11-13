@@ -172,46 +172,6 @@ export default function BrandStoryDashboard() {
         </CardContent>
       </Card>
 
-      {/* Component Distribution */}
-      {stats && stats.totalComponents > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Component Distribution</CardTitle>
-            <CardDescription>Components by type and status</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div>
-                <h4 className="text-sm font-medium mb-2">By Type</h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {Object.entries(stats.componentsByType).map(([type, count]) => (
-                    <div key={type} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        {COMPONENT_TYPE_LABELS[type as keyof typeof COMPONENT_TYPE_LABELS]}
-                      </span>
-                      <span className="font-medium">{count}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium mb-2">By Status</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {Object.entries(stats.componentsByStatus).map(([status, count]) => (
-                    <div key={status} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        {STATUS_LABELS[status as keyof typeof STATUS_LABELS]}
-                      </span>
-                      <span className="font-medium">{count}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Components Table */}
       <Card>
         <CardHeader>
