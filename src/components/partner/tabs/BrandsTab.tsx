@@ -292,16 +292,16 @@ export function BrandsTab({
     console.log('Form submitted!');
     console.log('Current formData:', formData);
     console.log('Editing brand:', editingBrand);
-    
     if (editingBrand) {
       console.log('Calling updateBrand mutation with:', {
         id: editingBrand.id,
         updates: formData
       });
-      
+
       // Store a copy of formData before mutation to avoid closure issues
-      const dataToSubmit = { ...formData };
-      
+      const dataToSubmit = {
+        ...formData
+      };
       updateBrand.mutate({
         id: editingBrand.id,
         updates: dataToSubmit
@@ -314,7 +314,7 @@ export function BrandsTab({
           setEditingBrand(null);
           resetForm();
         },
-        onError: (error) => {
+        onError: error => {
           console.error('Error updating brand:', error);
         }
       });
@@ -410,53 +410,35 @@ export function BrandsTab({
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid grid-cols-[110px_1fr] gap-2 items-center">
                   <Label className="text-sm text-right">Brand Name *</Label>
-                  <Input 
-                    value={formData.brand_name} 
-                    onChange={e => setFormData(prev => ({
+                  <Input value={formData.brand_name} onChange={e => setFormData(prev => ({
                       ...prev,
                       brand_name: e.target.value
-                    }))} 
-                    required 
-                  />
+                    }))} required />
                 </div>
                 
                 <div className="grid grid-cols-[110px_1fr] gap-2 items-center">
                   <Label className="text-sm text-right">Tagline</Label>
-                  <Input 
-                    value={formData.tagline} 
-                    onChange={e => setFormData(prev => ({
-                      ...prev, 
+                  <Input value={formData.tagline} onChange={e => setFormData(prev => ({
+                      ...prev,
                       tagline: e.target.value
-                    }))} 
-                    placeholder="Short brand tagline" 
-                  />
+                    }))} placeholder="Short brand tagline" />
                 </div>
               </div>
 
               <div className="grid grid-cols-[110px_1fr] gap-3 items-start">
                 <Label className="text-sm text-right pt-2">Description</Label>
-                <Textarea 
-                  value={formData.description} 
-                  onChange={e => setFormData(prev => ({
+                <Textarea value={formData.description} onChange={e => setFormData(prev => ({
                     ...prev,
                     description: e.target.value
-                  }))} 
-                  rows={2} 
-                  placeholder="Brief description" 
-                />
+                  }))} rows={2} placeholder="Brief description" />
               </div>
 
               <div className="grid grid-cols-[110px_1fr] gap-3 items-start">
                 <Label className="text-sm text-right pt-2">Brand Story</Label>
-                <Textarea 
-                  value={formData.brand_story} 
-                  onChange={e => setFormData(prev => ({
-                    ...prev, 
+                <Textarea value={formData.brand_story} onChange={e => setFormData(prev => ({
+                    ...prev,
                     brand_story: e.target.value
-                  }))} 
-                  rows={3} 
-                  placeholder="Detailed brand story for landing pages" 
-                />
+                  }))} rows={3} placeholder="Detailed brand story for landing pages" />
               </div>
             </div>
 
@@ -470,72 +452,42 @@ export function BrandsTab({
               <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
                 <Label className="text-sm text-right">Primary Color</Label>
                 <div className="flex gap-2">
-                  <Input 
-                    type="color" 
-                    value={formData.primary_color} 
-                    onChange={e => setFormData(prev => ({
+                  <Input type="color" value={formData.primary_color} onChange={e => setFormData(prev => ({
                       ...prev,
                       primary_color: e.target.value
-                    }))} 
-                    className="w-16 h-10 p-1" 
-                  />
-                  <Input 
-                    type="text" 
-                    value={formData.primary_color} 
-                    onChange={e => setFormData(prev => ({
+                    }))} className="w-16 h-10 p-1" />
+                  <Input type="text" value={formData.primary_color} onChange={e => setFormData(prev => ({
                       ...prev,
                       primary_color: e.target.value
-                    }))} 
-                    placeholder="#000000" 
-                  />
+                    }))} placeholder="#000000" />
                 </div>
               </div>
 
               <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
                 <Label className="text-sm text-right">Secondary Color</Label>
                 <div className="flex gap-2">
-                  <Input 
-                    type="color" 
-                    value={formData.secondary_color} 
-                    onChange={e => setFormData(prev => ({
+                  <Input type="color" value={formData.secondary_color} onChange={e => setFormData(prev => ({
                       ...prev,
                       secondary_color: e.target.value
-                    }))} 
-                    className="w-16 h-10 p-1" 
-                  />
-                  <Input 
-                    type="text" 
-                    value={formData.secondary_color} 
-                    onChange={e => setFormData(prev => ({
+                    }))} className="w-16 h-10 p-1" />
+                  <Input type="text" value={formData.secondary_color} onChange={e => setFormData(prev => ({
                       ...prev,
                       secondary_color: e.target.value
-                    }))} 
-                    placeholder="#666666" 
-                  />
+                    }))} placeholder="#666666" />
                 </div>
               </div>
 
               <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
                 <Label className="text-sm text-right">Accent Color</Label>
                 <div className="flex gap-2">
-                  <Input 
-                    type="color" 
-                    value={formData.accent_color} 
-                    onChange={e => setFormData(prev => ({
+                  <Input type="color" value={formData.accent_color} onChange={e => setFormData(prev => ({
                       ...prev,
                       accent_color: e.target.value
-                    }))} 
-                    className="w-16 h-10 p-1" 
-                  />
-                  <Input 
-                    type="text" 
-                    value={formData.accent_color} 
-                    onChange={e => setFormData(prev => ({
+                    }))} className="w-16 h-10 p-1" />
+                  <Input type="text" value={formData.accent_color} onChange={e => setFormData(prev => ({
                       ...prev,
                       accent_color: e.target.value
-                    }))} 
-                    placeholder="#FF6B6B" 
-                  />
+                    }))} placeholder="#FF6B6B" />
                 </div>
               </div>
             </div>
@@ -549,95 +501,70 @@ export function BrandsTab({
               
               <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
                 <Label className="text-sm text-right">Website URL</Label>
-                <Input 
-                  type="url" 
-                  value={formData.website_url} 
-                  onChange={e => setFormData(prev => ({
+                <Input type="url" value={formData.website_url} onChange={e => setFormData(prev => ({
                     ...prev,
                     website_url: e.target.value
-                  }))} 
-                  placeholder="https://brand.com" 
-                />
+                  }))} placeholder="https://brand.com" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
                   <Label className="text-sm text-right">Instagram</Label>
-                  <Input 
-                    value={formData.social_links.instagram} 
-                    onChange={e => setFormData(prev => ({
+                  <Input value={formData.social_links.instagram} onChange={e => setFormData(prev => ({
                       ...prev,
                       social_links: {
                         ...prev.social_links,
                         instagram: e.target.value
                       }
-                    }))} 
-                    placeholder="@brandname" 
-                  />
+                    }))} placeholder="@brandname" />
                 </div>
                 
                 <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
                   <Label className="text-sm text-right">Facebook</Label>
-                  <Input 
-                    value={formData.social_links.facebook} 
-                    onChange={e => setFormData(prev => ({
+                  <Input value={formData.social_links.facebook} onChange={e => setFormData(prev => ({
                       ...prev,
                       social_links: {
                         ...prev.social_links,
                         facebook: e.target.value
                       }
-                    }))} 
-                    placeholder="facebook.com/..." 
-                  />
+                    }))} placeholder="facebook.com/..." />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
                   <Label className="text-sm text-right">Twitter/X</Label>
-                  <Input 
-                    value={formData.social_links.twitter} 
-                    onChange={e => setFormData(prev => ({
+                  <Input value={formData.social_links.twitter} onChange={e => setFormData(prev => ({
                       ...prev,
                       social_links: {
                         ...prev.social_links,
                         twitter: e.target.value
                       }
-                    }))} 
-                    placeholder="@brandname" 
-                  />
+                    }))} placeholder="@brandname" />
                 </div>
                 
                 <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
                   <Label className="text-sm text-right">LinkedIn</Label>
-                  <Input 
-                    value={formData.social_links.linkedin} 
-                    onChange={e => setFormData(prev => ({
+                  <Input value={formData.social_links.linkedin} onChange={e => setFormData(prev => ({
                       ...prev,
                       social_links: {
                         ...prev.social_links,
                         linkedin: e.target.value
                       }
-                    }))} 
-                    placeholder="linkedin.com/..." 
-                  />
+                    }))} placeholder="linkedin.com/..." />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
                   <Label className="text-sm text-right">Pinterest</Label>
-                  <Input 
-                    value={formData.social_links.pinterest} 
-                    onChange={e => setFormData(prev => ({
+                  <Input value={formData.social_links.pinterest} onChange={e => setFormData(prev => ({
                       ...prev,
                       social_links: {
                         ...prev.social_links,
                         pinterest: e.target.value
                       }
-                    }))} 
-                    placeholder="pinterest.com/..." 
-                  />
+                    }))} placeholder="pinterest.com/..." />
                 </div>
               </div>
             </div>
@@ -659,41 +586,23 @@ export function BrandsTab({
                   <ImageIcon className="h-4 w-4" />
                   Brand Assets & Logo
                 </h4>
-                {editingBrand && (
-                  <BrandLogoUpload 
-                    brandId={editingBrand.id} 
-                    currentLogoUrl={formData.logo_url} 
-                    onLogoChange={(url) => setFormData(prev => ({
-                      ...prev,
-                      logo_url: url
-                    }))} 
-                  />
-                )}
-                {!editingBrand && (
-                  <p className="text-sm text-muted-foreground">
+                {editingBrand && <BrandLogoUpload brandId={editingBrand.id} currentLogoUrl={formData.logo_url} onLogoChange={url => setFormData(prev => ({
+                ...prev,
+                logo_url: url
+              }))} />}
+                {!editingBrand && <p className="text-sm text-muted-foreground">
                     Save the brand first to upload images
-                  </p>
-                )}
+                  </p>}
               </div>
             </TabsContent>
 
             <TabsContent value="tags" className="mt-4">
               <div className="space-y-4">
-                <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
-                  <Tags className="h-4 w-4" />
-                  Tag Management
-                </h4>
-                {editingBrand && (
-                  <BrandTagManager 
-                    brandId={editingBrand.id}
-                    brandName={editingBrand.brand_name}
-                  />
-                )}
-                {!editingBrand && (
-                  <p className="text-sm text-muted-foreground">
+                
+                {editingBrand && <BrandTagManager brandId={editingBrand.id} brandName={editingBrand.brand_name} />}
+                {!editingBrand && <p className="text-sm text-muted-foreground">
                     Save the brand first to manage tags
-                  </p>
-                )}
+                  </p>}
               </div>
             </TabsContent>
           </Tabs>
@@ -726,13 +635,13 @@ export function BrandsTab({
             </TableHeader>
             <TableBody>
               {brands.map(brand => {
-                const BrandTagCount = () => {
-                  const { data: tags } = useEntityTags('brand', brand.id);
-                  return <span>{tags?.length || 0}</span>;
-                };
-                
-                return (
-                  <TableRow key={brand.id} className="cursor-pointer hover:bg-muted/50" onClick={() => handleOpenForm(brand)}>
+            const BrandTagCount = () => {
+              const {
+                data: tags
+              } = useEntityTags('brand', brand.id);
+              return <span>{tags?.length || 0}</span>;
+            };
+            return <TableRow key={brand.id} className="cursor-pointer hover:bg-muted/50" onClick={() => handleOpenForm(brand)}>
                     <TableCell>
                       <div className="flex gap-3 items-center">
                         {brand.logo_url && <img src={brand.logo_url} alt={brand.brand_name} className="h-8 w-8 object-contain rounded" />}
@@ -765,16 +674,16 @@ export function BrandsTab({
                     <TableCell className="text-right">
                       <div className="flex gap-1 justify-end">
                         <Button variant="ghost" size="sm" onClick={e => {
-                          e.stopPropagation();
-                          handleOpenForm(brand);
-                        }} title="Edit brand">
+                    e.stopPropagation();
+                    handleOpenForm(brand);
+                  }} title="Edit brand">
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="sm" onClick={e => {
-                          e.stopPropagation();
-                          handleOpenForm(brand);
-                          setActiveTab("tags");
-                        }} title="Manage tags">
+                    e.stopPropagation();
+                    handleOpenForm(brand);
+                    setActiveTab("tags");
+                  }} title="Manage tags">
                           <Tags className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="sm" onClick={e => handleDeleteClick(brand, e)} title="Delete brand">
@@ -782,9 +691,8 @@ export function BrandsTab({
                         </Button>
                       </div>
                     </TableCell>
-                  </TableRow>
-                );
-              })}
+                  </TableRow>;
+          })}
             </TableBody>
           </Table>
         </div>}
