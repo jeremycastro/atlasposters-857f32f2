@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ export const BrandTagManager = ({
   brandId,
   brandName
 }: BrandTagManagerProps) => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [localSearchTerm, setLocalSearchTerm] = useState("");
   const [globalSearchTerm, setGlobalSearchTerm] = useState("");
@@ -366,7 +368,11 @@ export const BrandTagManager = ({
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {sampleArtworks?.map(artwork => <div key={artwork.id} className="flex items-center gap-2 text-sm">
+              {sampleArtworks?.map(artwork => <div 
+                  key={artwork.id} 
+                  className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted/50 p-2 rounded-md transition-colors"
+                  onClick={() => navigate('/admin/artworks')}
+                >
                   <Badge variant="outline" className="font-mono text-xs">
                     {artwork.asc_code}
                   </Badge>
