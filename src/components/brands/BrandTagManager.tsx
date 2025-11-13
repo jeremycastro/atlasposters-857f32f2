@@ -161,15 +161,6 @@ export const BrandTagManager = ({
   };
   const selectedCategoryData = categories?.find(c => c.category_key === selectedCategory);
   return <div className="space-y-4">
-      {/* Info Alert */}
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertDescription>
-          Tags added to this brand will automatically be inherited by all {artworkCount || 0} artwork{artworkCount !== 1 ? 's' : ''} under <strong>{brandName}</strong>. 
-          Inherited tags appear with a dashed border and cannot be removed from individual artworks.
-        </AlertDescription>
-      </Alert>
-
       {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Sidebar - Category Navigation */}
@@ -302,6 +293,15 @@ export const BrandTagManager = ({
           </Card>
         </div>
       </div>
+
+      {/* Info Alert */}
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertDescription>
+          Tags added to this brand will automatically be inherited by all {artworkCount || 0} artwork{artworkCount !== 1 ? 's' : ''} under <strong>{brandName}</strong>. 
+          Inherited tags appear with a dashed border and cannot be removed from individual artworks.
+        </AlertDescription>
+      </Alert>
 
       {/* Create Tag Dialog */}
       <CreateTagDialog open={createTagOpen} onOpenChange={setCreateTagOpen} categoryKey={selectedCategory || ""} categoryName={selectedCategoryData?.display_name || ""} />
