@@ -1,9 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useArtworks } from '@/hooks/useArtworks';
 import { ArtworkStats } from '@/components/artworks/ArtworkStats';
 import { ArtworkTableView } from '@/components/artworks/ArtworkTableView';
 import { CreateArtworkDialog } from '@/components/artworks/CreateArtworkDialog';
-import { EditArtworkDialog } from '@/components/artworks/EditArtworkDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search } from 'lucide-react';
@@ -25,21 +25,18 @@ type Artwork = Database['public']['Tables']['artworks']['Row'] & {
 };
 
 export default function ArtworkCatalog() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null);
 
   const { data: artworks, isLoading } = useArtworks({ search });
 
   const handleView = (artwork: Artwork) => {
-    setSelectedArtwork(artwork);
-    setEditDialogOpen(true);
+    navigate(`/admin/artworks/${artwork.id}`);
   };
 
   const handleEdit = (artwork: Artwork) => {
-    setSelectedArtwork(artwork);
-    setEditDialogOpen(true);
+    navigate(`/admin/artworks/${artwork.id}`);
   };
 
   const handleArchive = (artwork: Artwork) => {
@@ -93,16 +90,10 @@ export default function ArtworkCatalog() {
         />
       )}
 
-      {/* Dialogs */}
+      {/* Create Dialog */}
       <CreateArtworkDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
-      />
-
-      <EditArtworkDialog
-        artwork={selectedArtwork}
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
       />
     </div>
   );
