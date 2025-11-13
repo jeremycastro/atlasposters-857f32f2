@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useCategories, useTags } from "@/hooks/useTags";
+import { useCategories, useTags, useAllTags } from "@/hooks/useTags";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -53,6 +53,11 @@ export default function TagManagement() {
     isLoading: categoriesLoading
   } = useCategories();
 
+  const {
+    data: allTags,
+    isLoading: allTagsLoading
+  } = useAllTags();
+
   // Auto-select first category when categories load
   if (categories && categories.length > 0 && !selectedCategory) {
     setSelectedCategory(categories[0].category_key);
@@ -64,13 +69,15 @@ export default function TagManagement() {
 
   // Global search across all categories, grouped by category groups
   const globalSearchResults = useMemo(() => {
-    if (!globalSearchTerm || !categories) return null;
+    if (!globalSearchTerm || !categories || !allTags) return null;
+    
+    const searchLower = globalSearchTerm.toLowerCase();
     const groupedResults: {
       groupName: string;
       groupIcon: any;
       categories: {
         category: Category;
-        matchingTags: Tag[];
+        matchingTags: any[];
       }[];
     }[] = [];
 
@@ -78,17 +85,21 @@ export default function TagManagement() {
     Object.entries(CATEGORY_GROUPS).forEach(([groupName, groupData]) => {
       const categoriesInGroup: {
         category: Category;
-        matchingTags: Tag[];
+        matchingTags: any[];
       }[] = [];
 
       // Find categories that belong to this group
       categories.forEach((category: any) => {
         if (groupData.categories.includes(category.category_key)) {
-          const categoryTags = category.tag_definitions || [];
-          const matches = categoryTags.filter((tag: Tag) => 
-            (tag.display_name?.toLowerCase() || '').includes(globalSearchTerm.toLowerCase()) || 
-            (tag.tag_key?.toLowerCase() || '').includes(globalSearchTerm.toLowerCase())
+          // Find matching tags for this category from allTags
+          const matches = allTags.filter((tag: any) => 
+            tag.category?.category_key === category.category_key &&
+            (
+              (tag.display_name?.toLowerCase() || '').includes(searchLower) || 
+              (tag.tag_key?.toLowerCase() || '').includes(searchLower)
+            )
           );
+          
           if (matches.length > 0) {
             categoriesInGroup.push({
               category,
@@ -106,7 +117,7 @@ export default function TagManagement() {
       }
     });
     return groupedResults;
-  }, [globalSearchTerm, categories]);
+  }, [globalSearchTerm, categories, allTags]);
   const totalGlobalResults = globalSearchResults?.reduce((sum, group) => sum + group.categories.reduce((catSum, cat) => catSum + cat.matchingTags.length, 0), 0) || 0;
 
   // Local search within selected category
