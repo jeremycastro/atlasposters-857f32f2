@@ -7,9 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Plus, Edit, Palette, Save, X, Trash2, Tags } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ExternalLink, Plus, Edit, Palette, Save, X, Trash2, Tags, FileText, ImageIcon } from "lucide-react";
 import { useCreateBrand, useUpdateBrand, useDeleteBrand } from "@/hooks/usePartnerMutations";
 import { BrandLogoUpload } from "@/components/partner/BrandLogoUpload";
+import { BrandTagManager } from "@/components/brands/BrandTagManager";
 import { useEntityTags } from "@/hooks/useTags";
 import type { Brand } from "@/types/partner";
 interface BrandFormData {
@@ -241,6 +243,7 @@ export function BrandsTab({
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
+  const [activeTab, setActiveTab] = useState("info");
   const [formData, setFormData] = useState<BrandFormData>({
     brand_name: "",
     description: "",
@@ -349,15 +352,14 @@ export function BrandsTab({
           pinterest: brand.social_links?.pinterest || ""
         }
       });
-    } else {
-      setEditingBrand(null);
-      resetForm();
     }
+    setActiveTab("info");
     setShowForm(true);
   };
   const handleBack = () => {
     setShowForm(false);
     setEditingBrand(null);
+    setActiveTab("info");
     resetForm();
   };
   const handleDeleteClick = (brand: Brand, e: React.MouseEvent) => {
@@ -375,11 +377,6 @@ export function BrandsTab({
       });
     }
   };
-
-  const handleManageTags = (brand: Brand, e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(`/admin/partners/${partnerId}/brands/${brand.id}/tags`);
-  };
   if (showForm) {
     return <div className="flex flex-col h-full">
         <div className="flex-1 overflow-y-auto space-y-2 pb-20">
@@ -387,7 +384,25 @@ export function BrandsTab({
             ← Back to Brands
           </Button>
           <h3 className="text-lg font-medium mb-2">{editingBrand ? "Edit Brand" : "Add Brand"}</h3>
-          <form onSubmit={handleSubmit} className="space-y-4" id="brand-form">
+          
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="info">
+                <FileText className="h-4 w-4 mr-2" />
+                Info
+              </TabsTrigger>
+              <TabsTrigger value="images">
+                <ImageIcon className="h-4 w-4 mr-2" />
+                Images
+              </TabsTrigger>
+              <TabsTrigger value="tags">
+                <Tags className="h-4 w-4 mr-2" />
+                Tags
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="info" className="mt-4">
+              <form onSubmit={handleSubmit} className="space-y-4" id="brand-form">
             {/* Basic Information */}
             <div className="border rounded-lg p-4 space-y-2">
               <h4 className="font-medium text-sm text-muted-foreground mb-3">Basic Information</h4>
@@ -627,50 +642,61 @@ export function BrandsTab({
               </div>
             </div>
 
-            {/* Brand Logo Upload */}
-            <div className="border rounded-lg p-4 space-y-2">
-              <h4 className="font-medium text-sm text-muted-foreground mb-3 flex items-center gap-2">
-                <Palette className="h-4 w-4" />
-                Brand Files
-              </h4>
-              {editingBrand && <BrandLogoUpload 
-                brandId={editingBrand.id} 
-                currentLogoUrl={formData.logo_url} 
-                onLogoChange={url => setFormData(prev => ({
-                  ...prev,
-                  logo_url: url
-                }))} 
-              />}
-              {!editingBrand && <p className="text-sm text-muted-foreground">
-                  Save the brand first to upload a logo
-                </p>}
-            </div>
-          </form>
-        </div>
-        <div className="sticky bottom-0 left-0 right-0 bg-background border-t p-4 flex gap-2 justify-between">
-          <div>
-            {editingBrand && (
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleManageTags(editingBrand, e);
-                }}
-              >
-                <Tags className="h-4 w-4 mr-2" />
-                Manage Tags
-              </Button>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <Button type="button" variant="outline" onClick={handleBack}>
-              Cancel
-            </Button>
-            <Button type="submit" form="brand-form" disabled={createBrand.isPending || updateBrand.isPending}>
-              {editingBrand ? "Save Changes" : "Create Brand"}
-            </Button>
-          </div>
+                <div className="flex gap-2 justify-end pt-4">
+                  <Button type="button" variant="outline" onClick={handleBack}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" form="brand-form" disabled={createBrand.isPending || updateBrand.isPending}>
+                    {editingBrand ? "Save Changes" : "Create Brand"}
+                  </Button>
+                </div>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="images" className="mt-4">
+              <div className="space-y-4">
+                <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4" />
+                  Brand Assets & Logo
+                </h4>
+                {editingBrand && (
+                  <BrandLogoUpload 
+                    brandId={editingBrand.id} 
+                    currentLogoUrl={formData.logo_url} 
+                    onLogoChange={(url) => setFormData(prev => ({
+                      ...prev,
+                      logo_url: url
+                    }))} 
+                  />
+                )}
+                {!editingBrand && (
+                  <p className="text-sm text-muted-foreground">
+                    Save the brand first to upload images
+                  </p>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="tags" className="mt-4">
+              <div className="space-y-4">
+                <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
+                  <Tags className="h-4 w-4" />
+                  Tag Management
+                </h4>
+                {editingBrand && (
+                  <BrandTagManager 
+                    brandId={editingBrand.id}
+                    brandName={editingBrand.brand_name}
+                  />
+                )}
+                {!editingBrand && (
+                  <p className="text-sm text-muted-foreground">
+                    Save the brand first to manage tags
+                  </p>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>;
   }
@@ -744,7 +770,11 @@ export function BrandsTab({
                         }} title="Edit brand">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={e => handleManageTags(brand, e)} title="Manage tags">
+                        <Button variant="ghost" size="sm" onClick={e => {
+                          e.stopPropagation();
+                          handleOpenForm(brand);
+                          setActiveTab("tags");
+                        }} title="Manage tags">
                           <Tags className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="sm" onClick={e => handleDeleteClick(brand, e)} title="Delete brand">
