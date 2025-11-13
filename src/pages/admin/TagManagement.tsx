@@ -102,7 +102,7 @@ export default function TagManagement() {
 
   const totalCategories = categories?.length || 0;
   const totalTags = tags?.length || 0;
-  const activeTags = tags?.filter(t => t.is_active).length || 0;
+  const activeTags = tags?.length || 0;
   const mostUsedTag = tags?.reduce((prev, current) => 
     (current.usage_count > (prev?.usage_count || 0)) ? current : prev, tags[0]);
 
@@ -353,7 +353,12 @@ export default function TagManagement() {
         </div>
       </div>
 
-      <CreateTagDialog open={createTagOpen} onOpenChange={setCreateTagOpen} categoryId={selectedCategoryData2?.id || ''} />
+      <CreateTagDialog 
+        open={createTagOpen} 
+        onOpenChange={setCreateTagOpen} 
+        categoryKey={selectedCategoryData2?.category_key || ''} 
+        categoryName={selectedCategoryData2?.display_name || ''} 
+      />
       <EditTagDialog open={editTagOpen} onOpenChange={setEditTagOpen} tag={selectedTag} />
       <DeleteTagDialog open={deleteTagOpen} onOpenChange={setDeleteTagOpen} tag={selectedTag} />
       <CreateCategoryDialog open={createCategoryOpen} onOpenChange={setCreateCategoryOpen} />
