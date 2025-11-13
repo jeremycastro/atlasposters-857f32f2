@@ -68,7 +68,7 @@ export const useTasks = (filters?: TaskFilters) => {
       }
 
       if (filters?.search) {
-        query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+        query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,reference_number.ilike.%${filters.search}%`);
       }
 
       const { data, error } = await query;

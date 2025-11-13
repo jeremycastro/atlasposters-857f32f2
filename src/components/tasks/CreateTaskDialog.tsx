@@ -94,6 +94,9 @@ export const CreateTaskDialog = ({ open, onOpenChange }: CreateTaskDialogProps) 
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Task</DialogTitle>
+          <p className="text-sm text-muted-foreground mt-1">
+            Reference number will be automatically assigned (e.g., TASK-093)
+          </p>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

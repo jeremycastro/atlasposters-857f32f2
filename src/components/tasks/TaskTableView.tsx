@@ -48,6 +48,7 @@ export const TaskTableView = ({ tasks, onEditTask, onViewTask }: TaskTableViewPr
           <TableRow>
             <TableHead>Title</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Reference</TableHead>
             <TableHead>Priority</TableHead>
             <TableHead>Assigned To</TableHead>
             <TableHead>Due Date</TableHead>
@@ -58,7 +59,7 @@ export const TaskTableView = ({ tasks, onEditTask, onViewTask }: TaskTableViewPr
         <TableBody>
           {tasks.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+              <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                 No tasks found
               </TableCell>
             </TableRow>
@@ -72,6 +73,11 @@ export const TaskTableView = ({ tasks, onEditTask, onViewTask }: TaskTableViewPr
                 <TableCell className="font-medium">{task.title}</TableCell>
                 <TableCell>
                   <Badge variant="outline">{task.status}</Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="secondary" className="font-mono text-xs">
+                    {task.reference_number}
+                  </Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline">{task.priority}</Badge>

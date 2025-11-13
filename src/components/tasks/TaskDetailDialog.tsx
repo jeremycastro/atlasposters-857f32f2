@@ -78,7 +78,12 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Task Details</DialogTitle>
+          <div className="flex items-center gap-2">
+            <DialogTitle>Task Details</DialogTitle>
+            <Badge variant="secondary" className="font-mono text-xs">
+              {task.reference_number}
+            </Badge>
+          </div>
         </DialogHeader>
 
         <Tabs defaultValue="details" className="w-full flex flex-col flex-1 overflow-hidden">

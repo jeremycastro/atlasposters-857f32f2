@@ -1583,6 +1583,7 @@ export type Database = {
           phase: string | null
           phase_id: string | null
           priority: Database["public"]["Enums"]["task_priority"] | null
+          reference_number: string
           started_at: string | null
           status: Database["public"]["Enums"]["task_status"] | null
           tags: string[] | null
@@ -1609,6 +1610,7 @@ export type Database = {
           phase?: string | null
           phase_id?: string | null
           priority?: Database["public"]["Enums"]["task_priority"] | null
+          reference_number: string
           started_at?: string | null
           status?: Database["public"]["Enums"]["task_status"] | null
           tags?: string[] | null
@@ -1635,6 +1637,7 @@ export type Database = {
           phase?: string | null
           phase_id?: string | null
           priority?: Database["public"]["Enums"]["task_priority"] | null
+          reference_number?: string
           started_at?: string | null
           status?: Database["public"]["Enums"]["task_status"] | null
           tags?: string[] | null
@@ -2486,6 +2489,7 @@ export type Database = {
         Returns: string
       }
       generate_next_asc: { Args: never; Returns: string }
+      generate_task_reference: { Args: never; Returns: string }
       get_active_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
