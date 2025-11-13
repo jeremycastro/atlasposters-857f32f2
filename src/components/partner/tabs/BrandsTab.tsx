@@ -10,6 +10,7 @@ import { ExternalLink, Plus, Edit, Palette, Save, X, Trash2, Tags } from "lucide
 import { useCreateBrand, useUpdateBrand, useDeleteBrand } from "@/hooks/usePartnerMutations";
 import { BrandLogoUpload } from "@/components/partner/BrandLogoUpload";
 import { BrandTagDrawer } from "@/components/brands/BrandTagDrawer";
+import { BrandTagManager } from "@/components/brands/BrandTagManager";
 import { useEntityTags } from "@/hooks/useTags";
 import type { Brand } from "@/types/partner";
 interface BrandFormData {
@@ -647,6 +648,17 @@ export function BrandsTab({
                   Save the brand first to upload a logo
                 </p>}
             </div>
+
+            {/* Brand Tags */}
+            {editingBrand && (
+              <div className="border rounded-lg p-4 space-y-2">
+                <h4 className="font-medium text-sm text-muted-foreground mb-3 flex items-center gap-2">
+                  <Tags className="h-4 w-4" />
+                  Brand Tags
+                </h4>
+                <BrandTagManager brandId={editingBrand.id} brandName={editingBrand.brand_name} />
+              </div>
+            )}
           </form>
         </div>
         <div className="sticky bottom-0 left-0 right-0 bg-background border-t p-4 flex gap-2 justify-end">
