@@ -3,7 +3,7 @@ import { useArtworks } from '@/hooks/useArtworks';
 import { ArtworkStats } from '@/components/artworks/ArtworkStats';
 import { ArtworkTableView } from '@/components/artworks/ArtworkTableView';
 import { CreateArtworkDialog } from '@/components/artworks/CreateArtworkDialog';
-import { ArtworkDetailDialog } from '@/components/artworks/ArtworkDetailDialog';
+import { EditArtworkDialog } from '@/components/artworks/EditArtworkDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search } from 'lucide-react';
@@ -27,19 +27,19 @@ type Artwork = Database['public']['Tables']['artworks']['Row'] & {
 export default function ArtworkCatalog() {
   const [search, setSearch] = useState('');
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null);
 
   const { data: artworks, isLoading } = useArtworks({ search });
 
   const handleView = (artwork: Artwork) => {
     setSelectedArtwork(artwork);
-    setDetailDialogOpen(true);
+    setEditDialogOpen(true);
   };
 
   const handleEdit = (artwork: Artwork) => {
     setSelectedArtwork(artwork);
-    setDetailDialogOpen(true);
+    setEditDialogOpen(true);
   };
 
   const handleArchive = (artwork: Artwork) => {
@@ -99,11 +99,10 @@ export default function ArtworkCatalog() {
         onOpenChange={setCreateDialogOpen}
       />
 
-      <ArtworkDetailDialog
+      <EditArtworkDialog
         artwork={selectedArtwork}
-        open={detailDialogOpen}
-        onOpenChange={setDetailDialogOpen}
-        onEdit={handleEdit}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
       />
     </div>
   );
