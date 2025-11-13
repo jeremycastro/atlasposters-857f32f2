@@ -64,7 +64,7 @@ export const TimelineEventTableView = ({
                     {EVENT_TYPE_LABELS[event.event_type]}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-medium">
+                <TableCell className="font-medium max-w-xs">
                   <div className="line-clamp-1">{event.title}</div>
                 </TableCell>
                 <TableCell>

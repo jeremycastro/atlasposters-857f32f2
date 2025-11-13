@@ -479,6 +479,35 @@ const AdminBrandGuide = () => {
 )}`}</code>
             </div>
           </div>
+
+          <div className="space-y-3">
+            <h4 className="font-semibold">Row Height & Text Truncation</h4>
+            <p className="text-sm text-muted-foreground">
+              Maintain consistent row heights by truncating long text content instead of expanding rows:
+            </p>
+            <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">Title Cell with Max Width</p>
+                <code className="text-xs whitespace-pre-wrap">{`<TableCell className="font-medium max-w-xs">
+  <div className="line-clamp-1">{item.title}</div>
+  {item.subtitle && (
+    <div className="text-xs text-muted-foreground line-clamp-1">
+      {item.subtitle}
+    </div>
+  )}
+</TableCell>`}</code>
+              </div>
+              <div className="text-xs space-y-1">
+                <p className="font-medium">Key Guidelines:</p>
+                <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
+                  <li>Use <code className="bg-background px-1 rounded">line-clamp-1</code> for single-line truncation</li>
+                  <li>Apply <code className="bg-background px-1 rounded">max-w-xs</code> or similar max-width to prevent overflow</li>
+                  <li>Keep row heights uniform across all table rows</li>
+                  <li>Full text visible in detail view/hover if needed</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

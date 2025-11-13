@@ -66,15 +66,13 @@ export const ComponentTableView = ({
                     {COMPONENT_TYPE_LABELS[component.component_type]}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-medium">
-                  <div className="space-y-1">
-                    <div>{component.title}</div>
-                    {component.subtitle && (
-                      <div className="text-xs text-muted-foreground line-clamp-1">
-                        {component.subtitle}
-                      </div>
-                    )}
-                  </div>
+                <TableCell className="font-medium max-w-xs">
+                  <div className="line-clamp-1">{component.title}</div>
+                  {component.subtitle && (
+                    <div className="text-xs text-muted-foreground line-clamp-1">
+                      {component.subtitle}
+                    </div>
+                  )}
                 </TableCell>
                 <TableCell>
                   <StatusBadge status={component.status} />
