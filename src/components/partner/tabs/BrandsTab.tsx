@@ -647,13 +647,30 @@ export function BrandsTab({
             </div>
           </form>
         </div>
-        <div className="sticky bottom-0 left-0 right-0 bg-background border-t p-4 flex gap-2 justify-end">
-          <Button type="button" variant="outline" onClick={handleBack}>
-            Cancel
-          </Button>
-          <Button type="submit" form="brand-form" disabled={createBrand.isPending || updateBrand.isPending}>
-            {editingBrand ? "Save Changes" : "Create Brand"}
-          </Button>
+        <div className="sticky bottom-0 left-0 right-0 bg-background border-t p-4 flex gap-2 justify-between">
+          <div>
+            {editingBrand && (
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleManageTags(editingBrand, e);
+                }}
+              >
+                <Tags className="h-4 w-4 mr-2" />
+                Manage Tags
+              </Button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" onClick={handleBack}>
+              Cancel
+            </Button>
+            <Button type="submit" form="brand-form" disabled={createBrand.isPending || updateBrand.isPending}>
+              {editingBrand ? "Save Changes" : "Create Brand"}
+            </Button>
+          </div>
         </div>
       </div>;
   }
