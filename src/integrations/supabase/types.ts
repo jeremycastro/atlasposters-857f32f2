@@ -666,6 +666,71 @@ export type Database = {
           },
         ]
       }
+      category_definitions: {
+        Row: {
+          allows_custom_tags: boolean | null
+          category_key: string
+          color: string | null
+          created_at: string | null
+          description: string | null
+          display_name: string
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          is_hierarchical: boolean | null
+          is_required: boolean | null
+          metadata: Json | null
+          parent_category_id: string | null
+          scope: string[]
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          allows_custom_tags?: boolean | null
+          category_key: string
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_name: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_hierarchical?: boolean | null
+          is_required?: boolean | null
+          metadata?: Json | null
+          parent_category_id?: string | null
+          scope: string[]
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          allows_custom_tags?: boolean | null
+          category_key?: string
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_name?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_hierarchical?: boolean | null
+          is_required?: boolean | null
+          metadata?: Json | null
+          parent_category_id?: string | null
+          scope?: string[]
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "category_definitions_parent_category_id_fkey"
+            columns: ["parent_category_id"]
+            isOneToOne: false
+            referencedRelation: "category_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_signups: {
         Row: {
           created_at: string | null
@@ -689,6 +754,63 @@ export type Database = {
           source?: string | null
         }
         Relationships: []
+      }
+      entity_tags: {
+        Row: {
+          confidence_score: number | null
+          entity_id: string
+          entity_type: string
+          id: string
+          inherited_from_id: string | null
+          inherited_from_type: string | null
+          metadata: Json | null
+          source: string | null
+          tag_id: string
+          tagged_at: string | null
+          tagged_by: string | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          inherited_from_id?: string | null
+          inherited_from_type?: string | null
+          metadata?: Json | null
+          source?: string | null
+          tag_id: string
+          tagged_at?: string | null
+          tagged_by?: string | null
+        }
+        Update: {
+          confidence_score?: number | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          inherited_from_id?: string | null
+          inherited_from_type?: string | null
+          metadata?: Json | null
+          source?: string | null
+          tag_id?: string
+          tagged_at?: string | null
+          tagged_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tag_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entity_tags_tagged_by_fkey"
+            columns: ["tagged_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       file_tags: {
         Row: {
@@ -2114,6 +2236,188 @@ export type Database = {
           },
         ]
       }
+      tag_definitions: {
+        Row: {
+          category_id: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          display_name: string
+          id: string
+          is_active: boolean | null
+          metadata: Json | null
+          parent_tag_id: string | null
+          sort_order: number | null
+          tag_key: string
+          tag_type: string | null
+          updated_at: string | null
+          usage_count: number | null
+        }
+        Insert: {
+          category_id: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          display_name: string
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          parent_tag_id?: string | null
+          sort_order?: number | null
+          tag_key: string
+          tag_type?: string | null
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Update: {
+          category_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          display_name?: string
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          parent_tag_id?: string | null
+          sort_order?: number | null
+          tag_key?: string
+          tag_type?: string | null
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tag_definitions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "category_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_definitions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_definitions_parent_tag_id_fkey"
+            columns: ["parent_tag_id"]
+            isOneToOne: false
+            referencedRelation: "tag_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tag_inheritance_rules: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          from_entity_type: string
+          id: string
+          is_active: boolean | null
+          is_bidirectional: boolean | null
+          to_entity_type: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          from_entity_type: string
+          id?: string
+          is_active?: boolean | null
+          is_bidirectional?: boolean | null
+          to_entity_type: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          from_entity_type?: string
+          id?: string
+          is_active?: boolean | null
+          is_bidirectional?: boolean | null
+          to_entity_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tag_inheritance_rules_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "category_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tag_permissions: {
+        Row: {
+          can_apply: boolean | null
+          can_create: boolean | null
+          can_delete: boolean | null
+          can_edit: boolean | null
+          can_view: boolean | null
+          category_id: string | null
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          can_apply?: boolean | null
+          can_create?: boolean | null
+          can_delete?: boolean | null
+          can_edit?: boolean | null
+          can_view?: boolean | null
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          can_apply?: boolean | null
+          can_create?: boolean | null
+          can_delete?: boolean | null
+          can_edit?: boolean | null
+          can_view?: boolean | null
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tag_permissions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "category_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tag_suggestions: {
+        Row: {
+          entity_id: string
+          entity_type: string
+          expires_at: string | null
+          generated_at: string | null
+          id: string
+          suggested_tags: Json
+        }
+        Insert: {
+          entity_id: string
+          entity_type: string
+          expires_at?: string | null
+          generated_at?: string | null
+          id?: string
+          suggested_tags: Json
+        }
+        Update: {
+          entity_id?: string
+          entity_type?: string
+          expires_at?: string | null
+          generated_at?: string | null
+          id?: string
+          suggested_tags?: Json
+        }
+        Relationships: []
+      }
       task_activity: {
         Row: {
           action: string
@@ -2494,6 +2798,21 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      get_entity_tags: {
+        Args: { p_entity_id: string; p_entity_type: string }
+        Returns: {
+          category_key: string
+          category_name: string
+          confidence_score: number
+          inherited_from_id: string
+          inherited_from_type: string
+          source: string
+          tag_id: string
+          tag_key: string
+          tag_name: string
+          tag_type: string
+        }[]
+      }
       get_print_file_suggestions: {
         Args: { p_artwork_id: string; p_variant_codes: string[] }
         Returns: {
@@ -2514,6 +2833,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      search_by_tags: {
+        Args: {
+          p_entity_type: string
+          p_match_all?: boolean
+          p_tag_ids: string[]
+        }
+        Returns: {
+          entity_id: string
+        }[]
       }
     }
     Enums: {
