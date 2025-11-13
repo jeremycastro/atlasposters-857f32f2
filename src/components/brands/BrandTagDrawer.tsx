@@ -18,7 +18,11 @@ export const BrandTagDrawer = ({
 }: BrandTagDrawerProps) => {
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
+      <SheetContent 
+        className="w-full sm:max-w-2xl overflow-y-auto"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <SheetHeader className="pb-4">
           <div className="flex items-center gap-3">
             {brandLogoUrl && (
@@ -37,7 +41,7 @@ export const BrandTagDrawer = ({
           </div>
         </SheetHeader>
         
-        <div className="pt-4">
+        <div className="pt-4" onClick={(e) => e.stopPropagation()}>
           <BrandTagManager brandId={brandId} brandName={brandName} />
         </div>
       </SheetContent>

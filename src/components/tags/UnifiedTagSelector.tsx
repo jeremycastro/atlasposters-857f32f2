@@ -6,9 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ChevronDown, ChevronRight, Palette, Briefcase, Award, Calendar, Wrench } from "lucide-react";
+import { Plus, Search, Palette, Briefcase, Award, Calendar, Wrench } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface UnifiedTagSelectorProps {
   entityType: string;
@@ -48,7 +47,6 @@ export const UnifiedTagSelector = ({
 }: UnifiedTagSelectorProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [openGroups, setOpenGroups] = useState<string[]>(['Core Artwork']);
 
   const { data: categories } = useCategories(scope);
   const { data: entityTags, isLoading: tagsLoading } = useEntityTags(entityType, entityId);
@@ -74,7 +72,9 @@ export const UnifiedTagSelector = ({
     return acc;
   }, {} as Record<string, typeof entityTags>);
 
-  const handleAddTag = async (tagId: string) => {
+  const handleAddTag = async (tagId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    e?.preventDefault();
     await addTag.mutateAsync({
       entityType,
       entityId,
@@ -90,19 +90,16 @@ export const UnifiedTagSelector = ({
     });
   };
 
-  const filteredAvailableTags = availableTags?.filter(tag => {
+  // Show all tags but indicate which are already added
+  const processedTags = availableTags?.map(tag => {
     const isAlreadyAdded = entityTags?.some(et => et.tag_id === tag.id);
     const matchesSearch = tag.display_name.toLowerCase().includes(searchTerm.toLowerCase());
-    return !isAlreadyAdded && matchesSearch;
-  });
-
-  const toggleGroup = (groupName: string) => {
-    setOpenGroups(prev => 
-      prev.includes(groupName) 
-        ? prev.filter(g => g !== groupName)
-        : [...prev, groupName]
-    );
-  };
+    return {
+      ...tag,
+      isAlreadyAdded,
+      matchesSearch
+    };
+  }).filter(tag => tag.matchesSearch);
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -152,32 +149,21 @@ export const UnifiedTagSelector = ({
 
       {/* Tag Selection Interface */}
       <div className="border rounded-lg p-4 space-y-3">
-        <Label>Add Tags</Label>
+        <Label>Browse & Add Tags</Label>
         
-        <div className="space-y-2">
+        {/* Flat category selector with visual grouping */}
+        <div className="space-y-3">
           {Object.entries(CATEGORY_GROUPS).map(([groupName, group]) => {
-            const isOpen = openGroups.includes(groupName);
+            const GroupIcon = group.icon;
             
             return (
-              <Collapsible
-                key={groupName}
-                open={isOpen}
-                onOpenChange={() => toggleGroup(groupName)}
-              >
-                <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 hover:bg-muted/50 rounded-md">
-                  {isOpen ? (
-                    <ChevronDown className="h-4 w-4" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4" />
-                  )}
-                  <group.icon className="h-4 w-4" />
-                  <span className="font-medium text-sm">{groupName}</span>
-                  <Badge variant="secondary" className="ml-auto">
-                    {group.categories.length}
-                  </Badge>
-                </CollapsibleTrigger>
+              <div key={groupName} className="space-y-2">
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <GroupIcon className="h-3 w-3" />
+                  <span>{groupName}</span>
+                </div>
                 
-                <CollapsibleContent className="pt-2 pl-6 space-y-1">
+                <div className="flex flex-wrap gap-1.5">
                   {group.categories.map(categoryKey => {
                     const category = categories?.find(c => c.category_key === categoryKey);
                     if (!category) return null;
@@ -185,25 +171,27 @@ export const UnifiedTagSelector = ({
                     const isActive = selectedCategory === categoryKey;
                     
                     return (
-                      <button
+                      <Button
                         key={categoryKey}
-                        onClick={() => {
+                        variant={isActive ? "default" : "outline"}
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
                           setSelectedCategory(categoryKey);
                           setSearchTerm("");
                         }}
                         className={cn(
-                          "w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between",
-                          isActive 
-                            ? "bg-primary/10 text-primary font-medium" 
-                            : "hover:bg-muted/50"
+                          "h-8 text-xs",
+                          !isActive && "hover:bg-accent"
                         )}
                       >
-                        <span>{category.display_name}</span>
-                      </button>
+                        {category.display_name}
+                      </Button>
                     );
                   })}
-                </CollapsibleContent>
-              </Collapsible>
+                </div>
+              </div>
             );
           })}
         </div>
@@ -230,18 +218,30 @@ export const UnifiedTagSelector = ({
 
             <ScrollArea className="h-[200px] border rounded-md p-2">
               <div className="flex flex-wrap gap-1">
-                {filteredAvailableTags && filteredAvailableTags.length > 0 ? (
-                  filteredAvailableTags.map((tag) => (
+                {processedTags && processedTags.length > 0 ? (
+                  processedTags.map((tag) => (
                     <Button
                       key={tag.id}
-                      variant="outline"
+                      variant={tag.isAlreadyAdded ? "secondary" : "outline"}
                       size="sm"
-                      onClick={() => handleAddTag(tag.id)}
-                      className="h-7 text-xs"
-                      disabled={addTag.isPending}
+                      onClick={(e) => handleAddTag(tag.id, e)}
+                      className={cn(
+                        "h-7 text-xs",
+                        tag.isAlreadyAdded && "opacity-60 cursor-default"
+                      )}
+                      disabled={addTag.isPending || tag.isAlreadyAdded}
                     >
-                      <Plus className="h-3 w-3 mr-1" />
-                      {tag.display_name}
+                      {tag.isAlreadyAdded ? (
+                        <>
+                          <Badge variant="secondary" className="h-3 w-3 mr-1 p-0 flex items-center justify-center rounded-full">✓</Badge>
+                          {tag.display_name}
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="h-3 w-3 mr-1" />
+                          {tag.display_name}
+                        </>
+                      )}
                       {tag.usage_count > 0 && (
                         <Badge variant="secondary" className="ml-1 text-[10px] h-4 px-1">
                           {tag.usage_count}
