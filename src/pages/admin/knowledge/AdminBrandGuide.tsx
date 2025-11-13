@@ -394,6 +394,94 @@ const AdminBrandGuide = () => {
         </CardContent>
       </Card>
 
+      {/* Table Styling Standards */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Layout className="h-5 w-5 text-primary" />
+            <CardTitle>Table Styling Standards</CardTitle>
+          </div>
+          <CardDescription>Consistent patterns for data tables across the admin interface</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-3">
+            <h4 className="font-semibold">Table Wrapper Pattern</h4>
+            <p className="text-sm text-muted-foreground">
+              All tables should be wrapped in a container with consistent border and border-radius:
+            </p>
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <code className="text-xs whitespace-pre-wrap">{`<div className="border border-border rounded-lg">
+  <Table>
+    {/* Table content */}
+  </Table>
+</div>`}</code>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h4 className="font-semibold">Interactive Rows</h4>
+            <p className="text-sm text-muted-foreground">
+              Make rows clickable to open detail views, with visual feedback:
+            </p>
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <code className="text-xs whitespace-pre-wrap">{`<TableRow
+  className="cursor-pointer hover:bg-muted/50"
+  onClick={() => onViewItem(item)}
+>
+  {/* Table cells */}
+</TableRow>`}</code>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h4 className="font-semibold">Actions Column</h4>
+            <p className="text-sm text-muted-foreground">
+              Use dropdown menu for row actions, preventing event propagation:
+            </p>
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <code className="text-xs whitespace-pre-wrap">{`<DropdownMenu>
+  <DropdownMenuTrigger 
+    asChild 
+    onClick={(e) => e.stopPropagation()}
+  >
+    <Button variant="ghost" size="icon">
+      <MoreVertical className="h-4 w-4" />
+    </Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent align="end">
+    <DropdownMenuItem 
+      onClick={(e) => { 
+        e.stopPropagation(); 
+        onView(item); 
+      }}
+    >
+      View
+    </DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>`}</code>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h4 className="font-semibold">Empty States</h4>
+            <p className="text-sm text-muted-foreground">
+              Always provide clear empty states for tables with no data:
+            </p>
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <code className="text-xs whitespace-pre-wrap">{`{items.length === 0 ? (
+  <TableRow>
+    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+      No items found. Create your first item to get started!
+    </TableCell>
+  </TableRow>
+) : (
+  {/* Map items */}
+)}`}</code>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Component Styling Standards */}
       <Card>
         <CardHeader>

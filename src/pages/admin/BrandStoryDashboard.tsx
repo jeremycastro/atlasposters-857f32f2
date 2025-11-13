@@ -5,19 +5,58 @@ import { Plus, FileText, Calendar, Image, Download } from "lucide-react";
 import { BrandSelector } from "@/components/brandStory/BrandSelector";
 import { CreateComponentDialog } from "@/components/brandStory/CreateComponentDialog";
 import { CreateTimelineDialog } from "@/components/brandStory/CreateTimelineDialog";
-import { useBrandStoryStats, useBrandStoryComponents, useBrandTimeline } from "@/hooks/useBrandStory";
-import { ComponentCard } from "@/components/brandStory/ComponentCard";
+import { ComponentTableView } from "@/components/brandStory/ComponentTableView";
+import { ComponentDetailDialog } from "@/components/brandStory/ComponentDetailDialog";
 import { TimelineEventCard } from "@/components/brandStory/TimelineEventCard";
-import { COMPONENT_TYPE_LABELS, STATUS_LABELS } from "@/types/brandStory";
+import { useBrandStoryStats, useBrandStoryComponents, useBrandTimeline } from "@/hooks/useBrandStory";
+import { useDeleteBrandStoryComponent } from "@/hooks/useBrandStoryMutations";
+import { BrandStoryComponent, COMPONENT_TYPE_LABELS, STATUS_LABELS } from "@/types/brandStory";
+import { toast } from "sonner";
 
 export default function BrandStoryDashboard() {
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
   const [componentDialogOpen, setComponentDialogOpen] = useState(false);
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false);
+  const [selectedComponent, setSelectedComponent] = useState<BrandStoryComponent | null>(null);
+  const [componentToEdit, setComponentToEdit] = useState<BrandStoryComponent | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   const { data: stats } = useBrandStoryStats(selectedBrandId);
-  const { data: recentComponents = [] } = useBrandStoryComponents(selectedBrandId);
+  const { data: components = [] } = useBrandStoryComponents(selectedBrandId);
   const { data: recentTimeline = [] } = useBrandTimeline(selectedBrandId ? [selectedBrandId] : undefined);
+  const deleteComponent = useDeleteBrandStoryComponent();
+
+  const handleViewComponent = (component: BrandStoryComponent) => {
+    setSelectedComponent(component);
+    setDetailDialogOpen(true);
+  };
+
+  const handleEditComponent = (component: BrandStoryComponent) => {
+    setComponentToEdit(component);
+    setComponentDialogOpen(true);
+  };
+
+  const handleDeleteComponent = (component: BrandStoryComponent) => {
+    if (confirm("Are you sure you want to delete this component?")) {
+      deleteComponent.mutate(component.id, {
+        onSuccess: () => {
+          toast.success("Component deleted successfully");
+        },
+      });
+    }
+  };
+
+  const handleCreateNewComponent = () => {
+    setComponentToEdit(null);
+    setComponentDialogOpen(true);
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    setComponentDialogOpen(open);
+    if (!open) {
+      setComponentToEdit(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -85,7 +124,7 @@ export default function BrandStoryDashboard() {
         </CardHeader>
         <CardContent className="flex items-center gap-2">
           <BrandSelector value={selectedBrandId} onChange={setSelectedBrandId} />
-          <Button onClick={() => setComponentDialogOpen(true)}>
+          <Button onClick={handleCreateNewComponent}>
             <Plus className="h-4 w-4 mr-2" />
             Create Component
           </Button>
@@ -136,25 +175,19 @@ export default function BrandStoryDashboard() {
         </Card>
       )}
 
-      {/* Recent Components */}
+      {/* Components Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Components</CardTitle>
-          <CardDescription>Latest brand story components</CardDescription>
+          <CardTitle>Components</CardTitle>
+          <CardDescription>All brand story components</CardDescription>
         </CardHeader>
         <CardContent>
-          {recentComponents.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No components yet. Create your first component to get started!</p>
-            </div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {recentComponents.slice(0, 6).map((component) => (
-                <ComponentCard key={component.id} component={component} />
-              ))}
-            </div>
-          )}
+          <ComponentTableView
+            components={components}
+            onViewComponent={handleViewComponent}
+            onEditComponent={handleEditComponent}
+            onDeleteComponent={handleDeleteComponent}
+          />
         </CardContent>
       </Card>
 
@@ -180,13 +213,20 @@ export default function BrandStoryDashboard() {
         </CardContent>
       </Card>
 
-      <CreateComponentDialog
-        open={componentDialogOpen}
-        onOpenChange={setComponentDialogOpen}
+      <CreateComponentDialog 
+        open={componentDialogOpen} 
+        onOpenChange={handleDialogClose}
+        componentToEdit={componentToEdit}
       />
-      <CreateTimelineDialog
-        open={timelineDialogOpen}
-        onOpenChange={setTimelineDialogOpen}
+      <CreateTimelineDialog 
+        open={timelineDialogOpen} 
+        onOpenChange={setTimelineDialogOpen} 
+      />
+      <ComponentDetailDialog
+        component={selectedComponent}
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        onEdit={handleEditComponent}
       />
     </div>
   );

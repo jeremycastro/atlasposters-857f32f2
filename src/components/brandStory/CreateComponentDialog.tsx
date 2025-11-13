@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,15 +6,17 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BrandSelector } from "./BrandSelector";
-import { useCreateBrandStoryComponent } from "@/hooks/useBrandStoryMutations";
-import { BrandComponentType, COMPONENT_TYPE_LABELS } from "@/types/brandStory";
+import { useCreateBrandStoryComponent, useUpdateBrandStoryComponent } from "@/hooks/useBrandStoryMutations";
+import { BrandComponentType, COMPONENT_TYPE_LABELS, BrandStoryComponent } from "@/types/brandStory";
+import { toast } from "sonner";
 
 interface CreateComponentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  componentToEdit?: BrandStoryComponent | null;
 }
 
-export const CreateComponentDialog = ({ open, onOpenChange }: CreateComponentDialogProps) => {
+export const CreateComponentDialog = ({ open, onOpenChange, componentToEdit }: CreateComponentDialogProps) => {
   const [brandId, setBrandId] = useState<string | null>(null);
   const [componentType, setComponentType] = useState<BrandComponentType>("origin_story");
   const [title, setTitle] = useState("");
@@ -22,19 +24,49 @@ export const CreateComponentDialog = ({ open, onOpenChange }: CreateComponentDia
   const [content, setContent] = useState("");
 
   const createComponent = useCreateBrandStoryComponent();
+  const updateComponent = useUpdateBrandStoryComponent();
+  
+  const isEditMode = !!componentToEdit;
+
+  // Populate form when editing
+  useEffect(() => {
+    if (componentToEdit) {
+      setBrandId(componentToEdit.brand_id);
+      setComponentType(componentToEdit.component_type);
+      setTitle(componentToEdit.title);
+      setSubtitle(componentToEdit.subtitle || "");
+      setContent(componentToEdit.content);
+    } else {
+      resetForm();
+    }
+  }, [componentToEdit, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    await createComponent.mutateAsync({
-      brand_id: brandId,
-      scope: brandId ? "brand" : "atlas_global",
-      component_type: componentType,
-      title,
-      subtitle: subtitle || undefined,
-      content,
-      status: "draft",
-    });
+    if (isEditMode && componentToEdit) {
+      await updateComponent.mutateAsync({
+        id: componentToEdit.id,
+        brand_id: brandId,
+        scope: brandId ? "brand" : "atlas_global",
+        component_type: componentType,
+        title,
+        subtitle: subtitle || undefined,
+        content,
+      });
+      toast.success("Component updated successfully");
+    } else {
+      await createComponent.mutateAsync({
+        brand_id: brandId,
+        scope: brandId ? "brand" : "atlas_global",
+        component_type: componentType,
+        title,
+        subtitle: subtitle || undefined,
+        content,
+        status: "draft",
+      });
+      toast.success("Component created successfully");
+    }
 
     onOpenChange(false);
     resetForm();
@@ -52,9 +84,9 @@ export const CreateComponentDialog = ({ open, onOpenChange }: CreateComponentDia
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Brand Story Component</DialogTitle>
+          <DialogTitle>{isEditMode ? "Edit Component" : "Create Brand Story Component"}</DialogTitle>
           <DialogDescription>
-            Add a new component to build your brand story and messaging.
+            {isEditMode ? "Update the component details" : "Add a new component to build your brand story and messaging."}
           </DialogDescription>
         </DialogHeader>
 
@@ -117,8 +149,11 @@ export const CreateComponentDialog = ({ open, onOpenChange }: CreateComponentDia
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={createComponent.isPending}>
-              {createComponent.isPending ? "Creating..." : "Create Component"}
+            <Button type="submit" disabled={createComponent.isPending || updateComponent.isPending}>
+              {isEditMode 
+                ? (updateComponent.isPending ? "Updating..." : "Update Component")
+                : (createComponent.isPending ? "Creating..." : "Create Component")
+              }
             </Button>
           </DialogFooter>
         </form>
