@@ -44,22 +44,21 @@ export const useArtworkFileUpload = () => {
       const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
       const filePath = `${artworkId}/${fileName}`;
 
-      // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('brand-assets')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+      setProgress(25);
+
+      // Upload via Edge Function for server-side validation
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('bucket', 'brand-assets');
+      formData.append('filePath', filePath);
+      formData.append('maxSizeMB', '250');
+
+      const { data: uploadData, error: uploadError } = await supabase.functions.invoke('validate-upload', {
+        body: formData,
+      });
 
       if (uploadError) throw uploadError;
-
-      setProgress(50);
-
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('brand-assets')
-        .getPublicUrl(filePath);
+      if (!uploadData.success) throw new Error(uploadData.error || 'Upload failed');
 
       setProgress(75);
 
@@ -69,10 +68,10 @@ export const useArtworkFileUpload = () => {
         .insert({
           artwork_id: artworkId,
           file_name: file.name,
-          file_path: filePath,
+          file_path: uploadData.path,
           file_type: 'original',
-          file_size: file.size,
-          mime_type: file.type,
+          file_size: uploadData.fileSize,
+          mime_type: uploadData.mimeType,
           is_primary: isPrimary,
           tags: tags || {
             structured: {},
@@ -100,14 +99,13 @@ export const useArtworkFileUpload = () => {
         file_size: fileRecord.file_size,
         mime_type: fileRecord.mime_type,
         is_primary: fileRecord.is_primary,
-        url: urlData.publicUrl,
+        url: uploadData.publicUrl,
         tags: fileRecord.tags as any,
         print_specifications: fileRecord.print_specifications as any,
         version_number: fileRecord.version_number,
         is_latest: fileRecord.is_latest,
       };
     } catch (error: any) {
-      console.error('Upload error:', error);
       toast({
         title: 'Upload failed',
         description: error.message || 'Failed to upload file',

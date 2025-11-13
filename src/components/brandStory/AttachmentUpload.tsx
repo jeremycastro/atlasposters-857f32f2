@@ -64,50 +64,67 @@ export const AttachmentUpload = ({ componentId, timelineEventId, onUploadComplet
   const handleUpload = async () => {
     if (!selectedFile) return;
 
+    if (!componentId && !timelineEventId) {
+      setError('Please link this attachment to a component or timeline event');
+      return;
+    }
+
     setUploading(true);
     setError(null);
 
     try {
-      const fileExt = selectedFile.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const timestamp = Date.now();
+      const sanitizedName = selectedFile.name
+        .replace(/[^\w\s.-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+      const fileName = `${timestamp}-${sanitizedName}`;
+      const folder = componentId ? `components/${componentId}` : `timeline/${timelineEventId}`;
+      const filePath = `${folder}/${fileName}`;
 
-      // Upload to storage
-      const { error: uploadError } = await supabase.storage
-        .from('brand-story-assets')
-        .upload(filePath, selectedFile, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+      // Upload via Edge Function for server-side validation
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('bucket', 'brand-story-assets');
+      formData.append('filePath', filePath);
+      formData.append('maxSizeMB', '250');
+
+      const { data: uploadData, error: uploadError } = await supabase.functions.invoke('validate-upload', {
+        body: formData,
+      });
 
       if (uploadError) throw uploadError;
+      if (!uploadData.success) throw new Error(uploadData.error || 'Upload failed');
 
-      // Create database record
+      // Insert record into database
+      const assetType = selectedFile.type.startsWith('image/') ? 'image' : 'document';
       const { error: dbError } = await supabase
         .from('brand_story_assets')
         .insert({
           component_id: componentId || null,
           timeline_event_id: timelineEventId || null,
-          asset_type: selectedFile.type.startsWith('image/') ? 'image' : 'document',
+          asset_type: assetType,
           file_name: selectedFile.name,
-          file_path: filePath,
-          mime_type: selectedFile.type,
-          file_size: selectedFile.size,
+          file_path: uploadData.path,
+          file_size: uploadData.fileSize,
+          mime_type: uploadData.mimeType,
+          public_url: uploadData.publicUrl,
           description: description || null,
           usage_context: usageContext || null,
+          uploaded_by: (await supabase.auth.getUser()).data.user?.id,
         });
 
       if (dbError) throw dbError;
 
       toast.success("File uploaded successfully");
       setSelectedFile(null);
-      setDescription("");
-      setUsageContext("");
+      setDescription('');
+      setUsageContext('');
+      
       onUploadComplete();
     } catch (err: any) {
-      console.error('Upload error:', err);
-      setError(err.message || "Failed to upload file");
-      toast.error("Failed to upload file");
+      setError(err.message || 'Failed to upload file');
+      toast.error(err.message || 'Failed to upload file');
     } finally {
       setUploading(false);
     }

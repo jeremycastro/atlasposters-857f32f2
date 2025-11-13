@@ -36,7 +36,6 @@ export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUpload
 
   const loadDocuments = async () => {
     try {
-      console.log('Listing documents for agreement:', agreementId);
       const { data: files, error } = await supabase.storage
         .from('partner-documents')
         .list(`agreements/${agreementId}`, {
@@ -61,10 +60,8 @@ export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUpload
         })
       );
 
-      console.log('Found documents:', filesWithUrls.length);
       setUploadedFiles(filesWithUrls);
     } catch (error: any) {
-      console.error('Error loading documents:', error);
       toast.error('Failed to load documents');
     }
   };
@@ -161,10 +158,8 @@ export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUpload
   const handleUpload = async (filesToUpload: File[]) => {
     if (filesToUpload.length === 0) return;
 
-    console.log(`Starting upload of ${filesToUpload.length} file(s) to agreement ${agreementId}`);
     setIsUploading(true);
 
-    // Initialize progress tracking
     const initialProgress = filesToUpload.map(file => ({
       fileName: file.name,
       progress: 0,
@@ -180,18 +175,20 @@ export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUpload
         const fileName = `${timestamp}-${file.name}`;
         const filePath = `agreements/${agreementId}/${fileName}`;
 
-        console.log(`Uploading ${file.name} to ${filePath}`);
+        // Upload via Edge Function for server-side validation
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('bucket', 'partner-documents');
+        formData.append('filePath', filePath);
+        formData.append('maxSizeMB', '100');
 
-        const { error: uploadError } = await supabase.storage
-          .from('partner-documents')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false,
-          });
+        const { data: uploadData, error: uploadError } = await supabase.functions.invoke('validate-upload', {
+          body: formData,
+        });
 
         if (uploadError) throw uploadError;
+        if (!uploadData.success) throw new Error(uploadData.error || 'Upload failed');
 
-        // Update progress to complete
         setUploadProgress(prev =>
           prev.map(item =>
             item.fileName === file.name
@@ -199,24 +196,18 @@ export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUpload
               : item
           )
         );
-
-        console.log(`Successfully uploaded: ${file.name}`);
       }
 
       toast.success(`Successfully uploaded ${filesToUpload.length} file(s)`);
 
-      // Clear progress after 2 seconds
       setTimeout(() => {
         setUploadProgress([]);
       }, 2000);
 
-      // Refresh the list
       await loadDocuments();
     } catch (error: any) {
-      console.error("Upload failed:", error);
       toast.error(`Upload failed: ${error.message}`);
       
-      // Mark all as error
       setUploadProgress(prev =>
         prev.map(item => ({ ...item, status: 'error' as const }))
       );

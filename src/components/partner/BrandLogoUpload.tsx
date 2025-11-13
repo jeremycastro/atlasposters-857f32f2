@@ -202,8 +202,6 @@ export const BrandLogoUpload = ({ brandId, currentLogoUrl, onLogoChange }: Brand
         },
       });
     } catch (error) {
-      console.error("Upload failed:", error);
-      // Mark all as error
       setUploadProgress(prev =>
         prev.map(item => ({ ...item, status: 'error' as const }))
       );

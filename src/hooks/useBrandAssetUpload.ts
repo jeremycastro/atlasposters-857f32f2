@@ -31,53 +31,56 @@ export const useBrandAssetUpload = () => {
           
           const totalMB = file.size / 1024 / 1024;
           
-          // Simulate progress for small files, real progress for larger ones
           if (onProgress) {
             onProgress(file.name, 0, 0, totalMB);
           }
           
           // Sanitize filename: remove special characters and spaces
           const sanitizedName = file.name
-            .replace(/[^\w\s.-]/g, '') // Remove special chars except spaces, dots, dashes
-            .replace(/\s+/g, '-') // Replace spaces with dashes
-            .replace(/-+/g, '-'); // Replace multiple dashes with single dash
+            .replace(/[^\w\s.-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
           
-          const fileName = `${brandId}/${Date.now()}-${sanitizedName}`;
+          const filePath = `${brandId}/${Date.now()}-${sanitizedName}`;
 
-          // Upload to storage
-          const { data, error } = await supabase.storage
-            .from('brand-assets')
-            .upload(fileName, file, {
-              cacheControl: '3600',
-              upsert: false,
-            });
+          // Upload via Edge Function for server-side validation
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('bucket', 'brand-assets');
+          formData.append('filePath', filePath);
+          formData.append('maxSizeMB', '250');
+
+          const { data: uploadData, error } = await supabase.functions.invoke('validate-upload', {
+            body: formData,
+          });
 
           if (error) {
             console.error(`Failed to upload ${file.name}:`, error);
             if (onProgress) {
-              onProgress(file.name, -1, 0, totalMB); // -1 indicates error
+              onProgress(file.name, -1, 0, totalMB);
             }
             throw new Error(`Failed to upload ${file.name}: ${error.message}`);
           }
 
-          // Report 100% completion
+          if (!uploadData.success) {
+            if (onProgress) {
+              onProgress(file.name, -1, 0, totalMB);
+            }
+            throw new Error(uploadData.error || `Failed to upload ${file.name}`);
+          }
+
           if (onProgress) {
             onProgress(file.name, 100, totalMB, totalMB);
           }
           
           console.log(`Successfully uploaded: ${file.name}`);
 
-          // Get public URL
-          const { data: { publicUrl } } = supabase.storage
-            .from('brand-assets')
-            .getPublicUrl(fileName);
-
           return {
-            path: data.path,
-            publicUrl,
+            path: uploadData.path,
+            publicUrl: uploadData.publicUrl,
             fileName: file.name,
-            size: file.size,
-            mimeType: file.type,
+            size: uploadData.fileSize,
+            mimeType: uploadData.mimeType,
           };
         } catch (error) {
           console.error(`Error uploading ${file.name}:`, error);
@@ -95,7 +98,6 @@ export const useBrandAssetUpload = () => {
       toast.success(`Successfully uploaded ${data.length} file${data.length > 1 ? 's' : ''}`);
     },
     onError: (error: Error) => {
-      console.error("Upload error:", error);
       toast.error(`Upload failed: ${error.message}`, {
         duration: Infinity,
         action: {
