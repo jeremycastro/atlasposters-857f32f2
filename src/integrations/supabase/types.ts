@@ -539,6 +539,7 @@ export type Database = {
           event_type: Database["public"]["Enums"]["brand_event_type"]
           featured_image_url: string | null
           id: string
+          is_archived: boolean
           is_published: boolean
           related_components: string[] | null
           related_tasks: string[] | null
@@ -556,6 +557,7 @@ export type Database = {
           event_type: Database["public"]["Enums"]["brand_event_type"]
           featured_image_url?: string | null
           id?: string
+          is_archived?: boolean
           is_published?: boolean
           related_components?: string[] | null
           related_tasks?: string[] | null
@@ -573,6 +575,7 @@ export type Database = {
           event_type?: Database["public"]["Enums"]["brand_event_type"]
           featured_image_url?: string | null
           id?: string
+          is_archived?: boolean
           is_published?: boolean
           related_components?: string[] | null
           related_tasks?: string[] | null

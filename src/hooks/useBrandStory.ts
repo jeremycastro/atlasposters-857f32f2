@@ -82,6 +82,7 @@ export const useBrandTimeline = (
   options?: {
     includeGlobal?: boolean;
     publishedOnly?: boolean;
+    includeArchived?: boolean;
   }
 ) => {
   return useQuery({
@@ -133,6 +134,11 @@ export const useBrandTimeline = (
 
       if (options?.publishedOnly) {
         query = query.eq("is_published", true);
+      }
+
+      // Filter out archived events by default
+      if (!options?.includeArchived) {
+        query = query.eq("is_archived", false);
       }
 
       const { data, error } = await query;

@@ -98,14 +98,14 @@ export const ComponentDetailDialog = ({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          <Tabs defaultValue="content" className="mt-6">
-            <TabsList className="grid w-full grid-cols-3">
+          <Tabs defaultValue="content" className="h-full flex flex-col">
+            <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
               <TabsTrigger value="content">Content</TabsTrigger>
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="content" className="space-y-4 mt-6">
+            <TabsContent value="content" className="space-y-4 mt-6 flex-1 overflow-y-auto min-h-0">
               <div className="prose prose-sm max-w-none">
                 <div className="bg-muted/50 p-6 rounded-lg whitespace-pre-wrap">
                   {component.content}
@@ -113,7 +113,7 @@ export const ComponentDetailDialog = ({
               </div>
             </TabsContent>
 
-            <TabsContent value="details" className="space-y-6 mt-6">
+            <TabsContent value="details" className="space-y-6 mt-6 flex-1 overflow-y-auto min-h-0">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-muted-foreground">Component Type</p>
@@ -181,7 +181,7 @@ export const ComponentDetailDialog = ({
               )}
             </TabsContent>
 
-            <TabsContent value="history" className="space-y-4 mt-6">
+            <TabsContent value="history" className="space-y-4 mt-6 flex-1 overflow-y-auto min-h-0">
               <div className="space-y-3">
                 {component.parent_version_id ? (
                   <div className="bg-muted/50 p-4 rounded-lg">

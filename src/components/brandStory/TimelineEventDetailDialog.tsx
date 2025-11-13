@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Edit, Trash2, Globe } from "lucide-react";
+import { Edit, Trash2, Globe, Archive } from "lucide-react";
 import { BrandTimelineEvent, EVENT_TYPE_LABELS } from "@/types/brandStory";
 import { format } from "date-fns";
 import { useUpdateTimelineEvent, useDeleteTimelineEvent } from "@/hooks/useBrandStoryMutations";
@@ -58,6 +58,18 @@ export const TimelineEventDetailDialog = ({
     );
   };
 
+  const handleArchive = () => {
+    updateEvent.mutate(
+      { id: event.id, is_archived: true },
+      {
+        onSuccess: () => {
+          toast.success("Event archived successfully");
+          onOpenChange(false);
+        },
+      }
+    );
+  };
+
   const handleDelete = () => {
     if (confirm("Are you sure you want to delete this timeline event? This action cannot be undone.")) {
       deleteEvent.mutate(event.id, {
@@ -81,9 +93,13 @@ export const TimelineEventDetailDialog = ({
               <Badge variant="outline">
                 {EVENT_TYPE_LABELS[event.event_type]}
               </Badge>
-              <Badge variant={event.is_published ? "default" : "secondary"}>
-                {event.is_published ? "Published" : "Draft"}
-              </Badge>
+              {event.is_archived ? (
+                <Badge variant="secondary">Archived</Badge>
+              ) : (
+                <Badge variant={event.is_published ? "default" : "secondary"}>
+                  {event.is_published ? "Published" : "Draft"}
+                </Badge>
+              )}
               <Badge variant="secondary" className="text-xs">
                 {format(new Date(event.event_date), "MMM d, yyyy")}
               </Badge>
@@ -96,13 +112,13 @@ export const TimelineEventDetailDialog = ({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          <Tabs defaultValue="content" className="mt-6">
-            <TabsList className="grid w-full grid-cols-2">
+          <Tabs defaultValue="content" className="h-full flex flex-col">
+            <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
               <TabsTrigger value="content">Content</TabsTrigger>
               <TabsTrigger value="details">Details</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="content" className="space-y-4 mt-6">
+            <TabsContent value="content" className="space-y-4 mt-6 flex-1 overflow-y-auto min-h-0">
               {event.featured_image_url && (
                 <div className="rounded-lg overflow-hidden mb-4">
                   <img 
@@ -119,7 +135,7 @@ export const TimelineEventDetailDialog = ({
               </div>
             </TabsContent>
 
-            <TabsContent value="details" className="space-y-6 mt-6">
+            <TabsContent value="details" className="space-y-6 mt-6 flex-1 overflow-y-auto min-h-0">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-muted-foreground">Event Type</p>
@@ -133,9 +149,13 @@ export const TimelineEventDetailDialog = ({
 
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-muted-foreground">Status</p>
-                  <Badge variant={event.is_published ? "default" : "secondary"}>
-                    {event.is_published ? "Published" : "Draft"}
-                  </Badge>
+                  {event.is_archived ? (
+                    <Badge variant="secondary">Archived</Badge>
+                  ) : (
+                    <Badge variant={event.is_published ? "default" : "secondary"}>
+                      {event.is_published ? "Published" : "Draft"}
+                    </Badge>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -227,6 +247,16 @@ export const TimelineEventDetailDialog = ({
               >
                 <Globe className="h-4 w-4 mr-2" />
                 Unpublish
+              </Button>
+            )}
+            {!event.is_archived && (
+              <Button
+                variant="outline"
+                onClick={handleArchive}
+                disabled={updateEvent.isPending}
+              >
+                <Archive className="h-4 w-4 mr-2" />
+                Archive
               </Button>
             )}
             {onEdit && (

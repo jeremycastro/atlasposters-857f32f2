@@ -42,6 +42,7 @@ export interface BrandTimelineEvent {
   featured_image_url: string | null;
   tags: string[];
   is_published: boolean;
+  is_archived: boolean;
   created_by: string | null;
   created_at: string;
   updated_at: string;
