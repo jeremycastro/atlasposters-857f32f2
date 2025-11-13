@@ -1,0 +1,22 @@
+-- Color Palette (20 tags)
+INSERT INTO tag_definitions (category_id, tag_key, display_name, description, sort_order, tag_type)
+SELECT id, 'monochrome', 'Monochrome', 'Single color variations', 10, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'black_white', 'Black & White', 'Pure grayscale palette', 20, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'warm', 'Warm', 'Reds, oranges, yellows', 30, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'cool', 'Cool', 'Blues, greens, purples', 40, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'neutral', 'Neutral', 'Beiges, grays, earth tones', 50, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'pastel', 'Pastel', 'Soft, light, delicate colors', 60, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'vibrant', 'Vibrant', 'Bright, saturated, bold colors', 70, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'muted', 'Muted', 'Subdued, desaturated tones', 80, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'earth_tones', 'Earth Tones', 'Browns, tans, natural colors', 90, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'jewel_tones', 'Jewel Tones', 'Rich, saturated colors', 100, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'complementary', 'Complementary', 'Opposite color wheel pairs', 110, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'analogous', 'Analogous', 'Adjacent color harmonies', 120, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'triadic', 'Triadic', 'Three evenly-spaced colors', 130, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'blue_palette', 'Blue Palette', 'Predominantly blue tones', 140, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'green_palette', 'Green Palette', 'Predominantly green tones', 150, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'pink_palette', 'Pink Palette', 'Predominantly pink tones', 160, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'gold_palette', 'Gold Palette', 'Metallic gold accents', 170, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'rainbow', 'Rainbow', 'Full spectrum of colors', 180, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'high_contrast', 'High Contrast', 'Strong value differences', 190, 'system' FROM category_definitions WHERE category_key = 'color_palette'
+UNION ALL SELECT id, 'low_contrast', 'Low Contrast', 'Subtle value changes', 200, 'system' FROM category_definitions WHERE category_key = 'color_palette';

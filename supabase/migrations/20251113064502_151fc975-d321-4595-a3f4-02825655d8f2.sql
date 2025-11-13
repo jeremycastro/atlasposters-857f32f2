@@ -1,0 +1,22 @@
+-- Art Medium (20 tags)
+INSERT INTO tag_definitions (category_id, tag_key, display_name, description, sort_order, tag_type)
+SELECT id, 'watercolor', 'Watercolor', 'Water-based transparent paint', 10, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'oil_painting', 'Oil Painting', 'Oil-based paint technique', 20, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'acrylic', 'Acrylic', 'Acrylic paint medium', 30, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'digital', 'Digital', 'Computer-created artwork', 40, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'mixed_media', 'Mixed Media', 'Combination of techniques', 50, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'photography', 'Photography', 'Photographic art', 60, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'illustration', 'Illustration', 'Hand-drawn or digital illustration', 70, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'ink', 'Ink', 'Ink-based artwork', 80, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'pencil', 'Pencil', 'Pencil or graphite drawing', 90, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'charcoal', 'Charcoal', 'Charcoal drawing medium', 100, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'pastel', 'Pastel', 'Soft pastel medium', 110, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'collage', 'Collage', 'Cut and pasted elements', 120, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'print', 'Print', 'Printmaking techniques', 130, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'vector', 'Vector', 'Vector-based digital art', 140, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, '3d_render', '3D Render', 'Three-dimensional rendering', 150, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'linocut', 'Linocut', 'Linoleum block printing', 160, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'screen_print', 'Screen Print', 'Silkscreen printing', 170, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'gouache', 'Gouache', 'Opaque water-based paint', 180, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'spray_paint', 'Spray Paint', 'Aerosol paint technique', 190, 'system' FROM category_definitions WHERE category_key = 'art_medium'
+UNION ALL SELECT id, 'ai_generated', 'AI Generated', 'AI-assisted artwork', 200, 'system' FROM category_definitions WHERE category_key = 'art_medium';
