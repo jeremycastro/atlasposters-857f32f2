@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Eye, MoreVertical, Edit, Archive, Image, Building2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
 
 type Artwork = Database['public']['Tables']['artworks']['Row'] & {
   partner_profile?: {
@@ -39,6 +40,34 @@ export const ArtworkCardView = ({
   onEdit,
   onArchive,
 }: ArtworkCardViewProps) => {
+  const getThumbnailUrl = (artwork: Artwork & { artwork_files?: any[] }) => {
+    if (!artwork.artwork_files || artwork.artwork_files.length === 0) return null;
+
+    // Try to find thumbnails first (prefer medium for card view)
+    const thumbnailMedium = artwork.artwork_files.find(
+      (f: any) => f.file_type === 'thumbnail' && f.metadata?.variant === 'medium'
+    );
+    const thumbnailSmall = artwork.artwork_files.find(
+      (f: any) => f.file_type === 'thumbnail' && f.metadata?.variant === 'small'
+    );
+    const thumbnailLarge = artwork.artwork_files.find(
+      (f: any) => f.file_type === 'thumbnail' && f.metadata?.variant === 'large'
+    );
+    
+    // Look for primary file first, then any image file as fallback
+    const primaryImage = artwork.artwork_files.find((f: any) => f.is_primary);
+    const fallbackImage = artwork.artwork_files.find((f: any) => 
+      f.mime_type?.startsWith('image/')
+    );
+    
+    // Prefer medium thumbnail for card view
+    const file = thumbnailMedium || thumbnailSmall || thumbnailLarge || primaryImage || fallbackImage;
+    if (!file) return null;
+
+    const { data } = supabase.storage.from("brand-assets").getPublicUrl(file.file_path);
+    return data.publicUrl;
+  };
+
   if (artworks.length === 0) {
     return (
       <div className="text-center py-12">
@@ -97,9 +126,21 @@ export const ArtworkCardView = ({
             </div>
           </CardHeader>
           <CardContent>
-            <div className="aspect-video bg-muted rounded-md flex items-center justify-center mb-4">
-              <Image className="h-12 w-12 text-muted-foreground" />
-            </div>
+            {getThumbnailUrl(artwork as any) ? (
+              <div className="aspect-video bg-muted rounded-md overflow-hidden mb-4">
+                <img
+                  src={getThumbnailUrl(artwork as any) || ''}
+                  alt={artwork.title}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            ) : (
+              <div className="aspect-video bg-muted rounded-md flex items-center justify-center mb-4">
+                <Image className="h-12 w-12 text-muted-foreground" />
+              </div>
+            )}
 
             {artwork.description && (
               <p className="text-sm text-muted-foreground line-clamp-2 mb-3">

@@ -276,12 +276,25 @@ export function ArtworkTableView({ artworks, onView, onEdit, onArchive, searchBa
   const getThumbnailUrl = (artwork: Artwork) => {
     if (!artwork.artwork_files || artwork.artwork_files.length === 0) return null;
 
-    // Look for primary file first, then any image file
+    // Try to find thumbnails first (small -> medium -> large) for fast loading
+    const thumbnailSmall = artwork.artwork_files.find(
+      (f: any) => f.file_type === 'thumbnail' && f.metadata?.variant === 'small'
+    );
+    const thumbnailMedium = artwork.artwork_files.find(
+      (f: any) => f.file_type === 'thumbnail' && f.metadata?.variant === 'medium'
+    );
+    const thumbnailLarge = artwork.artwork_files.find(
+      (f: any) => f.file_type === 'thumbnail' && f.metadata?.variant === 'large'
+    );
+    
+    // Look for primary file first, then any image file as fallback
     const primaryImage = artwork.artwork_files.find(f => f.is_primary);
     const fallbackImage = artwork.artwork_files.find(f => 
       f.mime_type?.startsWith('image/')
     );
-    const file = primaryImage || fallbackImage;
+    
+    // Prefer small thumbnail for table view, fallback to larger thumbnails or original
+    const file = thumbnailSmall || thumbnailMedium || thumbnailLarge || primaryImage || fallbackImage;
 
     if (!file) return null;
 
@@ -307,6 +320,8 @@ export function ArtworkTableView({ artworks, onView, onEdit, onArchive, searchBa
                     src={thumbnailUrl}
                     alt={artwork.title}
                     className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                 ) : (
                   <ImageIcon className="h-6 w-6 text-muted-foreground" />
