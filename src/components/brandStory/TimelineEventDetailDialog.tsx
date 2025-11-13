@@ -8,6 +8,7 @@ import { BrandTimelineEvent, EVENT_TYPE_LABELS } from "@/types/brandStory";
 import { format } from "date-fns";
 import { useUpdateTimelineEvent, useDeleteTimelineEvent } from "@/hooks/useBrandStoryMutations";
 import { toast } from "sonner";
+import { useState } from "react";
 
 interface TimelineEventDetailDialogProps {
   event: BrandTimelineEvent | null;
@@ -24,8 +25,16 @@ export const TimelineEventDetailDialog = ({
 }: TimelineEventDetailDialogProps) => {
   const updateEvent = useUpdateTimelineEvent();
   const deleteEvent = useDeleteTimelineEvent();
+  const [isEditing, setIsEditing] = useState(false);
 
   if (!event) return null;
+
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(event);
+      setIsEditing(true);
+    }
+  };
 
   const handlePublish = () => {
     updateEvent.mutate(
@@ -61,39 +70,40 @@ export const TimelineEventDetailDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={(open) => {
+      onOpenChange(open);
+      if (!open) setIsEditing(false);
+    }}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto relative">
+        {isEditing && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-14 text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={handleDelete}
+            disabled={deleteEvent.isPending}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
+
         <DialogHeader>
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline">
-                  {EVENT_TYPE_LABELS[event.event_type]}
-                </Badge>
-                <Badge variant={event.is_published ? "default" : "secondary"}>
-                  {event.is_published ? "Published" : "Draft"}
-                </Badge>
-                <Badge variant="secondary" className="text-xs">
-                  {format(new Date(event.event_date), "MMM d, yyyy")}
-                </Badge>
-              </div>
-              <DialogTitle className="text-2xl">{event.title}</DialogTitle>
-              <DialogDescription className="text-base">
-                {event.scope === "brand" ? "Brand-specific event" : "Atlas global event"}
-              </DialogDescription>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline">
+                {EVENT_TYPE_LABELS[event.event_type]}
+              </Badge>
+              <Badge variant={event.is_published ? "default" : "secondary"}>
+                {event.is_published ? "Published" : "Draft"}
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                {format(new Date(event.event_date), "MMM d, yyyy")}
+              </Badge>
             </div>
-            <div className="flex gap-2">
-              {onEdit && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onEdit(event)}
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit
-                </Button>
-              )}
-            </div>
+            <DialogTitle className="text-2xl">{event.title}</DialogTitle>
+            <DialogDescription className="text-base">
+              {event.scope === "brand" ? "Brand-specific event" : "Atlas global event"}
+            </DialogDescription>
           </div>
         </DialogHeader>
 
@@ -197,39 +207,35 @@ export const TimelineEventDetailDialog = ({
 
         <Separator className="my-6" />
 
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-            {!event.is_published ? (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handlePublish}
-                disabled={updateEvent.isPending}
-              >
-                <Globe className="h-4 w-4 mr-2" />
-                Publish
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleUnpublish}
-                disabled={updateEvent.isPending}
-              >
-                <Globe className="h-4 w-4 mr-2" />
-                Unpublish
-              </Button>
-            )}
-          </div>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleDelete}
-            disabled={deleteEvent.isPending}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </Button>
+        <div className="flex items-center justify-end gap-2">
+          {!event.is_published ? (
+            <Button
+              variant="default"
+              onClick={handlePublish}
+              disabled={updateEvent.isPending}
+            >
+              <Globe className="h-4 w-4 mr-2" />
+              Publish
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={handleUnpublish}
+              disabled={updateEvent.isPending}
+            >
+              <Globe className="h-4 w-4 mr-2" />
+              Unpublish
+            </Button>
+          )}
+          {onEdit && (
+            <Button
+              variant="outline"
+              onClick={handleEdit}
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
