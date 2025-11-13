@@ -26,14 +26,12 @@ export const ComponentDetailDialog = ({
 }: ComponentDetailDialogProps) => {
   const updateComponent = useUpdateBrandStoryComponent();
   const deleteComponent = useDeleteBrandStoryComponent();
-  const [isEditing, setIsEditing] = useState(false);
 
   if (!component) return null;
 
   const handleEdit = () => {
     if (onEdit) {
       onEdit(component);
-      setIsEditing(true);
     }
   };
 
@@ -72,10 +70,7 @@ export const ComponentDetailDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(open) => {
-      onOpenChange(open);
-      if (!open) setIsEditing(false);
-    }}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col mx-4 w-[calc(100vw-2rem)] sm:w-full">
         <DialogHeader className="flex-shrink-0">
           <div className="space-y-2">
@@ -207,17 +202,15 @@ export const ComponentDetailDialog = ({
         <Separator className="flex-shrink-0" />
 
         <div className="flex items-center justify-between gap-2 flex-shrink-0 pt-4">
-          {isEditing && (
-            <Button
-              variant="ghost"
-              onClick={handleDelete}
-              disabled={deleteComponent.isPending}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            onClick={handleDelete}
+            disabled={deleteComponent.isPending}
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
+          </Button>
           <div className="flex items-center gap-2 ml-auto">
             {component.status === "draft" && (
               <Button
