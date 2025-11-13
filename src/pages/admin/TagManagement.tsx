@@ -13,19 +13,8 @@ import { DeleteTagDialog } from "@/components/tags/DeleteTagDialog";
 import { CreateCategoryDialog } from "@/components/tags/CreateCategoryDialog";
 import { EditCategoryDialog } from "@/components/tags/EditCategoryDialog";
 import type { Tag, Category } from "@/hooks/useTags";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 const CATEGORY_GROUPS = {
   'Core Artwork': {
@@ -107,75 +96,94 @@ export default function TagManagement() {
   const totalTags = categories?.reduce((sum, cat: any) => sum + (cat.tag_definitions?.length || 0), 0) || 0;
   const mostUsedTag = tags?.reduce((max, tag) => tag.usage_count > (max?.usage_count || 0) ? tag : max, tags[0]);
 
-  return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <Sidebar className="border-r">
-          <SidebarHeader className="p-4">
-            <div className="space-y-2">
-              <h2 className="font-semibold text-lg">Categories</h2>
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search all tags..."
-                  value={globalSearchTerm}
-                  onChange={(e) => setGlobalSearchTerm(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
-            </div>
-          </SidebarHeader>
-          
-          <SidebarContent>
-            <ScrollArea className="flex-1">
-              {Object.entries(CATEGORY_GROUPS).map(([groupName, group]) => (
-                <SidebarGroup key={groupName}>
-                  <SidebarGroupLabel>
-                    <group.icon className="h-4 w-4 mr-2" />
-                    {groupName}
-                  </SidebarGroupLabel>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
-                      {group.categories.map(categoryKey => {
-                        const category = categories?.find(c => c.category_key === categoryKey);
-                        const tagCount = (category as any)?.tag_definitions?.length || 0;
-                        
-                        if (!category) return null;
-                        
-                        return (
-                          <SidebarMenuItem key={categoryKey}>
-                            <SidebarMenuButton
-                              isActive={selectedCategory === categoryKey}
-                              onClick={() => {
-                                setSelectedCategory(categoryKey);
-                                setGlobalSearchTerm("");
-                                setLocalSearchTerm("");
-                              }}
-                            >
-                              <span className="flex-1">{category.display_name}</span>
-                              <Badge variant="secondary" className="ml-2">
-                                {tagCount}
-                              </Badge>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                        );
-                      })}
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                </SidebarGroup>
-              ))}
-            </ScrollArea>
-          </SidebarContent>
-          
-          <SidebarFooter className="p-4">
-            <Button variant="outline" onClick={() => setCreateCategoryOpen(true)} className="w-full">
-              <Plus className="h-4 w-4 mr-2" />
-              New Category
-            </Button>
-          </SidebarFooter>
-        </Sidebar>
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
+    // Initialize all groups as open
+    return Object.keys(CATEGORY_GROUPS).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+  });
 
-        <main className="flex-1 overflow-auto">
+  const toggleGroup = (group: string) => {
+    setOpenGroups(prev => ({ ...prev, [group]: !prev[group] }));
+  };
+
+  return (
+    <>
+      <div className="flex min-h-screen w-full">
+      {/* Category Navigation Sidebar */}
+      <aside className="w-64 border-r bg-card flex flex-col">
+        <div className="p-4 border-b">
+          <h2 className="font-semibold text-lg mb-3">Categories</h2>
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search all tags..."
+              value={globalSearchTerm}
+              onChange={(e) => setGlobalSearchTerm(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+        </div>
+        
+        <ScrollArea className="flex-1">
+          <div className="p-2 space-y-1">
+            {Object.entries(CATEGORY_GROUPS).map(([groupName, group]) => (
+              <Collapsible
+                key={groupName}
+                open={openGroups[groupName]}
+                onOpenChange={() => toggleGroup(groupName)}
+              >
+                <CollapsibleTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-between text-xs font-semibold text-muted-foreground hover:text-foreground"
+                  >
+                    <div className="flex items-center">
+                      <group.icon className="h-4 w-4 mr-2" />
+                      {groupName}
+                    </div>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openGroups[groupName] ? 'rotate-180' : ''}`} />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-1 mt-1">
+                  {group.categories.map(categoryKey => {
+                    const category = categories?.find(c => c.category_key === categoryKey);
+                    const tagCount = (category as any)?.tag_definitions?.length || 0;
+                    
+                    if (!category) return null;
+                    
+                    return (
+                      <Button
+                        key={categoryKey}
+                        variant={selectedCategory === categoryKey ? "secondary" : "ghost"}
+                        className="w-full justify-between text-sm"
+                        onClick={() => {
+                          setSelectedCategory(categoryKey);
+                          setGlobalSearchTerm("");
+                          setLocalSearchTerm("");
+                        }}
+                      >
+                        <span className="truncate">{category.display_name}</span>
+                        <Badge variant="outline" className="ml-2 shrink-0">
+                          {tagCount}
+                        </Badge>
+                      </Button>
+                    );
+                  })}
+                </CollapsibleContent>
+              </Collapsible>
+            ))}
+          </div>
+        </ScrollArea>
+        
+        <div className="p-4 border-t">
+          <Button variant="outline" onClick={() => setCreateCategoryOpen(true)} className="w-full">
+            <Plus className="h-4 w-4 mr-2" />
+            New Category
+          </Button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-auto">
           <div className="p-8 space-y-6">
             <div className="flex items-center justify-between">
               <div>
@@ -451,6 +459,6 @@ export default function TagManagement() {
         onOpenChange={setEditCategoryOpen}
         category={selectedCategoryData}
       />
-    </SidebarProvider>
+    </>
   );
 }
