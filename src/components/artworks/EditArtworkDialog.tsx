@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { UnifiedTagSelector } from '@/components/tags/UnifiedTagSelector';
+import { AITagSuggestions } from '@/components/tags/AITagSuggestions';
 import {
   Dialog,
   DialogContent,
@@ -9,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Form,
   FormControl,
@@ -50,7 +53,6 @@ const artworkSchema = z.object({
   art_medium: z.string().optional(),
   year_created: z.coerce.number().int().min(1900).max(currentYear).optional(),
   original_dimensions: z.string().optional(),
-  tags: z.string().optional(),
   is_exclusive: z.boolean().default(false),
   rights_start_date: z.string().optional(),
   rights_end_date: z.string().optional(),
@@ -124,7 +126,6 @@ export const EditArtworkDialog = ({ artwork, open, onOpenChange }: EditArtworkDi
         art_medium: artwork.art_medium || '',
         year_created: artwork.year_created || undefined,
         original_dimensions: artwork.original_dimensions || '',
-        tags: artwork.tags?.join(', ') || '',
         is_exclusive: artwork.is_exclusive || false,
         brand_id: artwork.brand_id || '',
         rights_start_date: artwork.rights_start_date || '',
@@ -157,10 +158,6 @@ export const EditArtworkDialog = ({ artwork, open, onOpenChange }: EditArtworkDi
 
     setIsSubmitting(true);
     try {
-      const tagsArray = values.tags
-        ? values.tags.split(',').map(tag => tag.trim()).filter(Boolean)
-        : null;
-
       await updateArtwork.mutateAsync({
         id: artwork.id,
         updates: {
@@ -170,7 +167,6 @@ export const EditArtworkDialog = ({ artwork, open, onOpenChange }: EditArtworkDi
           art_medium: values.art_medium || null,
           year_created: values.year_created || null,
           original_dimensions: values.original_dimensions || null,
-          tags: tagsArray,
           is_exclusive: values.is_exclusive,
           rights_start_date: values.rights_start_date || null,
           rights_end_date: values.rights_end_date || null,
@@ -424,21 +420,41 @@ export const EditArtworkDialog = ({ artwork, open, onOpenChange }: EditArtworkDi
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="tags"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
-                        <FormLabel className="text-sm text-right">Tags</FormLabel>
-                        <FormControl>
-                          <Input placeholder="landscape, nature, mountains" {...field} />
-                        </FormControl>
-                      </div>
-                      <FormMessage className="ml-[122px]" />
-                    </FormItem>
-                  )}
-                />
+              </div>
+
+              {/* Tag Management Section */}
+              <div className="border rounded-lg p-4">
+                <h4 className="font-medium text-sm text-muted-foreground mb-3">Tags & AI Suggestions</h4>
+                
+                <Tabs defaultValue="tags" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="tags">Manage Tags</TabsTrigger>
+                    <TabsTrigger value="ai">AI Suggestions</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="tags" className="mt-4">
+                    <UnifiedTagSelector
+                      entityType="artwork"
+                      entityId={artwork.id}
+                      scope="artwork"
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="ai" className="mt-4">
+                    <AITagSuggestions
+                      entityType="artwork"
+                      entityId={artwork.id}
+                      imageUrl={artworkFiles.find(f => f.is_primary)?.url}
+                      metadata={{
+                        title: artwork.title,
+                        artist_name: artwork.artist_name,
+                        description: artwork.description,
+                        art_medium: artwork.art_medium,
+                        year_created: artwork.year_created,
+                      }}
+                    />
+                  </TabsContent>
+                </Tabs>
               </div>
 
               {/* Rights & Licensing */}

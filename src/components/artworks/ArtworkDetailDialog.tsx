@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Database } from '@/integrations/supabase/types';
+import { useEntityTags } from '@/hooks/useTags';
+import { TagPill } from '@/components/tags/TagPill';
 import {
   Dialog,
   DialogContent,
@@ -42,6 +44,18 @@ export const ArtworkDetailDialog = ({
 }: ArtworkDetailDialogProps) => {
   const { archiveArtwork } = useArtworkMutations();
   const [isArchiving, setIsArchiving] = useState(false);
+
+  // Fetch entity tags
+  const { data: entityTags } = useEntityTags('artwork', artwork?.id || '');
+  
+  // Group tags by category
+  const tagsByCategory = entityTags?.reduce((acc, tag) => {
+    if (!acc[tag.category_name]) {
+      acc[tag.category_name] = [];
+    }
+    acc[tag.category_name].push(tag);
+    return acc;
+  }, {} as Record<string, typeof entityTags>);
 
   // Fetch artwork files
   const { data: artworkFiles = [] } = useQuery({
@@ -172,17 +186,33 @@ export const ArtworkDetailDialog = ({
               </div>
             </div>
 
-            {artwork.tags && artwork.tags.length > 0 && (
+            {entityTags && entityTags.length > 0 && (
               <div>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-3">
                   <Tag className="h-4 w-4 text-muted-foreground" />
                   <h4 className="text-sm font-medium">Tags</h4>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {artwork.tags.map((tag, index) => (
-                    <Badge key={index} variant="secondary">
-                      {tag}
-                    </Badge>
+                <div className="space-y-3">
+                  {Object.entries(tagsByCategory || {}).map(([categoryName, tags]) => (
+                    <div key={categoryName} className="space-y-1">
+                      <div className="text-xs text-muted-foreground font-medium">
+                        {categoryName}
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {tags.map((tag) => (
+                          <TagPill
+                            key={tag.tag_id}
+                            tag={{
+                              display_name: tag.tag_name,
+                              category_name: tag.category_name,
+                              source: tag.source,
+                              confidence_score: tag.confidence_score || undefined,
+                            }}
+                            showSource
+                          />
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>

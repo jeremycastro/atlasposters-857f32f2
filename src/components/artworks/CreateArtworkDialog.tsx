@@ -43,7 +43,6 @@ const artworkSchema = z.object({
   art_medium: z.string().optional(),
   year_created: z.coerce.number().int().min(1900).max(currentYear).optional(),
   original_dimensions: z.string().optional(),
-  tags: z.string().optional(),
   is_exclusive: z.boolean().default(false),
   rights_start_date: z.string().optional(),
   rights_end_date: z.string().optional(),
@@ -109,11 +108,6 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
         throw new Error('Brand must have an associated partner');
       }
 
-      // Convert tags string to array
-      const tagsArray = values.tags
-        ? values.tags.split(',').map(tag => tag.trim()).filter(Boolean)
-        : null;
-
       const result = await createArtwork.mutateAsync({
         artwork: {
           title: values.title,
@@ -122,7 +116,7 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
           art_medium: values.art_medium || null,
           year_created: values.year_created || null,
           original_dimensions: values.original_dimensions || null,
-          tags: tagsArray,
+          tags: null,
           is_exclusive: values.is_exclusive,
           rights_start_date: values.rights_start_date || null,
           rights_end_date: values.rights_end_date || null,
@@ -384,21 +378,18 @@ export const CreateArtworkDialog = ({ open, onOpenChange }: CreateArtworkDialogP
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="tags"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
-                        <FormLabel className="text-sm text-right">Tags</FormLabel>
-                        <FormControl>
-                          <Input placeholder="landscape, nature, mountains" {...field} />
-                        </FormControl>
-                      </div>
-                      <FormMessage className="ml-[122px]" />
-                    </FormItem>
-                  )}
-                />
+                {/* Tag Management Info */}
+                <div className="bg-muted/50 border border-border rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1">
+                      <p className="text-sm font-medium mb-1">Tags</p>
+                      <p className="text-xs text-muted-foreground">
+                        Tags can be added after creating the artwork using the Edit dialog. 
+                        AI-powered tag suggestions will be available based on your artwork details and uploaded images.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Rights & Licensing */}
