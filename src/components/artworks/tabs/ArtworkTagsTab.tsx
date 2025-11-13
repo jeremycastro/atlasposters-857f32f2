@@ -54,6 +54,7 @@ export function ArtworkTagsTab({ artworkId }: ArtworkTagsTabProps) {
     'Technical & Production': false
   });
   const [currentTagsOpen, setCurrentTagsOpen] = useState(true);
+  const [aiSuggestionsOpen, setAiSuggestionsOpen] = useState(false);
 
   // Fetch artwork tags
   const {
@@ -146,20 +147,6 @@ export function ArtworkTagsTab({ artworkId }: ArtworkTagsTabProps) {
 
   return (
     <div className="space-y-4">
-      {/* AI Tag Suggestions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>AI Tag Suggestions</CardTitle>
-          <CardDescription>Get intelligent tag recommendations based on artwork content</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AITagSuggestions
-            entityType="artwork"
-            entityId={artworkId}
-          />
-        </CardContent>
-      </Card>
-
       {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-full">
         {/* Sidebar - Category Navigation */}
@@ -373,6 +360,36 @@ export function ArtworkTagsTab({ artworkId }: ArtworkTagsTabProps) {
           </Card>
         </div>
       </div>
+
+      {/* AI Tag Suggestions */}
+      <Collapsible open={aiSuggestionsOpen} onOpenChange={setAiSuggestionsOpen}>
+        <Card>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base">AI Tag Suggestions</CardTitle>
+                  <CardDescription>Get intelligent tag recommendations based on artwork content</CardDescription>
+                </div>
+                <ChevronDown 
+                  className={cn(
+                    "h-4 w-4 transition-transform",
+                    aiSuggestionsOpen && "rotate-180"
+                  )} 
+                />
+              </div>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent>
+              <AITagSuggestions
+                entityType="artwork"
+                entityId={artworkId}
+              />
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       {/* Current Artwork Tags */}
       {artworkTags && artworkTags.length > 0 && (
