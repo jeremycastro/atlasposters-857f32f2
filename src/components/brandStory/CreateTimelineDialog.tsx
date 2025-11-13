@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,16 +6,18 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BrandSelector } from "./BrandSelector";
-import { useCreateTimelineEvent } from "@/hooks/useBrandStoryMutations";
-import { BrandEventType, EVENT_TYPE_LABELS } from "@/types/brandStory";
+import { useCreateTimelineEvent, useUpdateTimelineEvent } from "@/hooks/useBrandStoryMutations";
+import { BrandEventType, EVENT_TYPE_LABELS, BrandTimelineEvent } from "@/types/brandStory";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 interface CreateTimelineDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  eventToEdit?: BrandTimelineEvent | null;
 }
 
-export const CreateTimelineDialog = ({ open, onOpenChange }: CreateTimelineDialogProps) => {
+export const CreateTimelineDialog = ({ open, onOpenChange, eventToEdit }: CreateTimelineDialogProps) => {
   const [brandId, setBrandId] = useState<string | null>(null);
   const [eventType, setEventType] = useState<BrandEventType>("milestone");
   const [title, setTitle] = useState("");
@@ -23,19 +25,49 @@ export const CreateTimelineDialog = ({ open, onOpenChange }: CreateTimelineDialo
   const [eventDate, setEventDate] = useState(format(new Date(), "yyyy-MM-dd"));
 
   const createEvent = useCreateTimelineEvent();
+  const updateEvent = useUpdateTimelineEvent();
+  
+  const isEditMode = !!eventToEdit;
+
+  // Populate form when editing
+  useEffect(() => {
+    if (eventToEdit) {
+      setBrandId(eventToEdit.brand_id);
+      setEventType(eventToEdit.event_type);
+      setTitle(eventToEdit.title);
+      setContent(eventToEdit.content);
+      setEventDate(format(new Date(eventToEdit.event_date), "yyyy-MM-dd"));
+    } else {
+      resetForm();
+    }
+  }, [eventToEdit, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    await createEvent.mutateAsync({
-      brand_id: brandId,
-      scope: brandId ? "brand" : "atlas_global",
-      event_type: eventType,
-      title,
-      content,
-      event_date: eventDate,
-      is_published: false,
-    });
+    if (isEditMode && eventToEdit) {
+      await updateEvent.mutateAsync({
+        id: eventToEdit.id,
+        brand_id: brandId,
+        scope: brandId ? "brand" : "atlas_global",
+        event_type: eventType,
+        title,
+        content,
+        event_date: eventDate,
+      });
+      toast.success("Event updated successfully");
+    } else {
+      await createEvent.mutateAsync({
+        brand_id: brandId,
+        scope: brandId ? "brand" : "atlas_global",
+        event_type: eventType,
+        title,
+        content,
+        event_date: eventDate,
+        is_published: false,
+      });
+      toast.success("Event created successfully");
+    }
 
     onOpenChange(false);
     resetForm();
@@ -53,9 +85,9 @@ export const CreateTimelineDialog = ({ open, onOpenChange }: CreateTimelineDialo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Timeline Event</DialogTitle>
+          <DialogTitle>{isEditMode ? "Edit Timeline Event" : "Create Timeline Event"}</DialogTitle>
           <DialogDescription>
-            Document an important moment in your brand's evolution.
+            {isEditMode ? "Update the event details" : "Document an important moment in your brand's evolution."}
           </DialogDescription>
         </DialogHeader>
 
@@ -119,8 +151,11 @@ export const CreateTimelineDialog = ({ open, onOpenChange }: CreateTimelineDialo
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={createEvent.isPending}>
-              {createEvent.isPending ? "Creating..." : "Create Event"}
+            <Button type="submit" disabled={createEvent.isPending || updateEvent.isPending}>
+              {isEditMode 
+                ? (updateEvent.isPending ? "Updating..." : "Update Event")
+                : (createEvent.isPending ? "Creating..." : "Create Event")
+              }
             </Button>
           </DialogFooter>
         </form>

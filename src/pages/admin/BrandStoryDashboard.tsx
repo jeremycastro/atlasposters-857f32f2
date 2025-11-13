@@ -7,10 +7,11 @@ import { CreateComponentDialog } from "@/components/brandStory/CreateComponentDi
 import { CreateTimelineDialog } from "@/components/brandStory/CreateTimelineDialog";
 import { ComponentTableView } from "@/components/brandStory/ComponentTableView";
 import { ComponentDetailDialog } from "@/components/brandStory/ComponentDetailDialog";
-import { TimelineEventCard } from "@/components/brandStory/TimelineEventCard";
+import { TimelineEventTableView } from "@/components/brandStory/TimelineEventTableView";
+import { TimelineEventDetailDialog } from "@/components/brandStory/TimelineEventDetailDialog";
 import { useBrandStoryStats, useBrandStoryComponents, useBrandTimeline } from "@/hooks/useBrandStory";
-import { useDeleteBrandStoryComponent } from "@/hooks/useBrandStoryMutations";
-import { BrandStoryComponent, COMPONENT_TYPE_LABELS, STATUS_LABELS } from "@/types/brandStory";
+import { useDeleteBrandStoryComponent, useDeleteTimelineEvent } from "@/hooks/useBrandStoryMutations";
+import { BrandStoryComponent, BrandTimelineEvent, COMPONENT_TYPE_LABELS, STATUS_LABELS } from "@/types/brandStory";
 import { toast } from "sonner";
 
 export default function BrandStoryDashboard() {
@@ -20,11 +21,15 @@ export default function BrandStoryDashboard() {
   const [selectedComponent, setSelectedComponent] = useState<BrandStoryComponent | null>(null);
   const [componentToEdit, setComponentToEdit] = useState<BrandStoryComponent | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<BrandTimelineEvent | null>(null);
+  const [eventToEdit, setEventToEdit] = useState<BrandTimelineEvent | null>(null);
+  const [eventDetailDialogOpen, setEventDetailDialogOpen] = useState(false);
 
   const { data: stats } = useBrandStoryStats(selectedBrandId);
   const { data: components = [] } = useBrandStoryComponents(selectedBrandId);
-  const { data: recentTimeline = [] } = useBrandTimeline(selectedBrandId ? [selectedBrandId] : undefined);
+  const { data: events = [] } = useBrandTimeline(selectedBrandId ? [selectedBrandId] : undefined);
   const deleteComponent = useDeleteBrandStoryComponent();
+  const deleteEvent = useDeleteTimelineEvent();
 
   const handleViewComponent = (component: BrandStoryComponent) => {
     setSelectedComponent(component);
@@ -55,6 +60,38 @@ export default function BrandStoryDashboard() {
     setComponentDialogOpen(open);
     if (!open) {
       setComponentToEdit(null);
+    }
+  };
+
+  const handleViewEvent = (event: BrandTimelineEvent) => {
+    setSelectedEvent(event);
+    setEventDetailDialogOpen(true);
+  };
+
+  const handleEditEvent = (event: BrandTimelineEvent) => {
+    setEventToEdit(event);
+    setTimelineDialogOpen(true);
+  };
+
+  const handleDeleteEvent = (event: BrandTimelineEvent) => {
+    if (confirm("Are you sure you want to delete this timeline event?")) {
+      deleteEvent.mutate(event.id, {
+        onSuccess: () => {
+          toast.success("Event deleted successfully");
+        },
+      });
+    }
+  };
+
+  const handleCreateNewEvent = () => {
+    setEventToEdit(null);
+    setTimelineDialogOpen(true);
+  };
+
+  const handleTimelineDialogClose = (open: boolean) => {
+    setTimelineDialogOpen(open);
+    if (!open) {
+      setEventToEdit(null);
     }
   };
 
@@ -128,7 +165,7 @@ export default function BrandStoryDashboard() {
             <Plus className="h-4 w-4 mr-2" />
             Create Component
           </Button>
-          <Button variant="outline" onClick={() => setTimelineDialogOpen(true)}>
+          <Button variant="outline" onClick={handleCreateNewEvent}>
             <Calendar className="h-4 w-4 mr-2" />
             Add Timeline Event
           </Button>
@@ -191,25 +228,19 @@ export default function BrandStoryDashboard() {
         </CardContent>
       </Card>
 
-      {/* Recent Timeline */}
+      {/* Timeline Events Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Timeline Events</CardTitle>
-          <CardDescription>Latest brand evolution moments</CardDescription>
+          <CardTitle>Timeline Events</CardTitle>
+          <CardDescription>Brand evolution and milestones</CardDescription>
         </CardHeader>
         <CardContent>
-          {recentTimeline.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No timeline events yet. Document your brand's journey!</p>
-            </div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {recentTimeline.slice(0, 4).map((event) => (
-                <TimelineEventCard key={event.id} event={event} />
-              ))}
-            </div>
-          )}
+          <TimelineEventTableView
+            events={events}
+            onViewEvent={handleViewEvent}
+            onEditEvent={handleEditEvent}
+            onDeleteEvent={handleDeleteEvent}
+          />
         </CardContent>
       </Card>
 
@@ -220,13 +251,20 @@ export default function BrandStoryDashboard() {
       />
       <CreateTimelineDialog 
         open={timelineDialogOpen} 
-        onOpenChange={setTimelineDialogOpen} 
+        onOpenChange={handleTimelineDialogClose}
+        eventToEdit={eventToEdit}
       />
       <ComponentDetailDialog
         component={selectedComponent}
         open={detailDialogOpen}
         onOpenChange={setDetailDialogOpen}
         onEdit={handleEditComponent}
+      />
+      <TimelineEventDetailDialog
+        event={selectedEvent}
+        open={eventDetailDialogOpen}
+        onOpenChange={setEventDetailDialogOpen}
+        onEdit={handleEditEvent}
       />
     </div>
   );
