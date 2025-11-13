@@ -361,12 +361,12 @@ export default function TagManagement() {
                     <CardContent className="p-0">
                       <Table>
                         <TableHeader>
-                          <TableRow>
-                            <TableHead>Tag Name</TableHead>
-                            <TableHead>Key</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead className="text-right">Usage</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                          <TableRow className="h-9">
+                            <TableHead className="py-2">Tag Name</TableHead>
+                            <TableHead className="py-2">Key</TableHead>
+                            <TableHead className="py-2">Type</TableHead>
+                            <TableHead className="text-right py-2">Usage</TableHead>
+                            <TableHead className="text-right py-2">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -374,33 +374,33 @@ export default function TagManagement() {
                               <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                                 Loading tags...
                               </TableCell>
-                            </TableRow> : sortedTags && sortedTags.length > 0 ? sortedTags.map(tag => <TableRow key={tag.id} className="cursor-pointer hover:bg-muted/50" onClick={() => {
+                            </TableRow> : sortedTags && sortedTags.length > 0 ? sortedTags.map(tag => <TableRow key={tag.id} className="cursor-pointer hover:bg-muted/50 h-10" onClick={() => {
                       setSelectedTag(tag);
                       setEditTagOpen(true);
                     }}>
-                                <TableCell className="font-medium">{tag.display_name}</TableCell>
-                                <TableCell className="font-mono text-sm">{tag.tag_key}</TableCell>
-                                <TableCell>
-                                  <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'}>
+                                <TableCell className="font-medium py-1.5">{tag.display_name}</TableCell>
+                                <TableCell className="font-mono text-sm py-1.5">{tag.tag_key}</TableCell>
+                                <TableCell className="py-1.5">
+                                  <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'} className="text-xs">
                                     {tag.tag_type}
                                   </Badge>
                                 </TableCell>
-                                <TableCell className="text-right">{tag.usage_count}</TableCell>
-                                <TableCell className="text-right">
-                                  <div className="flex justify-end gap-2">
-                                    <Button variant="ghost" size="sm" onClick={e => {
+                                <TableCell className="text-right py-1.5">{tag.usage_count}</TableCell>
+                                <TableCell className="text-right py-1.5">
+                                  <div className="flex justify-end gap-1">
+                                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={e => {
                             e.stopPropagation();
                             setSelectedTag(tag);
                             setEditTagOpen(true);
                           }}>
-                                      <Edit className="h-4 w-4" />
+                                      <Edit className="h-3.5 w-3.5" />
                                     </Button>
-                                    <Button variant="ghost" size="sm" onClick={e => {
+                                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={e => {
                             e.stopPropagation();
                             setSelectedTag(tag);
                             setDeleteTagOpen(true);
                           }} disabled={tag.usage_count > 0}>
-                                      <Trash2 className="h-4 w-4" />
+                                      <Trash2 className="h-3.5 w-3.5" />
                                     </Button>
                                   </div>
                                 </TableCell>
