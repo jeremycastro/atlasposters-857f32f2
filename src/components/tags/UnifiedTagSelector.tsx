@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCategories, useTags, useEntityTags, useTagEntity, useRemoveTag } from "@/hooks/useTags";
 import { TagPill } from "./TagPill";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,13 @@ export const UnifiedTagSelector = ({
   const { data: availableTags } = useTags(selectedCategory || "");
   const addTag = useTagEntity();
   const removeTag = useRemoveTag();
+
+  // Auto-select first category when categories load
+  useEffect(() => {
+    if (categories && categories.length > 0 && !selectedCategory) {
+      setSelectedCategory(categories[0].category_key);
+    }
+  }, [categories, selectedCategory]);
 
   const currentCategory = categories?.find(c => c.category_key === selectedCategory);
   
