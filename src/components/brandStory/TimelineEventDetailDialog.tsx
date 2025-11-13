@@ -111,14 +111,14 @@ export const TimelineEventDetailDialog = ({
           </div>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto min-h-0">
-          <Tabs defaultValue="content" className="h-full flex flex-col">
+        <div className="flex-1 min-h-0 flex flex-col">
+          <Tabs defaultValue="content" className="flex-1 flex flex-col min-h-0">
             <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
               <TabsTrigger value="content">Content</TabsTrigger>
               <TabsTrigger value="details">Details</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="content" className="space-y-4 mt-6 flex-1 overflow-y-auto min-h-0">
+            <TabsContent value="content" className="flex-1 overflow-y-auto min-h-0 mt-6 data-[state=active]:flex data-[state=active]:flex-col">
               {event.featured_image_url && (
                 <div className="rounded-lg overflow-hidden mb-4">
                   <img 
@@ -135,7 +135,8 @@ export const TimelineEventDetailDialog = ({
               </div>
             </TabsContent>
 
-            <TabsContent value="details" className="space-y-6 mt-6 flex-1 overflow-y-auto min-h-0">
+            <TabsContent value="details" className="flex-1 overflow-y-auto min-h-0 mt-6 data-[state=active]:flex data-[state=active]:flex-col">
+              <div className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-muted-foreground">Event Type</p>
@@ -209,8 +210,9 @@ export const TimelineEventDetailDialog = ({
                     <p className="text-sm font-medium text-muted-foreground">Related Tasks</p>
                     <p className="text-sm">{event.related_tasks.length} task(s) linked</p>
                   </div>
-                </>
-              )}
+                 </>
+               )}
+              </div>
             </TabsContent>
           </Tabs>
         </div>
