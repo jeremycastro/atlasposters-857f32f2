@@ -176,9 +176,9 @@ export const BrandTagManager = ({
   const selectedCategoryData = categories?.find(c => c.category_key === selectedCategory);
   return <div className="space-y-4">
       {/* Two-column layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        {/* Sidebar - Category Navigation */}
-        <aside className="lg:col-span-1 h-full flex flex-col border rounded-lg bg-card">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-full">
+      {/* Sidebar - Category Navigation */}
+      <aside className="lg:col-span-1 flex flex-col border rounded-lg bg-card">
           <div className="p-6 space-y-4">
             <div className="pb-4 border-b">
               <h3 className="text-base font-semibold">Browse Categories</h3>
@@ -224,7 +224,7 @@ export const BrandTagManager = ({
         </aside>
 
         {/* Main Content Area */}
-        <div className="lg:col-span-3 space-y-4">
+        <div className="lg:col-span-3 space-y-4 flex flex-col h-full">
           {/* Current Brand Tags */}
           {brandTags && brandTags.length > 0 && <Card>
               <CardHeader>
