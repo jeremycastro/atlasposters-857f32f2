@@ -74,7 +74,7 @@ export const TimelineEventDetailDialog = ({
       onOpenChange(open);
       if (!open) setIsEditing(false);
     }}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto relative">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto relative mx-4 w-[calc(100vw-2rem)] sm:w-full">
         {isEditing && (
           <Button
             variant="ghost"

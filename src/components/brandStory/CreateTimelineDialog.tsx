@@ -83,7 +83,7 @@ export const CreateTimelineDialog = ({ open, onOpenChange, eventToEdit }: Create
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4 w-[calc(100vw-2rem)] sm:w-full">
         <DialogHeader>
           <DialogTitle>{isEditMode ? "Edit Timeline Event" : "Create Timeline Event"}</DialogTitle>
           <DialogDescription>
