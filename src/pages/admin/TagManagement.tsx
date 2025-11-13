@@ -79,8 +79,8 @@ export default function TagManagement() {
         if (groupData.categories.includes(category.category_key)) {
           const categoryTags = category.tag_definitions || [];
           const matches = categoryTags.filter((tag: Tag) => 
-            tag.display_name.toLowerCase().includes(globalSearchTerm.toLowerCase()) ||
-            tag.tag_key.toLowerCase().includes(globalSearchTerm.toLowerCase())
+            (tag.display_name?.toLowerCase() || '').includes(globalSearchTerm.toLowerCase()) ||
+            (tag.tag_key?.toLowerCase() || '').includes(globalSearchTerm.toLowerCase())
           );
           
           if (matches.length > 0) {
@@ -107,8 +107,8 @@ export default function TagManagement() {
 
   // Local search within selected category
   const filteredTags = tags?.filter(tag =>
-    tag.display_name.toLowerCase().includes(localSearchTerm.toLowerCase()) ||
-    tag.tag_key.toLowerCase().includes(localSearchTerm.toLowerCase())
+    (tag.display_name?.toLowerCase() || '').includes(localSearchTerm.toLowerCase()) ||
+    (tag.tag_key?.toLowerCase() || '').includes(localSearchTerm.toLowerCase())
   );
 
   const sortedTags = filteredTags?.sort((a, b) => a.display_name.localeCompare(b.display_name));
