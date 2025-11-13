@@ -165,8 +165,8 @@ export const BrandTagManager = ({
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Sidebar - Category Navigation */}
         <aside className="lg:col-span-1 h-full flex flex-col border rounded-lg bg-card">
-          <div className="p-3 border-b">
-            <h3 className="font-semibold text-sm">Browse Categories</h3>
+          <div className="p-6 pb-4 border-b space-y-2">
+            <h3 className="font-semibold text-base">Browse Categories</h3>
           </div>
           <ScrollArea className="flex-1">
             <div className="p-2 space-y-1">
@@ -250,13 +250,12 @@ export const BrandTagManager = ({
 
           {/* Browse & Add Tags */}
           <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between mb-2">
                 <div>
                   <CardTitle className="text-base">
                     {selectedCategoryData?.display_name || 'Select a Category'}
                   </CardTitle>
-                  
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary">
