@@ -182,7 +182,7 @@ export default function TagManagement() {
         {/* Two Column Layout: Sidebar + Content */}
         <div className="grid grid-cols-[320px_1fr] gap-6">
           {/* Category Navigation Sidebar */}
-          <aside className="border rounded-lg bg-card flex flex-col h-[calc(100vh-16rem)] sticky top-8">
+          <aside className="border rounded-lg bg-card flex flex-col h-[calc(100vh-8rem)] sticky top-8">
             <div className="p-3 border-b">
               <h2 className="font-semibold text-lg mb-2">Categories</h2>
               <div className="relative">
