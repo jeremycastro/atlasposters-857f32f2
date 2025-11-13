@@ -98,6 +98,29 @@ export const useTags = (categoryKey: string) => {
   });
 };
 
+// Fetch all tags across all categories
+export const useAllTags = () => {
+  return useQuery({
+    queryKey: ['all-tags'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tag_definitions')
+        .select(`
+          *,
+          category:category_definitions!category_id(
+            category_key,
+            display_name
+          )
+        `)
+        .eq('is_active', true)
+        .order('display_name');
+
+      if (error) throw error;
+      return data as (Tag & { category: { category_key: string; display_name: string } })[];
+    },
+  });
+};
+
 // Fetch all tags for an entity
 export const useEntityTags = (entityType: string, entityId: string) => {
   return useQuery({
