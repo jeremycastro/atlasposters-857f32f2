@@ -85,7 +85,10 @@ export default function TagManagement() {
       categories.forEach((category: any) => {
         if (groupData.categories.includes(category.category_key)) {
           const categoryTags = category.tag_definitions || [];
-          const matches = categoryTags.filter((tag: Tag) => tag.display_name.toLowerCase().includes(globalSearchTerm.toLowerCase()) || tag.tag_key.toLowerCase().includes(globalSearchTerm.toLowerCase()));
+          const matches = categoryTags.filter((tag: Tag) => 
+            (tag.display_name?.toLowerCase() || '').includes(globalSearchTerm.toLowerCase()) || 
+            (tag.tag_key?.toLowerCase() || '').includes(globalSearchTerm.toLowerCase())
+          );
           if (matches.length > 0) {
             categoriesInGroup.push({
               category,
@@ -107,7 +110,10 @@ export default function TagManagement() {
   const totalGlobalResults = globalSearchResults?.reduce((sum, group) => sum + group.categories.reduce((catSum, cat) => catSum + cat.matchingTags.length, 0), 0) || 0;
 
   // Local search within selected category
-  const filteredTags = tags?.filter(tag => tag.display_name.toLowerCase().includes(localSearchTerm.toLowerCase()) || tag.tag_key.toLowerCase().includes(localSearchTerm.toLowerCase()));
+  const filteredTags = tags?.filter(tag => 
+    (tag.display_name?.toLowerCase() || '').includes(localSearchTerm.toLowerCase()) || 
+    (tag.tag_key?.toLowerCase() || '').includes(localSearchTerm.toLowerCase())
+  );
   const sortedTags = filteredTags?.sort((a, b) => a.display_name.localeCompare(b.display_name));
   const currentCategory = categories?.find(c => c.category_key === selectedCategory);
   const totalTags = categories?.reduce((sum, cat: any) => sum + (cat.tag_definitions?.length || 0), 0) || 0;
