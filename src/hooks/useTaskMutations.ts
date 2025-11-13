@@ -123,7 +123,30 @@ export const useTaskMutations = () => {
 
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async (updatedTask) => {
+      // Check if we need to auto-update milestone status
+      if (updatedTask.milestone_id) {
+        const { data: milestoneTasks } = await supabase
+          .from("project_tasks")
+          .select("status")
+          .eq("milestone_id", updatedTask.milestone_id);
+
+        if (milestoneTasks && milestoneTasks.length > 0) {
+          const allCompleted = milestoneTasks.every(t => t.status === "completed");
+          
+          if (allCompleted) {
+            // Update milestone status to completed
+            await supabase
+              .from("roadmap_milestones")
+              .update({ status: "completed", completed_date: new Date().toISOString() })
+              .eq("id", updatedTask.milestone_id);
+            
+            queryClient.invalidateQueries({ queryKey: ["roadmap-milestones"] });
+            queryClient.invalidateQueries({ queryKey: ["roadmap-with-progress"] });
+          }
+        }
+      }
+
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["task"] });
       toast({
