@@ -250,10 +250,10 @@ export const BrandTagManager = ({
 
           {/* Browse & Add Tags */}
           <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between mb-2">
+            <CardHeader className="pb-4 space-y-4">
+              <div className="flex items-center justify-between pb-4 border-b">
                 <div>
-                  <CardTitle className="text-base">
+                  <CardTitle className="text-base font-semibold">
                     {selectedCategoryData?.display_name || 'Select a Category'}
                   </CardTitle>
                 </div>
