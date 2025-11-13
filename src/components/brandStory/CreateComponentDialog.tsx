@@ -82,15 +82,15 @@ export const CreateComponentDialog = ({ open, onOpenChange, componentToEdit }: C
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-4 w-[calc(100vw-2rem)] sm:w-full">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col mx-4 w-[calc(100vw-2rem)] sm:w-full">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>{isEditMode ? "Edit Component" : "Create Brand Story Component"}</DialogTitle>
           <DialogDescription>
             {isEditMode ? "Update the component details" : "Add a new component to build your brand story and messaging."}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 flex-1 overflow-y-auto min-h-0">
           <div className="space-y-2">
             <Label htmlFor="brand">Brand</Label>
             <BrandSelector value={brandId} onChange={setBrandId} />
@@ -145,7 +145,7 @@ export const CreateComponentDialog = ({ open, onOpenChange, componentToEdit }: C
             />
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-shrink-0">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
