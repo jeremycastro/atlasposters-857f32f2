@@ -182,9 +182,9 @@ export default function TagManagement() {
         {/* Two Column Layout: Sidebar + Content */}
         <div className="grid grid-cols-[320px_1fr] gap-6">
           {/* Category Navigation Sidebar */}
-          <aside className="border rounded-lg bg-card flex flex-col h-[calc(100vh-24rem)] sticky top-8">
-            <div className="p-4 border-b">
-              <h2 className="font-semibold text-lg mb-3">Categories</h2>
+          <aside className="border rounded-lg bg-card flex flex-col h-[calc(100vh-16rem)] sticky top-8">
+            <div className="p-3 border-b">
+              <h2 className="font-semibold text-lg mb-2">Categories</h2>
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -197,7 +197,7 @@ export default function TagManagement() {
             </div>
             
             <ScrollArea className="flex-1">
-              <div className="p-2 space-y-1">
+              <div className="p-1 space-y-0.5">
                 {Object.entries(CATEGORY_GROUPS).map(([groupName, group]) => (
                   <Collapsible
                     key={groupName}
@@ -207,19 +207,18 @@ export default function TagManagement() {
                     <CollapsibleTrigger asChild>
                       <Button 
                         variant="ghost" 
-                        className="w-full justify-between text-sm font-bold text-primary hover:text-primary hover:bg-primary/10 py-6"
+                        className="w-full justify-between text-sm font-bold text-primary hover:text-primary hover:bg-primary/10 py-4"
                       >
                         <div className="flex items-center gap-2">
-                          <group.icon className="h-5 w-5" />
+                          <group.icon className="h-4 w-4" />
                           <span className="uppercase tracking-wide">{groupName}</span>
                         </div>
                         <ChevronDown className={`h-4 w-4 transition-transform ${openGroups[groupName] ? 'rotate-180' : ''}`} />
                       </Button>
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="space-y-1 mt-1">
+                    <CollapsibleContent className="space-y-0.5 mt-0.5">
                       {group.categories.map(categoryKey => {
                         const category = categories?.find(c => c.category_key === categoryKey);
-                        const tagCount = category?.tag_count || 0;
                         
                         if (!category) return null;
                         
@@ -227,7 +226,7 @@ export default function TagManagement() {
                           <Button
                             key={categoryKey}
                             variant={selectedCategory === categoryKey ? "secondary" : "ghost"}
-                            className="w-full flex items-center justify-between text-sm pl-8 pr-2 gap-2"
+                            className="w-full justify-start text-sm pl-8 py-2"
                             onClick={() => {
                               setSelectedCategory(categoryKey);
                               setGlobalSearchTerm("");
@@ -235,9 +234,6 @@ export default function TagManagement() {
                             }}
                           >
                             <span className="truncate">{category.display_name}</span>
-                            <Badge variant="secondary" className="shrink-0">
-                              {tagCount}
-                            </Badge>
                           </Button>
                         );
                       })}
@@ -247,8 +243,8 @@ export default function TagManagement() {
               </div>
             </ScrollArea>
             
-            <div className="p-4 border-t">
-              <Button variant="outline" onClick={() => setCreateCategoryOpen(true)} className="w-full">
+            <div className="p-2 border-t">
+              <Button variant="outline" onClick={() => setCreateCategoryOpen(true)} className="w-full" size="sm">
                 <Plus className="h-4 w-4 mr-2" />
                 New Category
               </Button>
@@ -377,9 +373,11 @@ export default function TagManagement() {
               currentCategory && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <div>
+                    <div className="flex items-center gap-3">
                       <h2 className="text-2xl font-bold">{currentCategory.display_name}</h2>
-                      <p className="text-muted-foreground">{currentCategory.description}</p>
+                      <Badge variant="secondary" className="text-sm">
+                        {currentCategory.tag_count || 0} tags
+                      </Badge>
                     </div>
                     <div className="flex gap-2">
                       <Button 
@@ -398,6 +396,8 @@ export default function TagManagement() {
                       </Button>
                     </div>
                   </div>
+                  
+                  <p className="text-muted-foreground">{currentCategory.description}</p>
                   
                   <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
