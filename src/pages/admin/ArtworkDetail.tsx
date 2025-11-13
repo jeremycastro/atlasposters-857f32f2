@@ -47,7 +47,7 @@ export default function ArtworkDetail() {
 
   if (isLoading) {
     return (
-      <div className="container py-6 space-y-6">
+      <div className="container mx-auto p-6 space-y-6">
         <Skeleton className="h-10 w-48" />
         <Skeleton className="h-32 w-full" />
       </div>
@@ -56,7 +56,7 @@ export default function ArtworkDetail() {
 
   if (!artwork) {
     return (
-      <div className="container py-6 space-y-6">
+      <div className="container mx-auto p-6 space-y-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold">Artwork not found</h2>
           <p className="text-muted-foreground mt-2">
@@ -76,12 +76,14 @@ export default function ArtworkDetail() {
   }
 
   return (
-    <div className="container py-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6">
       {/* Back Button & Breadcrumb */}
       <div className="space-y-4">
         <Button
           variant="ghost"
+          size="sm"
           onClick={() => navigate('/admin/artworks')}
+          className="mb-2"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Artworks
@@ -97,7 +99,7 @@ export default function ArtworkDetail() {
 
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">{artwork.title || "Untitled Artwork"}</h1>
+        <h1 className="text-3xl font-bold">{artwork.title || "Untitled Artwork"}</h1>
         {artwork.artist_name && (
           <p className="text-lg text-muted-foreground">by {artwork.artist_name}</p>
         )}
@@ -110,8 +112,8 @@ export default function ArtworkDetail() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="info" className="space-y-6">
-        <TabsList>
+      <Tabs defaultValue="info">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="info">Basic Info</TabsTrigger>
           <TabsTrigger value="files">Files</TabsTrigger>
           <TabsTrigger value="rights">Rights & Licensing</TabsTrigger>
@@ -119,25 +121,27 @@ export default function ArtworkDetail() {
           <TabsTrigger value="metadata">Metadata</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="info">
-          <ArtworkInfoTab artwork={artwork} />
-        </TabsContent>
+        <div className="mt-6">
+          <TabsContent value="info">
+            <ArtworkInfoTab artwork={artwork} />
+          </TabsContent>
 
-        <TabsContent value="files">
-          <ArtworkFilesTab artworkId={artwork.id} />
-        </TabsContent>
+          <TabsContent value="files">
+            <ArtworkFilesTab artworkId={artwork.id} />
+          </TabsContent>
 
-        <TabsContent value="rights">
-          <ArtworkRightsTab artwork={artwork} />
-        </TabsContent>
+          <TabsContent value="rights">
+            <ArtworkRightsTab artwork={artwork} />
+          </TabsContent>
 
-        <TabsContent value="tags">
-          <ArtworkTagsTab artworkId={artwork.id} />
-        </TabsContent>
+          <TabsContent value="tags">
+            <ArtworkTagsTab artworkId={artwork.id} />
+          </TabsContent>
 
-        <TabsContent value="metadata">
-          <ArtworkMetadataTab artwork={artwork} />
-        </TabsContent>
+          <TabsContent value="metadata">
+            <ArtworkMetadataTab artwork={artwork} />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
