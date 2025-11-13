@@ -297,27 +297,29 @@ export function ArtworkTableView({ artworks, onView, onEdit, onArchive, searchBa
         const thumbnailUrl = getThumbnailUrl(artwork);
         return (
           <TableCell onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => onView(artwork)}
-              className="w-12 h-12 rounded border border-border flex items-center justify-center overflow-hidden bg-muted hover:border-primary transition-colors"
-            >
-              {thumbnailUrl ? (
-                <img
-                  src={thumbnailUrl}
-                  alt={artwork.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <ImageIcon className="h-6 w-6 text-muted-foreground" />
-              )}
-            </button>
+            <div className="flex items-center gap-2 pl-6">
+              <button
+                onClick={() => onView(artwork)}
+                className="w-12 h-12 rounded border border-border flex items-center justify-center overflow-hidden bg-muted hover:border-primary transition-colors"
+              >
+                {thumbnailUrl ? (
+                  <img
+                    src={thumbnailUrl}
+                    alt={artwork.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                )}
+              </button>
+            </div>
           </TableCell>
         );
 
       case "asc_code":
         return (
           <TableCell className="font-mono">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 pl-6">
               <span>{artwork.asc_code}</span>
               <Button
                 variant="ghost"
@@ -335,42 +337,48 @@ export function ArtworkTableView({ artworks, onView, onEdit, onArchive, searchBa
         );
 
       case "title":
-        return <TableCell className="font-medium">{artwork.title}</TableCell>;
+        return <TableCell className="font-medium"><div className="pl-6">{artwork.title}</div></TableCell>;
 
       case "artist_name":
-        return <TableCell>{artwork.artist_name || "—"}</TableCell>;
+        return <TableCell><div className="pl-6">{artwork.artist_name || "—"}</div></TableCell>;
 
       case "brand":
-        return <TableCell>{artwork.brand?.brand_name || "—"}</TableCell>;
+        return <TableCell><div className="pl-6">{artwork.brand?.brand_name || "—"}</div></TableCell>;
 
       case "partner":
-        return <TableCell>{artwork.brand?.partner?.partner_name || "—"}</TableCell>;
+        return <TableCell><div className="pl-6">{artwork.brand?.partner?.partner_name || "—"}</div></TableCell>;
 
       case "status":
         return (
           <TableCell>
-            <Badge variant={getStatusVariant(artwork.status || "draft")}>
-              {artwork.status}
-            </Badge>
+            <div className="pl-6">
+              <Badge variant={getStatusVariant(artwork.status || "draft")}>
+                {artwork.status}
+              </Badge>
+            </div>
           </TableCell>
         );
 
       case "year_created":
-        return <TableCell>{artwork.year_created || "—"}</TableCell>;
+        return <TableCell><div className="pl-6">{artwork.year_created || "—"}</div></TableCell>;
 
       case "rights_period":
         return (
           <TableCell>
-            {artwork.rights_start_date && artwork.rights_end_date
-              ? `${format(new Date(artwork.rights_start_date), "MMM yyyy")} - ${format(new Date(artwork.rights_end_date), "MMM yyyy")}`
-              : "—"}
+            <div className="pl-6">
+              {artwork.rights_start_date && artwork.rights_end_date
+                ? `${format(new Date(artwork.rights_start_date), "MMM yyyy")} - ${format(new Date(artwork.rights_end_date), "MMM yyyy")}`
+                : "—"}
+            </div>
           </TableCell>
         );
 
       case "created_at":
         return (
           <TableCell>
-            {format(new Date(artwork.created_at!), "MMM d, yyyy")}
+            <div className="pl-6">
+              {format(new Date(artwork.created_at!), "MMM d, yyyy")}
+            </div>
           </TableCell>
         );
 
