@@ -39,6 +39,7 @@ import CustomerDashboard from "./pages/customer/Dashboard";
 import BrandStory from "./pages/admin/knowledge/BrandStory";
 import BrandStoryDashboard from "./pages/admin/BrandStoryDashboard";
 import BrandTimeline from "./pages/admin/BrandTimeline";
+import TagManagement from "./pages/admin/TagManagement";
 import Pitch01 from "./pages/Pitch01";
 
 const queryClient = new QueryClient();
@@ -94,6 +95,7 @@ const App = () => (
               <Route path="navigation" element={<NavigationManager />} />
               <Route path="partners" element={<PartnerManagement />} />
               <Route path="payouts" element={<Payouts />} />
+              <Route path="tag-management" element={<TagManagement />} />
             </Route>
             
             {/* Partner routes */}

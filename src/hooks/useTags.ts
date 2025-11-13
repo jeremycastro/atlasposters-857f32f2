@@ -322,3 +322,174 @@ export const useCreateTag = () => {
     },
   });
 };
+
+// Update tag
+export const useUpdateTag = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      tagId,
+      displayName,
+      description,
+    }: {
+      tagId: string;
+      displayName: string;
+      description?: string;
+    }) => {
+      const { data, error } = await supabase
+        .from('tag_definitions')
+        .update({
+          display_name: displayName,
+          description,
+        })
+        .eq('id', tagId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      toast.success('Tag updated successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update tag');
+    },
+  });
+};
+
+// Delete tag
+export const useDeleteTag = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (tagId: string) => {
+      // First delete all entity_tags references
+      const { error: entityTagsError } = await supabase
+        .from('entity_tags')
+        .delete()
+        .eq('tag_id', tagId);
+
+      if (entityTagsError) throw entityTagsError;
+
+      // Then delete the tag itself
+      const { error } = await supabase
+        .from('tag_definitions')
+        .delete()
+        .eq('id', tagId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      queryClient.invalidateQueries({ queryKey: ['entity-tags'] });
+      toast.success('Tag deleted successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to delete tag');
+    },
+  });
+};
+
+// Create category
+export const useCreateCategory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      categoryKey,
+      displayName,
+      description,
+      scope,
+      icon,
+      color,
+      allowsCustomTags,
+      isHierarchical,
+    }: {
+      categoryKey: string;
+      displayName: string;
+      description?: string;
+      scope: string[];
+      icon?: string;
+      color?: string;
+      allowsCustomTags?: boolean;
+      isHierarchical?: boolean;
+    }) => {
+      const { data, error } = await supabase
+        .from('category_definitions')
+        .insert({
+          category_key: categoryKey,
+          display_name: displayName,
+          description,
+          scope,
+          icon,
+          color,
+          allows_custom_tags: allowsCustomTags,
+          is_hierarchical: isHierarchical,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast.success('Category created successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to create category');
+    },
+  });
+};
+
+// Update category
+export const useUpdateCategory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      categoryId,
+      displayName,
+      description,
+      icon,
+      color,
+      allowsCustomTags,
+      isHierarchical,
+    }: {
+      categoryId: string;
+      displayName: string;
+      description?: string;
+      icon?: string;
+      color?: string;
+      allowsCustomTags?: boolean;
+      isHierarchical?: boolean;
+    }) => {
+      const { data, error } = await supabase
+        .from('category_definitions')
+        .update({
+          display_name: displayName,
+          description,
+          icon,
+          color,
+          allows_custom_tags: allowsCustomTags,
+          is_hierarchical: isHierarchical,
+        })
+        .eq('id', categoryId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast.success('Category updated successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update category');
+    },
+  });
+};

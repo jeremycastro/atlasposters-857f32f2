@@ -1,5 +1,4 @@
 import { useState } from "react";
-import AdminLayout from "@/layouts/AdminLayout";
 import { useCategories, useTags } from "@/hooks/useTags";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,12 +6,25 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, Edit, Trash2, TrendingUp } from "lucide-react";
+import { Search, Plus, Edit, Trash2, TrendingUp, Settings } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { CreateTagDialog } from "@/components/tags/CreateTagDialog";
+import { EditTagDialog } from "@/components/tags/EditTagDialog";
+import { DeleteTagDialog } from "@/components/tags/DeleteTagDialog";
+import { CreateCategoryDialog } from "@/components/tags/CreateCategoryDialog";
+import { EditCategoryDialog } from "@/components/tags/EditCategoryDialog";
+import type { Tag, Category } from "@/hooks/useTags";
 
 export default function TagManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [createTagOpen, setCreateTagOpen] = useState(false);
+  const [editTagOpen, setEditTagOpen] = useState(false);
+  const [deleteTagOpen, setDeleteTagOpen] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
+  const [createCategoryOpen, setCreateCategoryOpen] = useState(false);
+  const [editCategoryOpen, setEditCategoryOpen] = useState(false);
+  const [selectedCategoryData, setSelectedCategoryData] = useState<Category | null>(null);
 
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const { data: tags, isLoading: tagsLoading } = useTags(selectedCategory || "");
@@ -24,13 +36,21 @@ export default function TagManagement() {
 
   const sortedTags = filteredTags?.sort((a, b) => b.usage_count - a.usage_count);
 
+  const currentCategory = categories?.find(c => c.category_key === selectedCategory);
+
   return (
     <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Tag Management</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage categories, tags, and taxonomy structure
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Tag Management</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage categories, tags, and taxonomy structure
+            </p>
+          </div>
+          <Button onClick={() => setCreateCategoryOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Category
+          </Button>
         </div>
 
         <div className="grid gap-4 md:grid-cols-4">
@@ -96,10 +116,26 @@ export default function TagManagement() {
                         <CardTitle>{category.display_name}</CardTitle>
                         <CardDescription>{category.description}</CardDescription>
                       </div>
-                      <Button size="sm">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Tag
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedCategoryData(category);
+                            setEditCategoryOpen(true);
+                          }}
+                        >
+                          <Settings className="h-4 w-4 mr-2" />
+                          Settings
+                        </Button>
+                        <Button 
+                          size="sm"
+                          onClick={() => setCreateTagOpen(true)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Tag
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -150,10 +186,24 @@ export default function TagManagement() {
                                 </TableCell>
                                 <TableCell className="text-right">
                                   <div className="flex justify-end gap-1">
-                                    <Button size="sm" variant="ghost">
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost"
+                                      onClick={() => {
+                                        setSelectedTag(tag);
+                                        setEditTagOpen(true);
+                                      }}
+                                    >
                                       <Edit className="h-4 w-4" />
                                     </Button>
-                                    <Button size="sm" variant="ghost">
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost"
+                                      onClick={() => {
+                                        setSelectedTag(tag);
+                                        setDeleteTagOpen(true);
+                                      }}
+                                    >
                                       <Trash2 className="h-4 w-4" />
                                     </Button>
                                   </div>
@@ -176,6 +226,33 @@ export default function TagManagement() {
             ))
           )}
         </Tabs>
+
+        {/* Dialogs */}
+        <CreateTagDialog
+          open={createTagOpen}
+          onOpenChange={setCreateTagOpen}
+          categoryKey={selectedCategory || ""}
+          categoryName={currentCategory?.display_name || ""}
+        />
+        <EditTagDialog
+          open={editTagOpen}
+          onOpenChange={setEditTagOpen}
+          tag={selectedTag}
+        />
+        <DeleteTagDialog
+          open={deleteTagOpen}
+          onOpenChange={setDeleteTagOpen}
+          tag={selectedTag}
+        />
+        <CreateCategoryDialog
+          open={createCategoryOpen}
+          onOpenChange={setCreateCategoryOpen}
+        />
+        <EditCategoryDialog
+          open={editCategoryOpen}
+          onOpenChange={setEditCategoryOpen}
+          category={selectedCategoryData}
+        />
       </div>
   );
 }
