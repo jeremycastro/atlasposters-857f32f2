@@ -111,14 +111,14 @@ export const TimelineEventDetailDialog = ({
           </div>
         </DialogHeader>
 
-        <div className="flex-1 min-h-0 flex flex-col">
-          <Tabs defaultValue="content" className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 min-h-0 flex flex-col" style={{ minHeight: "400px" }}>
+          <Tabs defaultValue="content" className="flex-1 flex flex-col">
             <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
               <TabsTrigger value="content">Content</TabsTrigger>
               <TabsTrigger value="details">Details</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="content" className="flex-1 overflow-y-auto min-h-0 mt-6 data-[state=active]:flex data-[state=active]:flex-col">
+            <TabsContent value="content" className="flex-1 overflow-y-auto mt-6 data-[state=active]:flex data-[state=active]:flex-col" style={{ minHeight: "350px" }}>
               {event.featured_image_url && (
                 <div className="rounded-lg overflow-hidden mb-4">
                   <img 
@@ -135,7 +135,7 @@ export const TimelineEventDetailDialog = ({
               </div>
             </TabsContent>
 
-            <TabsContent value="details" className="flex-1 overflow-y-auto min-h-0 mt-6 data-[state=active]:flex data-[state=active]:flex-col">
+            <TabsContent value="details" className="flex-1 overflow-y-auto mt-6 data-[state=active]:flex data-[state=active]:flex-col" style={{ minHeight: "350px" }}>
               <div className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
