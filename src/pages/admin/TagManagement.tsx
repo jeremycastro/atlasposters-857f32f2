@@ -146,7 +146,7 @@ export default function TagManagement() {
                 <CollapsibleContent className="space-y-1 mt-1">
                   {group.categories.map(categoryKey => {
                     const category = categories?.find(c => c.category_key === categoryKey);
-                    const tagCount = (category as any)?.tag_definitions?.length || 0;
+                    const tagCount = category?.tag_count || 0;
                     
                     if (!category) return null;
                     

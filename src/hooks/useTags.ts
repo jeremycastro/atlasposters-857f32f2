@@ -13,6 +13,7 @@ export interface Category {
   sort_order: number;
   is_hierarchical: boolean;
   allows_custom_tags: boolean;
+  tag_count?: number;
 }
 
 export interface Tag {
@@ -47,7 +48,10 @@ export const useCategories = (scope?: string) => {
     queryFn: async () => {
       let query = supabase
         .from('category_definitions')
-        .select('*')
+        .select(`
+          *,
+          tag_definitions!category_id(count)
+        `)
         .eq('is_active', true)
         .order('sort_order');
 
@@ -57,7 +61,12 @@ export const useCategories = (scope?: string) => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as Category[];
+      
+      // Transform the data to include tag_count as a number
+      return (data || []).map(category => ({
+        ...category,
+        tag_count: (category as any).tag_definitions?.[0]?.count || 0
+      })) as Category[];
     },
   });
 };
