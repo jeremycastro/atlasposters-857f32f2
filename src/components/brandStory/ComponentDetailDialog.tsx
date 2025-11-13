@@ -76,12 +76,12 @@ export const ComponentDetailDialog = ({
       onOpenChange(open);
       if (!open) setIsEditing(false);
     }}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto relative mx-4 w-[calc(100vw-2rem)] sm:w-full">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col mx-4 w-[calc(100vw-2rem)] sm:w-full">
         {isEditing && (
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-4 right-14 text-destructive hover:text-destructive hover:bg-destructive/10"
+            className="absolute top-4 right-14 z-10 text-destructive hover:text-destructive hover:bg-destructive/10"
             onClick={handleDelete}
             disabled={deleteComponent.isPending}
           >
@@ -89,7 +89,7 @@ export const ComponentDetailDialog = ({
           </Button>
         )}
 
-        <DialogHeader>
+        <DialogHeader className="flex-shrink-0">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="outline">
@@ -109,114 +109,116 @@ export const ComponentDetailDialog = ({
           </div>
         </DialogHeader>
 
-        <Tabs defaultValue="content" className="mt-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="content">Content</TabsTrigger>
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
-          </TabsList>
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <Tabs defaultValue="content" className="mt-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="content">Content</TabsTrigger>
+              <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="history">History</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="content" className="space-y-4 mt-6">
-            <div className="prose prose-sm max-w-none">
-              <div className="bg-muted/50 p-6 rounded-lg whitespace-pre-wrap">
-                {component.content}
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="details" className="space-y-6 mt-6">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Component Type</p>
-                <p className="text-sm">{COMPONENT_TYPE_LABELS[component.component_type]}</p>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Status</p>
-                <div>
-                  <StatusBadge status={component.status} />
+            <TabsContent value="content" className="space-y-4 mt-6">
+              <div className="prose prose-sm max-w-none">
+                <div className="bg-muted/50 p-6 rounded-lg whitespace-pre-wrap">
+                  {component.content}
                 </div>
               </div>
+            </TabsContent>
 
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Version</p>
-                <p className="text-sm">v{component.version_number}</p>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Scope</p>
-                <Badge variant="secondary">
-                  {component.brand_id ? "Brand Specific" : "Global"}
-                </Badge>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Created</p>
-                <p className="text-sm">{format(new Date(component.created_at), "PPP")}</p>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Last Updated</p>
-                <p className="text-sm">{format(new Date(component.updated_at), "PPP")}</p>
-              </div>
-            </div>
-
-            {component.tags.length > 0 && (
-              <>
-                <Separator />
+            <TabsContent value="details" className="space-y-6 mt-6">
+              <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">Tags</p>
-                  <div className="flex flex-wrap gap-2">
-                    {component.tags.map((tag, idx) => (
-                      <Badge key={idx} variant="secondary">
-                        {tag}
-                      </Badge>
-                    ))}
+                  <p className="text-sm font-medium text-muted-foreground">Component Type</p>
+                  <p className="text-sm">{COMPONENT_TYPE_LABELS[component.component_type]}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Status</p>
+                  <div>
+                    <StatusBadge status={component.status} />
                   </div>
                 </div>
-              </>
-            )}
 
-            {component.metadata && Object.keys(component.metadata).length > 0 && (
-              <>
-                <Separator />
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">Metadata</p>
-                  <div className="bg-muted/50 p-4 rounded-lg">
-                    <pre className="text-xs overflow-auto">
-                      {JSON.stringify(component.metadata, null, 2)}
-                    </pre>
-                  </div>
+                  <p className="text-sm font-medium text-muted-foreground">Version</p>
+                  <p className="text-sm">v{component.version_number}</p>
                 </div>
-              </>
-            )}
-          </TabsContent>
 
-          <TabsContent value="history" className="space-y-4 mt-6">
-            <div className="space-y-3">
-              {component.parent_version_id ? (
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <p className="text-sm text-muted-foreground">
-                    This is version {component.version_number} of the component.
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Parent version ID: {component.parent_version_id}
-                  </p>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Scope</p>
+                  <Badge variant="secondary">
+                    {component.brand_id ? "Brand Specific" : "Global"}
+                  </Badge>
                 </div>
-              ) : (
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <p className="text-sm text-muted-foreground">
-                    This is the original version of the component.
-                  </p>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Created</p>
+                  <p className="text-sm">{format(new Date(component.created_at), "PPP")}</p>
                 </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Last Updated</p>
+                  <p className="text-sm">{format(new Date(component.updated_at), "PPP")}</p>
+                </div>
+              </div>
+
+              {component.tags.length > 0 && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">Tags</p>
+                    <div className="flex flex-wrap gap-2">
+                      {component.tags.map((tag, idx) => (
+                        <Badge key={idx} variant="secondary">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </>
               )}
-            </div>
-          </TabsContent>
-        </Tabs>
 
-        <Separator className="my-6" />
+              {component.metadata && Object.keys(component.metadata).length > 0 && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">Metadata</p>
+                    <div className="bg-muted/50 p-4 rounded-lg">
+                      <pre className="text-xs overflow-auto">
+                        {JSON.stringify(component.metadata, null, 2)}
+                      </pre>
+                    </div>
+                  </div>
+                </>
+              )}
+            </TabsContent>
 
-        <div className="flex items-center justify-end gap-2">
+            <TabsContent value="history" className="space-y-4 mt-6">
+              <div className="space-y-3">
+                {component.parent_version_id ? (
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      This is version {component.version_number} of the component.
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Parent version ID: {component.parent_version_id}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      This is the original version of the component.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        <Separator className="flex-shrink-0" />
+
+        <div className="flex items-center justify-end gap-2 flex-shrink-0 pt-4">
           {component.status === "draft" && (
             <Button
               variant="default"

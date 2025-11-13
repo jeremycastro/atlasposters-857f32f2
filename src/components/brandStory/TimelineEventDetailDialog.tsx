@@ -74,12 +74,12 @@ export const TimelineEventDetailDialog = ({
       onOpenChange(open);
       if (!open) setIsEditing(false);
     }}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto relative mx-4 w-[calc(100vw-2rem)] sm:w-full">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col mx-4 w-[calc(100vw-2rem)] sm:w-full">
         {isEditing && (
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-4 right-14 text-destructive hover:text-destructive hover:bg-destructive/10"
+            className="absolute top-4 right-14 z-10 text-destructive hover:text-destructive hover:bg-destructive/10"
             onClick={handleDelete}
             disabled={deleteEvent.isPending}
           >
@@ -87,7 +87,7 @@ export const TimelineEventDetailDialog = ({
           </Button>
         )}
 
-        <DialogHeader>
+        <DialogHeader className="flex-shrink-0">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="outline">
@@ -107,107 +107,109 @@ export const TimelineEventDetailDialog = ({
           </div>
         </DialogHeader>
 
-        <Tabs defaultValue="content" className="mt-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="content">Content</TabsTrigger>
-            <TabsTrigger value="details">Details</TabsTrigger>
-          </TabsList>
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <Tabs defaultValue="content" className="mt-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="content">Content</TabsTrigger>
+              <TabsTrigger value="details">Details</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="content" className="space-y-4 mt-6">
-            {event.featured_image_url && (
-              <div className="rounded-lg overflow-hidden mb-4">
-                <img 
-                  src={event.featured_image_url} 
-                  alt={event.title}
-                  className="w-full max-h-96 object-cover"
-                />
+            <TabsContent value="content" className="space-y-4 mt-6">
+              {event.featured_image_url && (
+                <div className="rounded-lg overflow-hidden mb-4">
+                  <img 
+                    src={event.featured_image_url} 
+                    alt={event.title}
+                    className="w-full max-h-96 object-cover"
+                  />
+                </div>
+              )}
+              <div className="prose prose-sm max-w-none">
+                <div className="bg-muted/50 p-6 rounded-lg whitespace-pre-wrap">
+                  {event.content}
+                </div>
               </div>
-            )}
-            <div className="prose prose-sm max-w-none">
-              <div className="bg-muted/50 p-6 rounded-lg whitespace-pre-wrap">
-                {event.content}
-              </div>
-            </div>
-          </TabsContent>
+            </TabsContent>
 
-          <TabsContent value="details" className="space-y-6 mt-6">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Event Type</p>
-                <p className="text-sm">{EVENT_TYPE_LABELS[event.event_type]}</p>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Event Date</p>
-                <p className="text-sm">{format(new Date(event.event_date), "PPP")}</p>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Status</p>
-                <Badge variant={event.is_published ? "default" : "secondary"}>
-                  {event.is_published ? "Published" : "Draft"}
-                </Badge>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Scope</p>
-                <Badge variant="secondary">
-                  {event.brand_id ? "Brand Specific" : "Global"}
-                </Badge>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Created</p>
-                <p className="text-sm">{format(new Date(event.created_at), "PPP")}</p>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Last Updated</p>
-                <p className="text-sm">{format(new Date(event.updated_at), "PPP")}</p>
-              </div>
-            </div>
-
-            {event.tags.length > 0 && (
-              <>
-                <Separator />
+            <TabsContent value="details" className="space-y-6 mt-6">
+              <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">Tags</p>
-                  <div className="flex flex-wrap gap-2">
-                    {event.tags.map((tag, idx) => (
-                      <Badge key={idx} variant="secondary">
-                        {tag}
-                      </Badge>
-                    ))}
+                  <p className="text-sm font-medium text-muted-foreground">Event Type</p>
+                  <p className="text-sm">{EVENT_TYPE_LABELS[event.event_type]}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Event Date</p>
+                  <p className="text-sm">{format(new Date(event.event_date), "PPP")}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Status</p>
+                  <Badge variant={event.is_published ? "default" : "secondary"}>
+                    {event.is_published ? "Published" : "Draft"}
+                  </Badge>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Scope</p>
+                  <Badge variant="secondary">
+                    {event.brand_id ? "Brand Specific" : "Global"}
+                  </Badge>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Created</p>
+                  <p className="text-sm">{format(new Date(event.created_at), "PPP")}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Last Updated</p>
+                  <p className="text-sm">{format(new Date(event.updated_at), "PPP")}</p>
+                </div>
+              </div>
+
+              {event.tags.length > 0 && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">Tags</p>
+                    <div className="flex flex-wrap gap-2">
+                      {event.tags.map((tag, idx) => (
+                        <Badge key={idx} variant="secondary">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </>
-            )}
+                </>
+              )}
 
-            {event.related_components.length > 0 && (
-              <>
-                <Separator />
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">Related Components</p>
-                  <p className="text-sm">{event.related_components.length} component(s) linked</p>
-                </div>
-              </>
-            )}
+              {event.related_components.length > 0 && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">Related Components</p>
+                    <p className="text-sm">{event.related_components.length} component(s) linked</p>
+                  </div>
+                </>
+              )}
 
-            {event.related_tasks.length > 0 && (
-              <>
-                <Separator />
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">Related Tasks</p>
-                  <p className="text-sm">{event.related_tasks.length} task(s) linked</p>
-                </div>
-              </>
-            )}
-          </TabsContent>
-        </Tabs>
+              {event.related_tasks.length > 0 && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">Related Tasks</p>
+                    <p className="text-sm">{event.related_tasks.length} task(s) linked</p>
+                  </div>
+                </>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
 
-        <Separator className="my-6" />
+        <Separator className="flex-shrink-0" />
 
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-2 flex-shrink-0 pt-4">
           {!event.is_published ? (
             <Button
               variant="default"
