@@ -241,31 +241,6 @@ export const BrandTagManager = ({
               </CardContent>
             </Card>}
 
-          {/* Inheritance Preview */}
-          {artworkCount && artworkCount > 0 && brandTags && brandTags.length > 0 && <Card className="border-dashed">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <ArrowDown className="h-4 w-4 text-muted-foreground" />
-                  <CardTitle className="text-base">Tag Inheritance</CardTitle>
-                </div>
-                <CardDescription>
-                  {artworkCount} artwork{artworkCount !== 1 ? 's' : ''} will inherit these tags
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {sampleArtworks?.map(artwork => <div key={artwork.id} className="flex items-center gap-2 text-sm">
-                      <Badge variant="outline" className="font-mono text-xs">
-                        {artwork.asc_code}
-                      </Badge>
-                      <span className="text-muted-foreground">{artwork.title}</span>
-                    </div>)}
-                  {artworkCount > 5 && <p className="text-xs text-muted-foreground pt-2">
-                      + {artworkCount - 5} more artwork{artworkCount - 5 !== 1 ? 's' : ''}
-                    </p>}
-                </div>
-              </CardContent>
-            </Card>}
 
           {/* Browse & Add Tags */}
           <Card className="flex-1 flex flex-col overflow-hidden">
@@ -369,6 +344,32 @@ export const BrandTagManager = ({
           Inherited tags appear with a dashed border and cannot be removed from individual artworks.
         </AlertDescription>
       </Alert>
+
+      {/* Inheritance Preview */}
+      {artworkCount && artworkCount > 0 && brandTags && brandTags.length > 0 && <Card className="border-dashed">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <ArrowDown className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Tag Inheritance</CardTitle>
+            </div>
+            <CardDescription>
+              {artworkCount} artwork{artworkCount !== 1 ? 's' : ''} will inherit these tags
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {sampleArtworks?.map(artwork => <div key={artwork.id} className="flex items-center gap-2 text-sm">
+                  <Badge variant="outline" className="font-mono text-xs">
+                    {artwork.asc_code}
+                  </Badge>
+                  <span className="text-muted-foreground">{artwork.title}</span>
+                </div>)}
+              {artworkCount > 5 && <p className="text-xs text-muted-foreground pt-2">
+                  + {artworkCount - 5} more artwork{artworkCount - 5 !== 1 ? 's' : ''}
+                </p>}
+            </div>
+          </CardContent>
+        </Card>}
 
       {/* Create Tag Dialog */}
       <CreateTagDialog open={createTagOpen} onOpenChange={setCreateTagOpen} categoryKey={selectedCategory || ""} categoryName={selectedCategoryData?.display_name || ""} />
