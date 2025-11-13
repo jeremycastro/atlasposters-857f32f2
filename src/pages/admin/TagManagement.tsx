@@ -15,6 +15,7 @@ import { EditCategoryDialog } from "@/components/tags/EditCategoryDialog";
 import type { Tag, Category } from "@/hooks/useTags";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
+
 const CATEGORY_GROUPS = {
   'Core Artwork': {
     icon: Palette,
@@ -37,6 +38,7 @@ const CATEGORY_GROUPS = {
     categories: ['print_quality', 'material', 'finish', 'frame_style']
   }
 };
+
 export default function TagManagement() {
   const [globalSearchTerm, setGlobalSearchTerm] = useState("");
   const [localSearchTerm, setLocalSearchTerm] = useState("");
@@ -48,313 +50,234 @@ export default function TagManagement() {
   const [createCategoryOpen, setCreateCategoryOpen] = useState(false);
   const [editCategoryOpen, setEditCategoryOpen] = useState(false);
   const [selectedCategoryData, setSelectedCategoryData] = useState<Category | null>(null);
-  const {
-    data: categories,
-    isLoading: categoriesLoading
-  } = useCategories();
+  
+  const { data: categories } = useCategories();
+  const { data: allTags } = useAllTags();
+  const { data: tags } = useTags(selectedCategory || "");
 
-  const {
-    data: allTags,
-    isLoading: allTagsLoading
-  } = useAllTags();
-
-  // Auto-select first category when categories load
+  // Auto-select first category
   if (categories && categories.length > 0 && !selectedCategory) {
     setSelectedCategory(categories[0].category_key);
   }
-  const {
-    data: tags,
-    isLoading: tagsLoading
-  } = useTags(selectedCategory || "");
 
-  // Global search across all categories, grouped by category groups
+  // Global search - flat results
   const globalSearchResults = useMemo(() => {
-    if (!globalSearchTerm || !categories || !allTags) return null;
-    
+    if (!globalSearchTerm || !allTags) return null;
     const searchLower = globalSearchTerm.toLowerCase();
-    const groupedResults: {
-      groupName: string;
-      groupIcon: any;
-      categories: {
-        category: Category;
-        matchingTags: any[];
-      }[];
-    }[] = [];
+    return allTags.filter((tag: any) => 
+      (tag.display_name?.toLowerCase() || '').includes(searchLower) || 
+      (tag.tag_key?.toLowerCase() || '').includes(searchLower)
+    );
+  }, [globalSearchTerm, allTags]);
+  
+  const totalGlobalResults = globalSearchResults?.length || 0;
 
-    // Iterate through each category group
-    Object.entries(CATEGORY_GROUPS).forEach(([groupName, groupData]) => {
-      const categoriesInGroup: {
-        category: Category;
-        matchingTags: any[];
-      }[] = [];
+  // Local search
+  const filteredTags = useMemo(() => {
+    if (!tags) return [];
+    if (!localSearchTerm) return tags;
+    const searchLower = localSearchTerm.toLowerCase();
+    return tags.filter(tag => 
+      (tag.display_name?.toLowerCase() || '').includes(searchLower) || 
+      (tag.tag_key?.toLowerCase() || '').includes(searchLower)
+    );
+  }, [tags, localSearchTerm]);
 
-      // Find categories that belong to this group
-      categories.forEach((category: any) => {
-        if (groupData.categories.includes(category.category_key)) {
-          // Find matching tags for this category from allTags
-          const matches = allTags.filter((tag: any) => 
-            tag.category?.category_key === category.category_key &&
-            (
-              (tag.display_name?.toLowerCase() || '').includes(searchLower) || 
-              (tag.tag_key?.toLowerCase() || '').includes(searchLower)
-            )
-          );
-          
-          if (matches.length > 0) {
-            categoriesInGroup.push({
-              category,
-              matchingTags: matches
-            });
-          }
-        }
-      });
-      if (categoriesInGroup.length > 0) {
-        groupedResults.push({
-          groupName,
-          groupIcon: groupData.icon,
-          categories: categoriesInGroup
-        });
-      }
-    });
-    return groupedResults;
-  }, [globalSearchTerm, categories, allTags]);
-  const totalGlobalResults = globalSearchResults?.reduce((sum, group) => sum + group.categories.reduce((catSum, cat) => catSum + cat.matchingTags.length, 0), 0) || 0;
+  const sortedTags = useMemo(() => {
+    return [...filteredTags].sort((a, b) => 
+      (a.display_name || '').localeCompare(b.display_name || '')
+    );
+  }, [filteredTags]);
 
-  // Local search within selected category
-  const filteredTags = tags?.filter(tag => 
-    (tag.display_name?.toLowerCase() || '').includes(localSearchTerm.toLowerCase()) || 
-    (tag.tag_key?.toLowerCase() || '').includes(localSearchTerm.toLowerCase())
-  );
-  const sortedTags = filteredTags?.sort((a, b) => a.display_name.localeCompare(b.display_name));
-  const currentCategory = categories?.find(c => c.category_key === selectedCategory);
-  const totalTags = categories?.reduce((sum, cat: any) => sum + (cat.tag_definitions?.length || 0), 0) || 0;
-  const mostUsedTag = tags?.reduce((max, tag) => tag.usage_count > (max?.usage_count || 0) ? tag : max, tags[0]);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
-    // Initialize all groups as open
-    return Object.keys(CATEGORY_GROUPS).reduce((acc, key) => ({
-      ...acc,
-      [key]: true
-    }), {});
+    return Object.keys(CATEGORY_GROUPS).reduce((acc, key) => {
+      acc[key] = true;
+      return acc;
+    }, {} as Record<string, boolean>);
   });
-  const toggleGroup = (group: string) => {
-    setOpenGroups(prev => ({
-      ...prev,
-      [group]: !prev[group]
-    }));
+
+  const toggleGroup = (groupName: string) => {
+    setOpenGroups(prev => ({ ...prev, [groupName]: !prev[groupName] }));
   };
-  return <>
-      <div className="p-8 space-y-6">
-        {/* Top Header - Full Width */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Tag Management</h1>
-            <p className="text-muted-foreground mt-1">
-              Manage categories, tags, and taxonomy structure
-            </p>
+
+  const totalCategories = categories?.length || 0;
+  const totalTags = tags?.length || 0;
+  const activeTags = tags?.filter(t => t.is_active).length || 0;
+  const mostUsedTag = tags?.reduce((prev, current) => 
+    (current.usage_count > (prev?.usage_count || 0)) ? current : prev, tags[0]);
+
+  const selectedCategoryData2 = categories?.find(c => c.category_key === selectedCategory);
+
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Tag Management</h1>
+          <p className="text-muted-foreground mt-1">Manage your taxonomy categories and tags</p>
+        </div>
+        <Button onClick={() => setCreateCategoryOpen(true)}>
+          <Settings className="h-4 w-4 mr-2" />
+          Manage Categories
+        </Button>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Total Categories</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalCategories}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Total Tags</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalTags}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Active Tags</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{activeTags}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              Most Used Tag
+              <TrendingUp className="h-4 w-4" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-sm font-medium">{mostUsedTag?.display_name || "N/A"}</div>
+            <div className="text-xs text-muted-foreground">{mostUsedTag?.usage_count || 0} uses</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <aside className="lg:col-span-1 h-[calc(100vh-20rem)] flex flex-col border rounded-lg bg-card">
+          <div className="p-3 border-b">
+            <h2 className="font-semibold text-lg mb-2">Categories</h2>
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search all tags..." value={globalSearchTerm} onChange={(e) => setGlobalSearchTerm(e.target.value)} className="pl-8" />
+            </div>
           </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Total Categories</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{categories?.length || 0}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Total Tags</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalTags}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Active Tags</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{tags?.filter(t => t.usage_count > 0).length || 0}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                Most Used Tag
-                <TrendingUp className="h-4 w-4" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-sm font-medium">{mostUsedTag?.display_name || "N/A"}</div>
-              <div className="text-xs text-muted-foreground">{mostUsedTag?.usage_count || 0} uses</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Two Column Layout: Sidebar + Content */}
-        <div className="grid grid-cols-[320px_1fr] gap-6">
-          {/* Category Navigation Sidebar */}
-          <aside className="border rounded-lg bg-card flex flex-col h-[calc(100vh-8rem)] sticky top-8">
-            <div className="p-3 border-b">
-              <h2 className="font-semibold text-lg mb-2">Categories</h2>
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search all tags..." value={globalSearchTerm} onChange={e => setGlobalSearchTerm(e.target.value)} className="pl-8" />
-              </div>
+          
+          <ScrollArea className="flex-1">
+            <div className="p-1 space-y-0.5">
+              {Object.entries(CATEGORY_GROUPS).map(([groupName, group]) => (
+                <Collapsible key={groupName} open={openGroups[groupName]} onOpenChange={() => toggleGroup(groupName)}>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" className="w-full justify-between text-sm font-bold text-primary hover:text-primary hover:bg-primary/10 py-2">
+                      <div className="flex items-center gap-2">
+                        <group.icon className="h-4 w-4" />
+                        <span className="uppercase tracking-wide">{groupName}</span>
+                      </div>
+                      <ChevronDown className={`h-4 w-4 transition-transform ${openGroups[groupName] ? 'rotate-180' : ''}`} />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-0 mt-0">
+                    {group.categories.map((categoryKey) => {
+                      const category = categories?.find(c => c.category_key === categoryKey);
+                      if (!category) return null;
+                      return (
+                        <Button key={categoryKey} variant={selectedCategory === categoryKey ? "secondary" : "ghost"} className="w-full justify-start text-sm pl-8 py-1.5 h-auto" onClick={() => { setSelectedCategory(categoryKey); setGlobalSearchTerm(""); setLocalSearchTerm(""); }}>
+                          <span className="truncate">{category.display_name}</span>
+                        </Button>
+                      );
+                    })}
+                  </CollapsibleContent>
+                </Collapsible>
+              ))}
             </div>
-            
-            <ScrollArea className="flex-1">
-              <div className="p-1 space-y-0.5">
-                {Object.entries(CATEGORY_GROUPS).map(([groupName, group]) => <Collapsible key={groupName} open={openGroups[groupName]} onOpenChange={() => toggleGroup(groupName)}>
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" className="w-full justify-between text-sm font-bold text-primary hover:text-primary hover:bg-primary/10 py-2">
-                        <div className="flex items-center gap-2">
-                          <group.icon className="h-4 w-4" />
-                          <span className="uppercase tracking-wide">{groupName}</span>
-                        </div>
-                        <ChevronDown className={`h-4 w-4 transition-transform ${openGroups[groupName] ? 'rotate-180' : ''}`} />
-                      </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="space-y-0 mt-0">
-                      {group.categories.map(categoryKey => {
-                    const category = categories?.find(c => c.category_key === categoryKey);
-                    if (!category) return null;
-                    return <Button key={categoryKey} variant={selectedCategory === categoryKey ? "secondary" : "ghost"} className="w-full justify-start text-sm pl-8 py-1.5 h-auto" onClick={() => {
-                      setSelectedCategory(categoryKey);
-                      setGlobalSearchTerm("");
-                      setLocalSearchTerm("");
-                    }}>
-                            <span className="truncate">{category.display_name}</span>
-                          </Button>;
-                  })}
-                    </CollapsibleContent>
-                  </Collapsible>)}
-              </div>
-            </ScrollArea>
-            
-            <div className="p-2 border-t">
-              <Button variant="outline" onClick={() => setCreateCategoryOpen(true)} className="w-full" size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                New Category
-              </Button>
-            </div>
-          </aside>
+          </ScrollArea>
+          
+          <div className="p-2 border-t">
+            <Button variant="outline" onClick={() => setCreateCategoryOpen(true)} className="w-full" size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              New Category
+            </Button>
+          </div>
+        </aside>
 
-          {/* Main Content Area */}
-          <div className="space-y-6">
-            {globalSearchTerm ?
-          // Global search results view
-          <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold">
-                    Search Results for "{globalSearchTerm}"
-                  </h2>
-                  <Badge variant="secondary">
-                    {totalGlobalResults} tag{totalGlobalResults !== 1 ? 's' : ''} found
-                  </Badge>
-                </div>
-                
-                {globalSearchResults && globalSearchResults.length > 0 ? <div className="space-y-8">
-                    {globalSearchResults.map(({
-                groupName,
-                groupIcon: GroupIcon,
-                categories: categoriesInGroup
-              }) => {
-                const totalGroupTags = categoriesInGroup.reduce((sum, cat) => sum + cat.matchingTags.length, 0);
-                return <div key={groupName} className="space-y-4">
-                          {/* Category Group Header */}
-                          <div className="bg-primary/5 border-l-4 border-primary rounded-lg p-4">
-                            <div className="flex items-center gap-3">
-                              <GroupIcon className="h-6 w-6 text-primary" />
-                              <h3 className="text-xl font-bold text-primary">{groupName}</h3>
-                              <Badge variant="secondary" className="ml-auto">
-                                {categoriesInGroup.length} {categoriesInGroup.length === 1 ? 'category' : 'categories'} • {totalGroupTags} {totalGroupTags === 1 ? 'tag' : 'tags'}
-                              </Badge>
-                            </div>
-                          </div>
-                          
-                          {/* Categories within this group */}
-                          <div className="space-y-4 ml-4">
-                            {categoriesInGroup.map(({
-                      category,
-                      matchingTags
-                    }) => <Card key={category.id}>
-                                <CardHeader>
-                                  <CardTitle className="text-lg">{category.display_name}</CardTitle>
-                                  <CardDescription>
-                                    {matchingTags.length} matching tag{matchingTags.length !== 1 ? 's' : ''}
-                                  </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                  <Table>
-                                    <TableHeader>
-                                      <TableRow>
-                                        <TableHead>Tag Name</TableHead>
-                                        <TableHead>Key</TableHead>
-                                        <TableHead>Type</TableHead>
-                                        <TableHead className="text-right">Usage</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
-                                      </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                      {matchingTags.map(tag => <TableRow key={tag.id} className="cursor-pointer hover:bg-muted/50" onClick={() => {
-                              setSelectedTag(tag);
-                              setEditTagOpen(true);
-                            }}>
-                                          <TableCell className="font-medium">{tag.display_name}</TableCell>
-                                          <TableCell className="font-mono text-sm">{tag.tag_key}</TableCell>
-                                          <TableCell>
-                                            <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'}>
-                                              {tag.tag_type}
-                                            </Badge>
-                                          </TableCell>
-                                          <TableCell className="text-right">{tag.usage_count}</TableCell>
-                                          <TableCell className="text-right">
-                                            <div className="flex items-center justify-end gap-1">
-                                              <Button variant="ghost" size="sm" onClick={e => {
-                                    e.stopPropagation();
-                                    setSelectedTag(tag);
-                                    setEditTagOpen(true);
-                                  }}>
-                                                <Edit className="h-4 w-4" />
-                                              </Button>
-                                              <Button variant="ghost" size="sm" onClick={e => {
-                                    e.stopPropagation();
-                                    setSelectedTag(tag);
-                                    setDeleteTagOpen(true);
-                                  }}>
-                                                <Trash2 className="h-4 w-4" />
-                                              </Button>
-                                            </div>
-                                          </TableCell>
-                                        </TableRow>)}
-                                    </TableBody>
-                                  </Table>
-                                </CardContent>
-                              </Card>)}
-                          </div>
-                        </div>;
-              })}
-                  </div> : <Card>
-                    <CardContent className="p-8 text-center text-muted-foreground">
-                      No tags found matching "{globalSearchTerm}"
-                    </CardContent>
-                  </Card>}
-              </div> :
-          // Selected category view
-          currentCategory && <div className="space-y-4">
+        <div className="lg:col-span-3 space-y-6">
+          {globalSearchTerm ? (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold">Search Results for "{globalSearchTerm}"</h2>
+                <Badge variant="secondary">{totalGlobalResults} tag{totalGlobalResults !== 1 ? 's' : ''} found</Badge>
+              </div>
+              
+              {globalSearchResults && globalSearchResults.length > 0 ? (
+                <Card>
+                  <CardContent className="p-0">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Tag Name</TableHead>
+                          <TableHead>Category</TableHead>
+                          <TableHead>Key</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead className="text-right">Usage</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {globalSearchResults.map((tag: any) => (
+                          <TableRow key={tag.id} className="cursor-pointer hover:bg-muted/50 h-10" onClick={() => { setSelectedTag(tag); setEditTagOpen(true); }}>
+                            <TableCell className="font-medium py-1.5">{tag.display_name}</TableCell>
+                            <TableCell className="py-1.5">
+                              <Badge variant="outline" className="text-xs">{tag.category?.display_name || 'Unknown'}</Badge>
+                            </TableCell>
+                            <TableCell className="font-mono text-sm py-1.5">{tag.tag_key}</TableCell>
+                            <TableCell className="py-1.5">
+                              <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'}>{tag.tag_type}</Badge>
+                            </TableCell>
+                            <TableCell className="text-right py-1.5">{tag.usage_count}</TableCell>
+                            <TableCell className="text-right py-1.5">
+                              <div className="flex items-center justify-end gap-1">
+                                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedTag(tag); setEditTagOpen(true); }}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedTag(tag); setDeleteTagOpen(true); }}>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardContent className="py-8 text-center text-muted-foreground">
+                    No tags found matching "{globalSearchTerm}"
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          ) : (
+            selectedCategory && selectedCategoryData2 && (
+              <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <h2 className="text-2xl font-bold">{currentCategory.display_name}</h2>
+                      <h2 className="text-2xl font-bold">{selectedCategoryData2.display_name}</h2>
                       <Badge variant="secondary" className="text-sm">
-                        {currentCategory.tag_count || 0} tags
+                        {selectedCategoryData2.tag_count || 0} tags
                       </Badge>
                     </div>
                     <div className="flex gap-2">
                       <Button variant="outline" onClick={() => {
-                  setSelectedCategoryData(currentCategory);
+                  setSelectedCategoryData(selectedCategoryData2);
                   setEditCategoryOpen(true);
                 }}>
                         <Settings className="h-4 w-4 mr-2" />
@@ -378,72 +301,63 @@ export default function TagManagement() {
                     <CardContent className="p-0">
                       <Table>
                         <TableHeader>
-                          <TableRow className="h-9">
-                            <TableHead className="py-2">Tag Name</TableHead>
-                            <TableHead className="py-2">Key</TableHead>
-                            <TableHead className="py-2">Type</TableHead>
-                            <TableHead className="text-right py-2">Usage</TableHead>
-                            <TableHead className="text-right py-2">Actions</TableHead>
+                          <TableRow>
+                            <TableHead>Tag Name</TableHead>
+                            <TableHead>Key</TableHead>
+                            <TableHead>Type</TableHead>
+                            <TableHead className="text-right">Usage</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {tagsLoading ? <TableRow>
-                              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                                Loading tags...
+                          {sortedTags.map(tag => (
+                            <TableRow key={tag.id} className="cursor-pointer hover:bg-muted/50" onClick={() => {
+                              setSelectedTag(tag);
+                              setEditTagOpen(true);
+                            }}>
+                              <TableCell className="font-medium">{tag.display_name}</TableCell>
+                              <TableCell className="font-mono text-sm">{tag.tag_key}</TableCell>
+                              <TableCell>
+                                <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'}>
+                                  {tag.tag_type}
+                                </Badge>
                               </TableCell>
-                            </TableRow> : sortedTags && sortedTags.length > 0 ? sortedTags.map(tag => <TableRow key={tag.id} className="cursor-pointer hover:bg-muted/50 h-10" onClick={() => {
-                      setSelectedTag(tag);
-                      setEditTagOpen(true);
-                    }}>
-                                <TableCell className="font-medium py-1.5">{tag.display_name}</TableCell>
-                                <TableCell className="font-mono text-sm py-1.5">{tag.tag_key}</TableCell>
-                                <TableCell className="py-1.5">
-                                  <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'} className="text-xs">
-                                    {tag.tag_type}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell className="text-right py-1.5">{tag.usage_count}</TableCell>
-                                <TableCell className="text-right py-1.5">
-                                  <div className="flex justify-end gap-1">
-                                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={e => {
-                            e.stopPropagation();
-                            setSelectedTag(tag);
-                            setEditTagOpen(true);
-                          }}>
-                                      <Edit className="h-3.5 w-3.5" />
-                                    </Button>
-                                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={e => {
-                            e.stopPropagation();
-                            setSelectedTag(tag);
-                            setDeleteTagOpen(true);
-                          }} disabled={tag.usage_count > 0}>
-                                      <Trash2 className="h-3.5 w-3.5" />
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>) : <TableRow>
-                              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                                {localSearchTerm ? 'No matching tags found' : 'No tags in this category yet'}
+                              <TableCell className="text-right">{tag.usage_count}</TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex items-center justify-end gap-1">
+                                  <Button variant="ghost" size="sm" onClick={e => {
+                                    e.stopPropagation();
+                                    setSelectedTag(tag);
+                                    setEditTagOpen(true);
+                                  }}>
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="ghost" size="sm" onClick={e => {
+                                    e.stopPropagation();
+                                    setSelectedTag(tag);
+                                    setDeleteTagOpen(true);
+                                  }}>
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
                               </TableCell>
-                            </TableRow>}
+                            </TableRow>
+                          ))}
                         </TableBody>
                       </Table>
                     </CardContent>
                   </Card>
-                </div>}
-          </div>
+                </div>
+            )
+          )}
         </div>
       </div>
 
-      {/* Dialogs */}
-      <CreateTagDialog open={createTagOpen} onOpenChange={setCreateTagOpen} categoryKey={selectedCategory || ""} categoryName={currentCategory?.display_name || ""} />
-      
+      <CreateTagDialog open={createTagOpen} onOpenChange={setCreateTagOpen} categoryId={selectedCategoryData2?.id || ''} />
       <EditTagDialog open={editTagOpen} onOpenChange={setEditTagOpen} tag={selectedTag} />
-      
       <DeleteTagDialog open={deleteTagOpen} onOpenChange={setDeleteTagOpen} tag={selectedTag} />
-      
       <CreateCategoryDialog open={createCategoryOpen} onOpenChange={setCreateCategoryOpen} />
-      
       <EditCategoryDialog open={editCategoryOpen} onOpenChange={setEditCategoryOpen} category={selectedCategoryData} />
-    </>;
+    </div>
+  );
 }
