@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Mountain, Palette, Users, Compass, ArrowRight, Sparkles } from "lucide-react";
+import { Mountain, Palette, Users, Compass, ArrowRight, Sparkles, Target, TrendingUp } from "lucide-react";
 import { z } from "zod";
 import heroImage from "@/assets/hero-001.jpg";
 
@@ -156,13 +156,53 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section id="why-atlas" className="py-24 bg-muted/30">
+      {/* Mission & Vision */}
+      <section className="py-24 bg-muted/30">
         <div className="container max-w-7xl">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Why Atlas Posters?</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Our Mission</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              To create a platform where artists gain recognition, brands extend their storytelling, 
+              and adventurers find inspiration—transforming walls into windows to the world's most 
+              compelling narratives of exploration and discovery.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="bg-card rounded-2xl p-8 border border-border">
+              <div className="w-14 h-14 mb-6 rounded-xl bg-gradient-to-br from-atlas-gold to-atlas-gold/50 flex items-center justify-center">
+                <Target className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold mb-4">Vision</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                To become the premier destination where authentic stories of adventure, culture, and 
+                exploration are celebrated through beautiful, museum-quality poster art that inspires 
+                people to explore, discover, and transform their spaces.
+              </p>
+            </div>
+
+            <div className="bg-card rounded-2xl p-8 border border-border">
+              <div className="w-14 h-14 mb-6 rounded-xl bg-gradient-to-br from-atlas-ocean to-atlas-ocean/50 flex items-center justify-center">
+                <TrendingUp className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold mb-4">Market Opportunity</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                The global art market and home décor industries represent billions in annual sales. 
+                We're uniquely positioned to capture a niche audience seeking meaningful, story-driven 
+                art that connects with their values and lifestyle.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Three-Sided Marketplace */}
+      <section id="why-atlas" className="py-24">
+        <div className="container max-w-7xl">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Three-Sided Marketplace</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              More than a marketplace—we're building a movement
+              Creating value for artists, brands, and customers simultaneously
             </p>
           </div>
 
@@ -173,7 +213,8 @@ const Index = () => {
               </div>
               <h3 className="text-2xl font-bold mb-3">For Artists</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Share your vision with the world. Fair compensation, full credit, beautiful presentation.
+                Fair compensation, full attribution, and access to an engaged audience that 
+                values authentic creative work and compelling narratives.
               </p>
             </div>
 
@@ -183,7 +224,8 @@ const Index = () => {
               </div>
               <h3 className="text-2xl font-bold mb-3">For Brands</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Extend your story beyond products. Connect with audiences who value authenticity.
+                Extend brand storytelling beyond traditional channels. Connect with audiences 
+                who value authenticity, adventure, and meaningful experiences.
               </p>
             </div>
 
@@ -191,9 +233,10 @@ const Index = () => {
               <div className="w-14 h-14 mb-6 rounded-xl bg-gradient-to-br from-atlas-gold via-atlas-ocean/50 to-atlas-ocean flex items-center justify-center">
                 <Mountain className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-2xl font-bold mb-3">For Adventurers</h3>
+              <h3 className="text-2xl font-bold mb-3">For Customers</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Bring the outdoors in. Curated art celebrating travel, sport, nature, and culture.
+                Discover curated art celebrating travel, sport, nature, and culture. Every 
+                poster tells a story and supports the artists and brands behind it.
               </p>
             </div>
 
@@ -203,7 +246,8 @@ const Index = () => {
               </div>
               <h3 className="text-2xl font-bold mb-3">Story First</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Every poster has a story. Every artist has a voice. Every wall deserves inspiration.
+                Every piece has meaning. Every partnership is authentic. Every customer 
+                connection is built on shared values and genuine inspiration.
               </p>
             </div>
           </div>
@@ -215,21 +259,29 @@ const Index = () => {
         <div className="container max-w-4xl">
           <div className="text-center space-y-6">
             <h2 className="text-4xl md:text-5xl font-bold">
-              Join Us and Let's Give Walls Around the World a Voice!
+              Partner With Us to Transform Walls Worldwide
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              We're partnering with artists, photographers, brands, and IP holders who share our vision.
-              If you create work that celebrates{" "}
-              <strong className="text-foreground">adventure, travel, sport, nature, or culture</strong>, we want
-              to help you reach an audience that truly appreciates it.
+              We're seeking partnerships with artists, photographers, brands, and IP holders who 
+              create work celebrating{" "}
+              <strong className="text-foreground">adventure, travel, sport, nature, and culture</strong>.
+              Let's build something meaningful together and give walls around the world a voice.
             </p>
-            <div className="pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button
                 size="lg"
                 className="bg-atlas-gold hover:bg-atlas-gold/90 text-atlas-charcoal font-semibold h-12 px-8"
                 asChild
               >
                 <a href="mailto:partners@atlasposters.com">Become a Partner</a>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-12 px-8 font-semibold"
+                asChild
+              >
+                <Link to="/about">Learn More About Atlas</Link>
               </Button>
             </div>
           </div>
