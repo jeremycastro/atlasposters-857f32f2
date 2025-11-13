@@ -1,8 +1,15 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.0'
+import { Image } from 'https://deno.land/x/imagescript@1.3.0/mod.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+const THUMBNAIL_SIZES = {
+  small: { width: 200, height: 200, quality: 80 },
+  medium: { width: 600, height: 600, quality: 85 },
+  large: { width: 1200, height: 1200, quality: 90 },
 }
 
 // File type validation using magic bytes (file signatures)
@@ -132,6 +139,82 @@ Deno.serve(async (req) => {
 
     console.log(`Upload successful: ${filePath}`)
 
+    // Generate thumbnails for image files
+    const thumbnails: Array<{
+      variant: string
+      path: string
+      publicUrl: string
+      size: number
+    }> = []
+
+    const isImage = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)
+    
+    if (isImage) {
+      console.log('Generating thumbnails...')
+      try {
+        // Load the image
+        const image = await Image.decode(buffer)
+        
+        // Generate thumbnails for each size
+        for (const [variant, config] of Object.entries(THUMBNAIL_SIZES)) {
+          console.log(`Generating ${variant} thumbnail...`)
+          
+          // Calculate dimensions maintaining aspect ratio
+          const aspectRatio = image.width / image.height
+          let newWidth = config.width
+          let newHeight = config.height
+          
+          if (aspectRatio > 1) {
+            newHeight = Math.round(config.width / aspectRatio)
+          } else {
+            newWidth = Math.round(config.height * aspectRatio)
+          }
+          
+          // Resize image
+          const resized = image.resize(newWidth, newHeight)
+          
+          // Encode as JPEG with quality setting
+          const encoded = await resized.encodeJPEG(config.quality)
+          
+          // Generate thumbnail file path
+          const fileExtension = filePath.split('.').pop()
+          const baseFilePath = filePath.replace(`.${fileExtension}`, '')
+          const thumbnailPath = `${baseFilePath}_thumb_${variant}.jpg`
+          
+          // Upload thumbnail
+          const { data: thumbData, error: thumbError } = await supabase.storage
+            .from(bucket)
+            .upload(thumbnailPath, encoded, {
+              contentType: 'image/jpeg',
+              cacheControl: '3600',
+              upsert: false,
+            })
+          
+          if (thumbError) {
+            console.error(`Error uploading ${variant} thumbnail:`, thumbError)
+            continue
+          }
+          
+          // Get public URL for thumbnail
+          const { data: { publicUrl: thumbPublicUrl } } = supabase.storage
+            .from(bucket)
+            .getPublicUrl(thumbnailPath)
+          
+          thumbnails.push({
+            variant,
+            path: thumbData.path,
+            publicUrl: thumbPublicUrl,
+            size: encoded.length,
+          })
+          
+          console.log(`${variant} thumbnail generated: ${thumbnailPath}`)
+        }
+      } catch (thumbnailError) {
+        console.error('Error generating thumbnails:', thumbnailError)
+        // Continue without thumbnails if generation fails
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
@@ -140,6 +223,7 @@ Deno.serve(async (req) => {
         fileName: file.name,
         fileSize: file.size,
         mimeType: file.type,
+        thumbnails,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

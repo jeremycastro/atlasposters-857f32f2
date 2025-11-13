@@ -63,6 +63,8 @@ export const useArtworkFileUpload = () => {
       setProgress(75);
 
       // Save file metadata to database
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      
       const { data: fileRecord, error: dbError } = await supabase
         .from('artwork_files')
         .insert({
@@ -84,6 +86,38 @@ export const useArtworkFileUpload = () => {
         .single();
 
       if (dbError) throw dbError;
+
+      // Insert thumbnail records if they were generated
+      if (uploadData.thumbnails && uploadData.thumbnails.length > 0) {
+        console.log(`Saving ${uploadData.thumbnails.length} thumbnail records...`);
+        
+        const thumbnailRecords = uploadData.thumbnails.map((thumb: any) => ({
+          artwork_id: artworkId,
+          file_name: `${file.name}_${thumb.variant}`,
+          file_path: thumb.path,
+          file_type: "thumbnail",
+          file_size: thumb.size,
+          mime_type: "image/jpeg",
+          is_primary: false,
+          is_latest: true,
+          metadata: {
+            variant: thumb.variant,
+            original_file_id: fileRecord.id,
+            generated_at: new Date().toISOString(),
+          },
+        }));
+
+        const { error: thumbDbError } = await supabase
+          .from("artwork_files")
+          .insert(thumbnailRecords);
+
+        if (thumbDbError) {
+          console.error("Error saving thumbnail records:", thumbDbError);
+          // Don't fail the upload if thumbnails can't be saved
+        } else {
+          console.log(`Successfully saved ${thumbnailRecords.length} thumbnail records`);
+        }
+      }
 
       setProgress(100);
 
