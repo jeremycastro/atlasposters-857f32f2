@@ -109,6 +109,11 @@ const SortableTaskRow = ({ task, getStatusBadge, handleTaskClick, updateTask, pr
           </SelectContent>
         </Select>
       </TableCell>
+      <TableCell>
+        <Badge variant="secondary" className="font-mono text-xs">
+          {task.reference_number}
+        </Badge>
+      </TableCell>
       <TableCell 
         className="font-medium cursor-pointer"
         onClick={() => handleTaskClick(task.id)}
@@ -435,10 +440,11 @@ const RoadmapManager = () => {
                                 onDragEnd={(event) => handleDragEnd(event, milestone.id)}
                               >
                                 <Table>
-                                  <TableHeader>
+                                   <TableHeader>
                                     <TableRow>
                                       <TableHead className="w-12"></TableHead>
                                       <TableHead>Status</TableHead>
+                                      <TableHead>Task#</TableHead>
                                       <TableHead>Task</TableHead>
                                       <TableHead>Priority</TableHead>
                                       <TableHead>Assigned To</TableHead>
