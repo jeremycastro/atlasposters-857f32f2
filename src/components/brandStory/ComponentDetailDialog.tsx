@@ -9,6 +9,7 @@ import { StatusBadge } from "./StatusBadge";
 import { format } from "date-fns";
 import { useUpdateBrandStoryComponent, useDeleteBrandStoryComponent } from "@/hooks/useBrandStoryMutations";
 import { toast } from "sonner";
+import { useState } from "react";
 
 interface ComponentDetailDialogProps {
   component: BrandStoryComponent | null;
@@ -25,8 +26,16 @@ export const ComponentDetailDialog = ({
 }: ComponentDetailDialogProps) => {
   const updateComponent = useUpdateBrandStoryComponent();
   const deleteComponent = useDeleteBrandStoryComponent();
+  const [isEditing, setIsEditing] = useState(false);
 
   if (!component) return null;
+
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(component);
+      setIsEditing(true);
+    }
+  };
 
   const handleApprove = () => {
     updateComponent.mutate(
@@ -63,39 +72,40 @@ export const ComponentDetailDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={(open) => {
+      onOpenChange(open);
+      if (!open) setIsEditing(false);
+    }}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto relative">
+        {isEditing && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-14 text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={handleDelete}
+            disabled={deleteComponent.isPending}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
+
         <DialogHeader>
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline">
-                  {COMPONENT_TYPE_LABELS[component.component_type]}
-                </Badge>
-                <StatusBadge status={component.status} />
-                <Badge variant="secondary" className="text-xs">
-                  v{component.version_number}
-                </Badge>
-              </div>
-              <DialogTitle className="text-2xl">{component.title}</DialogTitle>
-              {component.subtitle && (
-                <DialogDescription className="text-base">
-                  {component.subtitle}
-                </DialogDescription>
-              )}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline">
+                {COMPONENT_TYPE_LABELS[component.component_type]}
+              </Badge>
+              <StatusBadge status={component.status} />
+              <Badge variant="secondary" className="text-xs">
+                v{component.version_number}
+              </Badge>
             </div>
-            <div className="flex gap-2">
-              {onEdit && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onEdit(component)}
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit
-                </Button>
-              )}
-            </div>
+            <DialogTitle className="text-2xl">{component.title}</DialogTitle>
+            {component.subtitle && (
+              <DialogDescription className="text-base">
+                {component.subtitle}
+              </DialogDescription>
+            )}
           </div>
         </DialogHeader>
 
@@ -206,40 +216,36 @@ export const ComponentDetailDialog = ({
 
         <Separator className="my-6" />
 
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-            {component.status === "draft" && (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handleApprove}
-                disabled={updateComponent.isPending}
-              >
-                <CheckCircle2 className="h-4 w-4 mr-2" />
-                Approve
-              </Button>
-            )}
-            {component.status !== "archived" && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleArchive}
-                disabled={updateComponent.isPending}
-              >
-                <Archive className="h-4 w-4 mr-2" />
-                Archive
-              </Button>
-            )}
-          </div>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleDelete}
-            disabled={deleteComponent.isPending}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </Button>
+        <div className="flex items-center justify-end gap-2">
+          {component.status === "draft" && (
+            <Button
+              variant="default"
+              onClick={handleApprove}
+              disabled={updateComponent.isPending}
+            >
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Approve
+            </Button>
+          )}
+          {component.status !== "archived" && (
+            <Button
+              variant="outline"
+              onClick={handleArchive}
+              disabled={updateComponent.isPending}
+            >
+              <Archive className="h-4 w-4 mr-2" />
+              Archive
+            </Button>
+          )}
+          {onEdit && (
+            <Button
+              variant="outline"
+              onClick={handleEdit}
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
