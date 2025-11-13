@@ -27,6 +27,12 @@ export default function TagManagement() {
   const [selectedCategoryData, setSelectedCategoryData] = useState<Category | null>(null);
 
   const { data: categories, isLoading: categoriesLoading } = useCategories();
+  
+  // Auto-select first category when categories load
+  if (categories && categories.length > 0 && !selectedCategory) {
+    setSelectedCategory(categories[0].category_key);
+  }
+  
   const { data: tags, isLoading: tagsLoading } = useTags(selectedCategory || "");
 
   const filteredTags = tags?.filter(tag =>
