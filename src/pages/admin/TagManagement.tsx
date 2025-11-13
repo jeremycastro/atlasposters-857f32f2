@@ -131,7 +131,7 @@ export default function TagManagement() {
     <>
       <div className="flex min-h-screen w-full">
       {/* Category Navigation Sidebar */}
-      <aside className="w-64 border-r bg-card flex flex-col">
+      <aside className="w-80 border-r bg-muted/40 flex flex-col fixed left-64 top-0 h-screen z-10">
         <div className="p-4 border-b">
           <h2 className="font-semibold text-lg mb-3">Categories</h2>
           <div className="relative">
@@ -176,7 +176,7 @@ export default function TagManagement() {
                       <Button
                         key={categoryKey}
                         variant={selectedCategory === categoryKey ? "secondary" : "ghost"}
-                        className="w-full justify-between text-sm"
+                        className="w-full flex items-center justify-between text-sm pl-8 pr-2 gap-2"
                         onClick={() => {
                           setSelectedCategory(categoryKey);
                           setGlobalSearchTerm("");
@@ -184,7 +184,7 @@ export default function TagManagement() {
                         }}
                       >
                         <span className="truncate">{category.display_name}</span>
-                        <Badge variant="outline" className="ml-2 shrink-0">
+                        <Badge variant="secondary" className="shrink-0">
                           {tagCount}
                         </Badge>
                       </Button>
@@ -204,8 +204,8 @@ export default function TagManagement() {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      {/* Main Content Area - Offset by both sidebars */}
+      <main className="flex-1 ml-80">
           <div className="p-8 space-y-6">
             <div className="flex items-center justify-between">
               <div>
