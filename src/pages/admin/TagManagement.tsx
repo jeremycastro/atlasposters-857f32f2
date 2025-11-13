@@ -218,43 +218,45 @@ export default function TagManagement() {
               {globalSearchResults && globalSearchResults.length > 0 ? (
                 <Card>
                   <CardContent className="p-0">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Tag Name</TableHead>
-                          <TableHead>Category</TableHead>
-                          <TableHead>Key</TableHead>
-                          <TableHead>Type</TableHead>
-                          <TableHead className="text-right">Usage</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {globalSearchResults.map((tag: any) => (
-                          <TableRow key={tag.id} className="cursor-pointer hover:bg-muted/50 h-10" onClick={() => { setSelectedTag(tag); setEditTagOpen(true); }}>
-                            <TableCell className="font-medium py-1.5">{tag.display_name}</TableCell>
-                            <TableCell className="py-1.5">
-                              <Badge variant="outline" className="text-xs">{tag.category?.display_name || 'Unknown'}</Badge>
-                            </TableCell>
-                            <TableCell className="font-mono text-sm py-1.5">{tag.tag_key}</TableCell>
-                            <TableCell className="py-1.5">
-                              <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'}>{tag.tag_type}</Badge>
-                            </TableCell>
-                            <TableCell className="text-right py-1.5">{tag.usage_count}</TableCell>
-                            <TableCell className="text-right py-1.5">
-                              <div className="flex items-center justify-end gap-1">
-                                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedTag(tag); setEditTagOpen(true); }}>
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedTag(tag); setDeleteTagOpen(true); }}>
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-[20%]">Tag Name</TableHead>
+                            <TableHead className="w-[18%]">Category</TableHead>
+                            <TableHead className="w-[20%]">Key</TableHead>
+                            <TableHead className="w-[12%]">Type</TableHead>
+                            <TableHead className="w-[10%] text-right">Usage</TableHead>
+                            <TableHead className="w-[20%] text-right">Actions</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {globalSearchResults.map((tag: any) => (
+                            <TableRow key={tag.id} className="cursor-pointer hover:bg-muted/50 h-10" onClick={() => { setSelectedTag(tag); setEditTagOpen(true); }}>
+                              <TableCell className="font-medium py-1.5">{tag.display_name}</TableCell>
+                              <TableCell className="py-1.5">
+                                <Badge variant="outline" className="text-xs">{tag.category?.display_name || 'Unknown'}</Badge>
+                              </TableCell>
+                              <TableCell className="font-mono text-sm py-1.5">{tag.tag_key}</TableCell>
+                              <TableCell className="py-1.5">
+                                <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'} className="text-xs">{tag.tag_type}</Badge>
+                              </TableCell>
+                              <TableCell className="text-right py-1.5">{tag.usage_count}</TableCell>
+                              <TableCell className="text-right py-1.5">
+                                <div className="flex items-center justify-end gap-1">
+                                  <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedTag(tag); setEditTagOpen(true); }}>
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedTag(tag); setDeleteTagOpen(true); }}>
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </CardContent>
                 </Card>
               ) : (
