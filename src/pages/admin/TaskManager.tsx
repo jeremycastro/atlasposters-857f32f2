@@ -55,36 +55,34 @@ const TaskManager = () => {
 
       <TaskStats tasks={tasks} />
 
-      <Tabs value={view} onValueChange={(v) => setView(v as "kanban" | "table")}>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <TabsList>
-              <TabsTrigger value="kanban" className="flex items-center gap-2">
-                <LayoutGrid className="h-4 w-4" />
-                Kanban
-              </TabsTrigger>
-              <TabsTrigger value="table" className="flex items-center gap-2">
-                <Table className="h-4 w-4" />
-                Table
-              </TabsTrigger>
-            </TabsList>
-            <TaskFilters filters={filters} onFiltersChange={setFilters} />
-          </div>
+      <Tabs value={view} onValueChange={(v) => setView(v as "kanban" | "table")} className="w-full">
+        <div className="flex items-center gap-2 mb-4">
+          <TabsList>
+            <TabsTrigger value="kanban" className="flex items-center gap-2">
+              <LayoutGrid className="h-4 w-4" />
+              Kanban
+            </TabsTrigger>
+            <TabsTrigger value="table" className="flex items-center gap-2">
+              <Table className="h-4 w-4" />
+              Table
+            </TabsTrigger>
+          </TabsList>
+          <TaskFilters filters={filters} onFiltersChange={setFilters} />
         </div>
 
-            <TabsContent value="kanban" className="mt-0">
-              {isLoading ? (
-                <p className="text-center text-muted-foreground py-8">Loading tasks...</p>
-              ) : (
-                <TaskKanbanView
-                  tasks={tasks}
-                  onEditTask={handleEditTask}
-                  onViewTask={handleViewTask}
-                />
-              )}
-            </TabsContent>
+        <TabsContent value="kanban" className="mt-0 w-full">
+          {isLoading ? (
+            <p className="text-center text-muted-foreground py-8">Loading tasks...</p>
+          ) : (
+            <TaskKanbanView
+              tasks={tasks}
+              onEditTask={handleEditTask}
+              onViewTask={handleViewTask}
+            />
+          )}
+        </TabsContent>
 
-        <TabsContent value="table" className="mt-0">
+        <TabsContent value="table" className="mt-0 w-full">
           {isLoading ? (
             <p className="text-center text-muted-foreground py-8">Loading tasks...</p>
           ) : (
