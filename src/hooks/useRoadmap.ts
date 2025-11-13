@@ -85,6 +85,20 @@ export const useAllRoadmapMilestones = () => {
         .order("order_index", { ascending: true });
 
       if (error) throw error;
+      
+      // Sort by milestone_number (e.g., "1.1", "1.2", "1.10")
+      data?.sort((a, b) => {
+        const aParts = a.milestone_number.split('.').map(Number);
+        const bParts = b.milestone_number.split('.').map(Number);
+        
+        for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+          const aVal = aParts[i] || 0;
+          const bVal = bParts[i] || 0;
+          if (aVal !== bVal) return aVal - bVal;
+        }
+        return 0;
+      });
+      
       return data;
     },
   });
