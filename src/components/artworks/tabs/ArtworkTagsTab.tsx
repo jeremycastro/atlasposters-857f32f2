@@ -145,7 +145,7 @@ export function ArtworkTagsTab({ artworkId }: ArtworkTagsTabProps) {
   const selectedCategoryData = categories?.find(c => c.category_key === selectedCategory);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* AI Tag Suggestions */}
       <Card>
         <CardHeader>
@@ -160,219 +160,266 @@ export function ArtworkTagsTab({ artworkId }: ArtworkTagsTabProps) {
         </CardContent>
       </Card>
 
-      {/* Manual Tag Management */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Tag Management</CardTitle>
-          <CardDescription>Browse and manage tags for this artwork</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
-            {/* Sidebar: Category Navigation */}
-            <div className="space-y-4">
-              {/* Global Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search all tags..."
-                  value={globalSearchTerm}
-                  onChange={(e) => setGlobalSearchTerm(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-
-              {/* Category Groups */}
-              <ScrollArea className="h-[500px]">
-                <div className="space-y-2">
-                  {Object.entries(CATEGORY_GROUPS).map(([groupName, group]) => {
-                    const Icon = group.icon;
-                    const groupCategories = categories?.filter(c => 
-                      group.categories.includes(c.category_key)
-                    ) || [];
-
-                    return (
-                      <Collapsible
-                        key={groupName}
-                        open={openGroups[groupName]}
-                        onOpenChange={() => toggleGroup(groupName)}
-                      >
-                        <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border p-3 hover:bg-accent">
-                          <div className="flex items-center gap-2">
-                            <Icon className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-medium text-sm">{groupName}</span>
-                          </div>
-                          <ChevronDown 
-                            className={cn(
-                              "h-4 w-4 transition-transform",
-                              openGroups[groupName] && "rotate-180"
-                            )} 
-                          />
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="mt-1 space-y-1 pl-2">
-                          {groupCategories.map(category => (
-                            <Button
-                              key={category.category_key}
-                              variant={selectedCategory === category.category_key ? "secondary" : "ghost"}
-                              size="sm"
-                              onClick={() => {
-                                setSelectedCategory(category.category_key);
-                                setLocalSearchTerm("");
-                              }}
-                              className="w-full justify-start font-normal"
-                            >
-                              {category.display_name}
-                            </Button>
-                          ))}
-                        </CollapsibleContent>
-                      </Collapsible>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCreateTagOpen(true)}
-                className="w-full"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create New Tag
-              </Button>
+      {/* Two-column layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-full">
+        {/* Sidebar - Category Navigation */}
+        <aside className="lg:col-span-1 flex flex-col border rounded-lg bg-card">
+          <div className="p-6 space-y-4">
+            <div className="pb-4 border-b">
+              <h3 className="text-base font-semibold">Browse Categories</h3>
             </div>
-
-            {/* Main Content: Tag Selection */}
-            <div className="space-y-4">
-              {globalSearchTerm ? (
-                /* Global Search Results */
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Search Results</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Found {globalSearchResults.length} tag{globalSearchResults.length !== 1 ? 's' : ''}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {globalSearchResults.map(tag => {
-                      const isApplied = appliedTagIds.has(tag.id);
-                      return (
-                        <Button
-                          key={tag.id}
-                          variant={isApplied ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => isApplied ? handleRemoveTag(tag.id) : handleAddTag(tag.id)}
-                          className="gap-2"
-                        >
-                          {isApplied && <Check className="h-3 w-3" />}
-                          {tag.display_name}
-                          <Badge variant="secondary" className="ml-1">
-                            {tag.usage_count || 0}
-                          </Badge>
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : selectedCategory ? (
-                /* Category-Specific Tags */
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold">{selectedCategoryData?.display_name}</h3>
-                      {selectedCategoryData?.description && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {selectedCategoryData.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Local Search within Category */}
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      placeholder={`Search ${selectedCategoryData?.display_name}...`}
-                      value={localSearchTerm}
-                      onChange={(e) => setLocalSearchTerm(e.target.value)}
-                      className="pl-9"
-                    />
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    {filteredAvailableTags.map(tag => {
-                      const isApplied = appliedTagIds.has(tag.id);
-                      return (
-                        <Button
-                          key={tag.id}
-                          variant={isApplied ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => isApplied ? handleRemoveTag(tag.id) : handleAddTag(tag.id)}
-                          className="gap-2"
-                        >
-                          {isApplied && <Check className="h-3 w-3" />}
-                          {tag.display_name}
-                          <Badge variant="secondary" className="ml-1">
-                            {tag.usage_count || 0}
-                          </Badge>
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : (
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertDescription>
-                    Select a category from the sidebar to browse available tags
-                  </AlertDescription>
-                </Alert>
-              )}
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search all tags..."
+                value={globalSearchTerm}
+                onChange={(e) => setGlobalSearchTerm(e.target.value)}
+                className="pl-8"
+              />
             </div>
           </div>
+          <ScrollArea className="flex-1">
+            <div className="p-2 space-y-1">
+              {Object.entries(CATEGORY_GROUPS).map(([groupName, groupData]) => {
+                const Icon = groupData.icon;
+                const groupCategories = categories?.filter(cat => 
+                  groupData.categories.includes(cat.category_key)
+                );
+                
+                return (
+                  <Collapsible
+                    key={groupName}
+                    open={openGroups[groupName]}
+                    onOpenChange={() => toggleGroup(groupName)}
+                  >
+                    <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-md transition-colors">
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">{groupName}</span>
+                      </div>
+                      <ChevronDown 
+                        className={cn(
+                          "h-4 w-4 text-muted-foreground transition-transform",
+                          openGroups[groupName] && "transform rotate-180"
+                        )} 
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="ml-6 mt-1 space-y-0.5">
+                        {groupCategories?.map(category => (
+                          <Button
+                            key={category.category_key}
+                            variant="ghost"
+                            size="sm"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              selectedCategory === category.category_key && "bg-muted text-primary font-medium"
+                            )}
+                            onClick={() => {
+                              setSelectedCategory(category.category_key);
+                              setGlobalSearchTerm("");
+                              setLocalSearchTerm("");
+                            }}
+                          >
+                            <span className="truncate">{category.display_name}</span>
+                          </Button>
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                );
+              })}
+            </div>
+          </ScrollArea>
+        </aside>
 
-          {/* Currently Applied Tags */}
-          {artworkTags && artworkTags.length > 0 && (
-            <div className="mt-6 pt-6 border-t">
-              <Collapsible open={currentTagsOpen} onOpenChange={setCurrentTagsOpen}>
-                <CollapsibleTrigger className="flex w-full items-center justify-between">
-                  <h3 className="text-lg font-semibold">
-                    Current Tags ({artworkTags.length})
-                  </h3>
+        {/* Main Content Area */}
+        <div className="lg:col-span-3 space-y-4 flex flex-col h-full">
+          {/* Browse & Add Tags */}
+          <Card className="flex-1 flex flex-col overflow-hidden">
+            {globalSearchTerm ? (
+              // Global Search Results View
+              <>
+                <CardHeader className="pb-4 space-y-4">
+                  <div className="flex items-center justify-between pb-4 border-b">
+                    <div>
+                      <CardTitle className="text-base font-semibold">
+                        Search Results for "{globalSearchTerm}"
+                      </CardTitle>
+                    </div>
+                    <Badge variant="secondary">
+                      {globalSearchResults.length} tag{globalSearchResults.length !== 1 ? 's' : ''}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-auto">
+                  {globalSearchResults.length > 0 ? (
+                    <div className="space-y-4">
+                      {/* Group results by category */}
+                      {Object.entries(
+                        globalSearchResults.reduce((acc, tag) => {
+                          const categoryName = tag.category?.display_name || 'Uncategorized';
+                          if (!acc[categoryName]) acc[categoryName] = [];
+                          acc[categoryName].push(tag);
+                          return acc;
+                        }, {} as Record<string, typeof globalSearchResults>)
+                      ).map(([categoryName, tags]) => (
+                        <div key={categoryName} className="space-y-2">
+                          <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+                            {categoryName}
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                            {tags.map(tag => {
+                              const isApplied = appliedTagIds.has(tag.id);
+                              return (
+                                <Button
+                                  key={tag.id}
+                                  variant={isApplied ? "default" : "outline"}
+                                  size="sm"
+                                  className={cn(
+                                    "justify-between gap-2",
+                                    isApplied && "bg-primary text-primary-foreground"
+                                  )}
+                                  onClick={() => isApplied ? handleRemoveTag(tag.id) : handleAddTag(tag.id)}
+                                >
+                                  <span className="truncate">{tag.display_name}</span>
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    {isApplied && <Check className="h-3 w-3" />}
+                                    {!isApplied && <Plus className="h-3 w-3" />}
+                                  </div>
+                                </Button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Search className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                      <p>No tags found matching "{globalSearchTerm}"</p>
+                    </div>
+                  )}
+                </CardContent>
+              </>
+            ) : (
+              // Category-Specific View
+              <>
+                <CardHeader className="pb-4 space-y-4">
+                  <div className="flex items-center justify-between pb-4 border-b">
+                    <div>
+                      <CardTitle className="text-base font-semibold">
+                        {selectedCategoryData?.display_name || 'Select a Category'}
+                      </CardTitle>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">
+                        {filteredAvailableTags.length} tags
+                      </Badge>
+                      <Button
+                        size="sm"
+                        onClick={() => setCreateTagOpen(true)}
+                        disabled={!selectedCategory}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        New
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search tags..."
+                      value={localSearchTerm}
+                      onChange={(e) => setLocalSearchTerm(e.target.value)}
+                      className="pl-8"
+                    />
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-auto">
+                  {selectedCategory ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                      {filteredAvailableTags.map(tag => {
+                        const isApplied = appliedTagIds.has(tag.id);
+                        return (
+                          <Button
+                            key={tag.id}
+                            variant={isApplied ? "default" : "outline"}
+                            size="sm"
+                            className={cn(
+                              "justify-between gap-2",
+                              isApplied && "bg-primary text-primary-foreground"
+                            )}
+                            onClick={() => isApplied ? handleRemoveTag(tag.id) : handleAddTag(tag.id)}
+                          >
+                            <span className="truncate">{tag.display_name}</span>
+                            <div className="flex items-center gap-1 shrink-0">
+                              {isApplied && <Check className="h-3 w-3" />}
+                              {!isApplied && <Plus className="h-3 w-3" />}
+                            </div>
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Palette className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                      <p>Select a category from the sidebar to browse tags</p>
+                    </div>
+                  )}
+                </CardContent>
+              </>
+            )}
+          </Card>
+        </div>
+      </div>
+
+      {/* Current Artwork Tags */}
+      {artworkTags && artworkTags.length > 0 && (
+        <Collapsible open={currentTagsOpen} onOpenChange={setCurrentTagsOpen}>
+          <Card>
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">Current Artwork Tags</CardTitle>
                   <ChevronDown 
                     className={cn(
-                      "h-5 w-5 transition-transform",
+                      "h-4 w-4 transition-transform",
                       currentTagsOpen && "rotate-180"
                     )} 
                   />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-4">
-                  <div className="space-y-4">
-                    {Object.entries(tagsByCategory || {}).map(([categoryName, tags]) => (
-                      <div key={categoryName}>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">
-                          {categoryName}
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {tags.map(tag => (
-                            <TagPill
-                              key={tag.tag_id}
-                              tag={{
-                                display_name: tag.tag_name,
-                                category_name: tag.category_name
-                              }}
-                              onRemove={() => handleRemoveTag(tag.tag_id)}
-                            />
-                          ))}
-                        </div>
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent>
+                <div className="space-y-3">
+                  {Object.entries(tagsByCategory || {}).map(([categoryName, tags]) => (
+                    <div key={categoryName} className="space-y-1">
+                      <div className="text-xs text-muted-foreground font-medium">
+                        {categoryName}
                       </div>
-                    ))}
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                      <div className="flex flex-wrap gap-1">
+                        {tags.map(tag => (
+                          <TagPill
+                            key={tag.tag_id}
+                            tag={{
+                              display_name: tag.tag_name,
+                              category_name: tag.category_name,
+                              source: tag.source
+                            }}
+                            onRemove={() => handleRemoveTag(tag.tag_id)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
+      )}
 
       <CreateTagDialog
         open={createTagOpen}
