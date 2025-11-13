@@ -6,9 +6,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Plus, Edit, Palette, Save, X, Trash2 } from "lucide-react";
+import { ExternalLink, Plus, Edit, Palette, Save, X, Trash2, Tags } from "lucide-react";
 import { useCreateBrand, useUpdateBrand, useDeleteBrand } from "@/hooks/usePartnerMutations";
 import { BrandLogoUpload } from "@/components/partner/BrandLogoUpload";
+import { BrandTagDrawer } from "@/components/brands/BrandTagDrawer";
+import { useEntityTags } from "@/hooks/useTags";
 import type { Brand } from "@/types/partner";
 interface BrandFormData {
   brand_name: string;
@@ -238,6 +240,8 @@ export function BrandsTab({
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
+  const [tagDrawerOpen, setTagDrawerOpen] = useState(false);
+  const [selectedBrandForTags, setSelectedBrandForTags] = useState<Brand | null>(null);
   const [formData, setFormData] = useState<BrandFormData>({
     brand_name: "",
     description: "",
@@ -371,6 +375,12 @@ export function BrandsTab({
         }
       });
     }
+  };
+
+  const handleManageTags = (brand: Brand, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedBrandForTags(brand);
+    setTagDrawerOpen(true);
   };
   if (showForm) {
     return <div className="flex flex-col h-full">
@@ -668,52 +678,68 @@ export function BrandsTab({
                 <TableHead>Status</TableHead>
                 <TableHead>Tagline</TableHead>
                 <TableHead>Website</TableHead>
+                <TableHead>Tags</TableHead>
                 <TableHead>Artworks</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {brands.map(brand => <TableRow key={brand.id} className="cursor-pointer hover:bg-muted/50" onClick={() => handleOpenForm(brand)}>
-                  <TableCell>
-                    <div className="flex gap-3 items-center">
-                      {brand.logo_url && <img src={brand.logo_url} alt={brand.brand_name} className="h-8 w-8 object-contain rounded" />}
-                      <div>
-                        <div className="font-medium">{brand.brand_name}</div>
-                        {brand.description && <div className="text-xs text-muted-foreground line-clamp-1">{brand.description}</div>}
+              {brands.map(brand => {
+                const BrandTagCount = () => {
+                  const { data: tags } = useEntityTags('brand', brand.id);
+                  return <span>{tags?.length || 0}</span>;
+                };
+                
+                return (
+                  <TableRow key={brand.id} className="cursor-pointer hover:bg-muted/50" onClick={() => handleOpenForm(brand)}>
+                    <TableCell>
+                      <div className="flex gap-3 items-center">
+                        {brand.logo_url && <img src={brand.logo_url} alt={brand.brand_name} className="h-8 w-8 object-contain rounded" />}
+                        <div>
+                          <div className="font-medium">{brand.brand_name}</div>
+                          {brand.description && <div className="text-xs text-muted-foreground line-clamp-1">{brand.description}</div>}
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={brand.is_active ? "default" : "secondary"}>
-                      {brand.is_active ? "Active" : "Inactive"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground max-w-xs">
-                    {brand.tagline || "-"}
-                  </TableCell>
-                  <TableCell>
-                    {brand.website_url ? <a href={brand.website_url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-1" onClick={e => e.stopPropagation()}>
-                        <ExternalLink className="h-3 w-3" />
-                        Visit
-                      </a> : "-"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {brand.artworks && brand.artworks.length > 0 ? brand.artworks.length : 0}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex gap-1 justify-end">
-                      <Button variant="ghost" size="sm" onClick={e => {
-                  e.stopPropagation();
-                  handleOpenForm(brand);
-                }}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={e => handleDeleteClick(brand, e)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>)}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={brand.is_active ? "default" : "secondary"}>
+                        {brand.is_active ? "Active" : "Inactive"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground max-w-xs">
+                      {brand.tagline || "-"}
+                    </TableCell>
+                    <TableCell>
+                      {brand.website_url ? <a href={brand.website_url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                          <ExternalLink className="h-3 w-3" />
+                          Visit
+                        </a> : "-"}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      <BrandTagCount />
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {brand.artworks && brand.artworks.length > 0 ? brand.artworks.length : 0}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex gap-1 justify-end">
+                        <Button variant="ghost" size="sm" onClick={e => {
+                          e.stopPropagation();
+                          handleOpenForm(brand);
+                        }} title="Edit brand">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={e => handleManageTags(brand, e)} title="Manage tags">
+                          <Tags className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={e => handleDeleteClick(brand, e)} title="Delete brand">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>}
@@ -734,5 +760,18 @@ export function BrandsTab({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {selectedBrandForTags && (
+        <BrandTagDrawer
+          isOpen={tagDrawerOpen}
+          onClose={() => {
+            setTagDrawerOpen(false);
+            setSelectedBrandForTags(null);
+          }}
+          brandId={selectedBrandForTags.id}
+          brandName={selectedBrandForTags.brand_name}
+          brandLogoUrl={selectedBrandForTags.logo_url}
+        />
+      )}
     </div>;
 }
