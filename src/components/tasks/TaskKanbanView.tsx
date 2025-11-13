@@ -22,6 +22,7 @@ const statusColumns = [
   { id: "todo", label: "To Do" },
   { id: "in_progress", label: "In Progress" },
   { id: "in_review", label: "In Review" },
+  { id: "testing", label: "Testing" },
   { id: "blocked", label: "Blocked" },
   { id: "completed", label: "Completed" },
 ];

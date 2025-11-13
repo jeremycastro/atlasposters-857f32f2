@@ -148,7 +148,9 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
                           {formData.status === "in_progress" 
                             ? "In Progress" 
                             : formData.status === "in_review" 
-                            ? "In Review" 
+                            ? "In Review"
+                            : formData.status === "testing"
+                            ? "Testing"
                             : formData.status === "todo"
                             ? "To Do"
                             : formData.status 
@@ -161,8 +163,9 @@ export const TaskDetailDialog = ({ taskId, open, onOpenChange }: TaskDetailDialo
                         <SelectItem value="todo">To Do</SelectItem>
                         <SelectItem value="in_progress">In Progress</SelectItem>
                         <SelectItem value="in_review">In Review</SelectItem>
+                        <SelectItem value="testing">Testing</SelectItem>
                         <SelectItem value="blocked">Blocked</SelectItem>
-                        <SelectItem value="done">Done</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

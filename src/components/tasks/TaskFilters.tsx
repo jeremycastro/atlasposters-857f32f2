@@ -21,6 +21,7 @@ const statusOptions = [
   { value: "todo", label: "To Do" },
   { value: "in_progress", label: "In Progress" },
   { value: "in_review", label: "In Review" },
+  { value: "testing", label: "Testing" },
   { value: "blocked", label: "Blocked" },
   { value: "completed", label: "Completed" },
 ];
