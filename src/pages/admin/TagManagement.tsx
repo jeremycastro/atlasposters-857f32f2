@@ -269,84 +269,99 @@ export default function TagManagement() {
             </div>
           ) : (
             selectedCategory && selectedCategoryData2 && (
-              <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <h2 className="text-2xl font-bold">{selectedCategoryData2.display_name}</h2>
-                      <Badge variant="secondary" className="text-sm">
-                        {selectedCategoryData2.tag_count || 0} tags
-                      </Badge>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => {
-                  setSelectedCategoryData(selectedCategoryData2);
-                  setEditCategoryOpen(true);
-                }}>
-                        <Settings className="h-4 w-4 mr-2" />
-                        Edit Category
-                      </Button>
-                      <Button onClick={() => setCreateTagOpen(true)}>
-                        <Plus className="h-4 w-4 mr-2" />
-                        New Tag
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  
-                  
-                  <div className="relative">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search tags in this category..." value={localSearchTerm} onChange={e => setLocalSearchTerm(e.target.value)} className="pl-8" />
-                  </div>
+              <div className="space-y-4 w-full">
+                  <Card>
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <CardTitle className="text-2xl">{selectedCategoryData2.display_name}</CardTitle>
+                          <Badge variant="secondary" className="text-sm">
+                            {sortedTags.length} tag{sortedTags.length !== 1 ? 's' : ''}
+                          </Badge>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" onClick={() => {
+                            setSelectedCategoryData(selectedCategoryData2);
+                            setEditCategoryOpen(true);
+                          }}>
+                            <Settings className="h-4 w-4 mr-2" />
+                            Edit Category
+                          </Button>
+                          <Button size="sm" onClick={() => setCreateTagOpen(true)}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            New Tag
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                  </Card>
 
                   <Card>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle>Tags</CardTitle>
+                        <div className="relative w-64">
+                          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input placeholder="Search tags..." value={localSearchTerm} onChange={e => setLocalSearchTerm(e.target.value)} className="pl-8" />
+                        </div>
+                      </div>
+                    </CardHeader>
+
                     <CardContent className="p-0">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Tag Name</TableHead>
-                            <TableHead>Key</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead className="text-right">Usage</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {sortedTags.map(tag => (
-                            <TableRow key={tag.id} className="cursor-pointer hover:bg-muted/50" onClick={() => {
-                              setSelectedTag(tag);
-                              setEditTagOpen(true);
-                            }}>
-                              <TableCell className="font-medium">{tag.display_name}</TableCell>
-                              <TableCell className="font-mono text-sm">{tag.tag_key}</TableCell>
-                              <TableCell>
-                                <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'}>
-                                  {tag.tag_type}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-right">{tag.usage_count}</TableCell>
-                              <TableCell className="text-right">
-                                <div className="flex items-center justify-end gap-1">
-                                  <Button variant="ghost" size="sm" onClick={e => {
-                                    e.stopPropagation();
-                                    setSelectedTag(tag);
-                                    setEditTagOpen(true);
-                                  }}>
-                                    <Edit className="h-4 w-4" />
-                                  </Button>
-                                  <Button variant="ghost" size="sm" onClick={e => {
-                                    e.stopPropagation();
-                                    setSelectedTag(tag);
-                                    setDeleteTagOpen(true);
-                                  }}>
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                      {sortedTags.length > 0 ? (
+                        <div className="overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead className="w-[25%]">Tag Name</TableHead>
+                                <TableHead className="w-[30%]">Key</TableHead>
+                                <TableHead className="w-[15%]">Type</TableHead>
+                                <TableHead className="w-[10%] text-right">Usage</TableHead>
+                                <TableHead className="w-[20%] text-right">Actions</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {sortedTags.map(tag => (
+                                <TableRow key={tag.id} className="cursor-pointer hover:bg-muted/50 h-10" onClick={() => {
+                                  setSelectedTag(tag);
+                                  setEditTagOpen(true);
+                                }}>
+                                  <TableCell className="font-medium py-1.5">{tag.display_name}</TableCell>
+                                  <TableCell className="font-mono text-sm py-1.5">{tag.tag_key}</TableCell>
+                                  <TableCell className="py-1.5">
+                                    <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'} className="text-xs">
+                                      {tag.tag_type}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="text-right py-1.5">{tag.usage_count}</TableCell>
+                                  <TableCell className="text-right py-1.5">
+                                    <div className="flex items-center justify-end gap-1">
+                                      <Button variant="ghost" size="sm" onClick={e => {
+                                        e.stopPropagation();
+                                        setSelectedTag(tag);
+                                        setEditTagOpen(true);
+                                      }}>
+                                        <Edit className="h-4 w-4" />
+                                      </Button>
+                                      <Button variant="ghost" size="sm" onClick={e => {
+                                        e.stopPropagation();
+                                        setSelectedTag(tag);
+                                        setDeleteTagOpen(true);
+                                      }}>
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      ) : (
+                        <div className="py-8 text-center text-muted-foreground">
+                          {localSearchTerm ? `No tags found matching "${localSearchTerm}"` : 'No tags in this category yet'}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </div>
@@ -355,7 +370,7 @@ export default function TagManagement() {
         </div>
       </div>
 
-      <CreateTagDialog 
+      <CreateTagDialog
         open={createTagOpen} 
         onOpenChange={setCreateTagOpen} 
         categoryKey={selectedCategoryData2?.category_key || ''} 
