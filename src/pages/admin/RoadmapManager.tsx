@@ -109,10 +109,8 @@ const SortableTaskRow = ({ task, getStatusBadge, handleTaskClick, updateTask, pr
           </SelectContent>
         </Select>
       </TableCell>
-      <TableCell>
-        <Badge variant="secondary" className="font-mono text-xs">
-          {task.reference_number}
-        </Badge>
+      <TableCell className="font-mono text-xs text-muted-foreground">
+        {task.reference_number}
       </TableCell>
       <TableCell 
         className="font-medium cursor-pointer"
