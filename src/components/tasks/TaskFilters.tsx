@@ -6,12 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Filter, X } from "lucide-react";
 import { useProfiles } from "@/hooks/useProfiles";
+import { useCurrentRoadmapVersion, useRoadmapPhases, useAllRoadmapMilestones } from "@/hooks/useRoadmap";
 
 interface TaskFiltersProps {
   filters: {
     status: string[];
     priority: string[];
     assigned_to: string;
+    phase_id: string;
+    milestone_id: string;
     search: string;
   };
   onFiltersChange: (filters: any) => void;
@@ -36,6 +39,9 @@ const priorityOptions = [
 
 export const TaskFilters = ({ filters, onFiltersChange }: TaskFiltersProps) => {
   const { data: profiles } = useProfiles();
+  const { data: currentVersion } = useCurrentRoadmapVersion();
+  const { data: phases } = useRoadmapPhases(currentVersion?.id);
+  const { data: milestones } = useAllRoadmapMilestones();
 
   const handleStatusToggle = (status: string) => {
     const newStatus = filters.status.includes(status)
@@ -56,12 +62,18 @@ export const TaskFilters = ({ filters, onFiltersChange }: TaskFiltersProps) => {
       status: [],
       priority: [],
       assigned_to: "",
+      phase_id: "",
+      milestone_id: "",
       search: "",
     });
   };
 
   const activeFilterCount =
-    filters.status.length + filters.priority.length + (filters.assigned_to ? 1 : 0);
+    filters.status.length + 
+    filters.priority.length + 
+    (filters.assigned_to ? 1 : 0) +
+    (filters.phase_id ? 1 : 0) +
+    (filters.milestone_id ? 1 : 0);
 
   return (
     <Popover>
@@ -162,6 +174,70 @@ export const TaskFilters = ({ filters, onFiltersChange }: TaskFiltersProps) => {
               variant="ghost"
               size="icon"
               onClick={() => onFiltersChange({ ...filters, assigned_to: "" })}
+              className="shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <Label>Roadmap Phase</Label>
+        <div className="flex gap-2">
+          <Select
+            value={filters.phase_id || undefined}
+            onValueChange={(value) => onFiltersChange({ ...filters, phase_id: value, milestone_id: "" })}
+          >
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="All phases" />
+            </SelectTrigger>
+            <SelectContent>
+              {phases?.map((phase) => (
+                <SelectItem key={phase.id} value={phase.id}>
+                  Phase {phase.phase_number}: {phase.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {filters.phase_id && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onFiltersChange({ ...filters, phase_id: "", milestone_id: "" })}
+              className="shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <Label>Roadmap Milestone</Label>
+        <div className="flex gap-2">
+          <Select
+            value={filters.milestone_id || undefined}
+            onValueChange={(value) => onFiltersChange({ ...filters, milestone_id: value })}
+          >
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="All milestones" />
+            </SelectTrigger>
+            <SelectContent>
+              {milestones
+                ?.filter((m) => !filters.phase_id || m.phase_id === filters.phase_id)
+                .map((milestone) => (
+                  <SelectItem key={milestone.id} value={milestone.id}>
+                    {milestone.milestone_number}: {milestone.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+          {filters.milestone_id && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onFiltersChange({ ...filters, milestone_id: "" })}
               className="shrink-0"
             >
               <X className="h-4 w-4" />

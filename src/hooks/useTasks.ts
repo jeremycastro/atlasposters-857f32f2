@@ -22,6 +22,8 @@ interface TaskFilters {
   tags?: string[];
   phase?: string;
   milestone?: string;
+  phase_id?: string;
+  milestone_id?: string;
   search?: string;
 }
 
@@ -61,6 +63,14 @@ export const useTasks = (filters?: TaskFilters) => {
 
       if (filters?.milestone) {
         query = query.eq("milestone", filters.milestone);
+      }
+
+      if (filters?.phase_id) {
+        query = query.eq("phase_id", filters.phase_id);
+      }
+
+      if (filters?.milestone_id) {
+        query = query.eq("milestone_id", filters.milestone_id);
       }
 
       if (filters?.tags && filters.tags.length > 0) {

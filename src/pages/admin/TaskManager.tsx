@@ -20,6 +20,8 @@ const TaskManager = () => {
     status: [] as string[],
     priority: [] as string[],
     assigned_to: "",
+    phase_id: "",
+    milestone_id: "",
     search: ""
   });
   const {
