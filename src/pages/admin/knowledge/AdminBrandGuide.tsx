@@ -560,6 +560,19 @@ const AdminBrandGuide = () => {
                 <p>Group related fields with <code className="bg-muted px-1 rounded">Separator</code> components</p>
               </div>
             </div>
+
+            <div className="border rounded-lg p-4">
+              <h4 className="font-semibold mb-3">File Uploads</h4>
+              <div className="space-y-2 text-sm">
+                <p>Use drag-and-drop zones with visual feedback for file selection</p>
+                <p>Display file information (name, size, type) before upload</p>
+                <p>Show upload progress and provide clear success/error feedback</p>
+                <p>Support multiple file formats with appropriate validation</p>
+                <p>Use <code className="bg-muted px-1 rounded">react-dropzone</code> for consistent drag-drop experience</p>
+                <p><strong>Max size:</strong> 250MB per file for attachments</p>
+                <p>Display uploaded files in tables with download and delete actions</p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

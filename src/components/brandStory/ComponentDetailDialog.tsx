@@ -8,6 +8,9 @@ import { BrandStoryComponent, COMPONENT_TYPE_LABELS } from "@/types/brandStory";
 import { StatusBadge } from "./StatusBadge";
 import { format } from "date-fns";
 import { useUpdateBrandStoryComponent, useDeleteBrandStoryComponent } from "@/hooks/useBrandStoryMutations";
+import { AttachmentUpload } from "./AttachmentUpload";
+import { AttachmentsTable } from "./AttachmentsTable";
+import { useBrandStoryAttachments } from "@/hooks/useBrandStoryAttachments";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -26,6 +29,7 @@ export const ComponentDetailDialog = ({
 }: ComponentDetailDialogProps) => {
   const updateComponent = useUpdateBrandStoryComponent();
   const deleteComponent = useDeleteBrandStoryComponent();
+  const { data: attachments = [], refetch: refetchAttachments } = useBrandStoryAttachments(component?.id, undefined);
 
   if (!component) return null;
 
@@ -94,9 +98,10 @@ export const ComponentDetailDialog = ({
 
         <div className="flex-1 min-h-0 flex flex-col" style={{ minHeight: "400px" }}>
           <Tabs defaultValue="content" className="flex-1 flex flex-col">
-            <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
+            <TabsList className="grid w-full grid-cols-4 flex-shrink-0">
               <TabsTrigger value="content">Content</TabsTrigger>
               <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="attachments">Attachments</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
             </TabsList>
 
@@ -175,6 +180,30 @@ export const ComponentDetailDialog = ({
                   </div>
                  </>
                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="attachments" className="flex-1 overflow-y-auto mt-6 data-[state=active]:flex data-[state=active]:flex-col" style={{ minHeight: "350px" }}>
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-semibold mb-4">Upload Attachment</h4>
+                  <AttachmentUpload
+                    componentId={component.id}
+                    onUploadComplete={refetchAttachments}
+                  />
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h4 className="text-sm font-semibold mb-4">
+                    Attachments ({attachments.length})
+                  </h4>
+                  <AttachmentsTable
+                    attachments={attachments}
+                    onDelete={refetchAttachments}
+                  />
+                </div>
               </div>
             </TabsContent>
 
