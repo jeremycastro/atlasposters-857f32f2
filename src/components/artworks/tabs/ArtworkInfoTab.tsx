@@ -86,25 +86,23 @@ export function ArtworkInfoTab({ artwork }: ArtworkInfoTabProps) {
           )}
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="asc-code">ASC Code</Label>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="font-mono text-base px-3 py-1">
-                {artwork.asc_code}
-              </Badge>
-            </div>
+      <CardContent className="space-y-4">
+        <div className="grid gap-4">
+          <div className="grid grid-cols-[180px_1fr] items-center gap-4">
+            <Label htmlFor="asc-code" className="text-right">ASC Code</Label>
+            <Badge variant="outline" className="font-mono text-base px-3 py-1 w-fit">
+              {artwork.asc_code}
+            </Badge>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+          <div className="grid grid-cols-[180px_1fr] items-center gap-4">
+            <Label htmlFor="status" className="text-right">Status</Label>
             {isEditing ? (
               <Select
                 value={formData.status}
                 onValueChange={(value) => setFormData({ ...formData, status: value as any })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-[200px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -114,61 +112,57 @@ export function ArtworkInfoTab({ artwork }: ArtworkInfoTabProps) {
                 </SelectContent>
               </Select>
             ) : (
-              <div className="h-10 flex items-center">
-                <Badge variant={
-                  formData.status === 'active' ? 'default' :
-                  formData.status === 'draft' ? 'secondary' : 'outline'
-                }>
-                  {formData.status}
-                </Badge>
-              </div>
+              <Badge variant={
+                formData.status === 'active' ? 'default' :
+                formData.status === 'draft' ? 'secondary' : 'outline'
+              } className="w-fit">
+                {formData.status}
+              </Badge>
             )}
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="title">Title</Label>
-          {isEditing ? (
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            />
-          ) : (
-            <p className="text-sm py-2">{formData.title || "—"}</p>
-          )}
-        </div>
+          <div className="grid grid-cols-[180px_1fr] items-center gap-4">
+            <Label htmlFor="title" className="text-right">Title</Label>
+            {isEditing ? (
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              />
+            ) : (
+              <p className="text-sm">{formData.title || "—"}</p>
+            )}
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="artist">Artist Name</Label>
-          {isEditing ? (
-            <Input
-              id="artist"
-              value={formData.artist_name}
-              onChange={(e) => setFormData({ ...formData, artist_name: e.target.value })}
-            />
-          ) : (
-            <p className="text-sm py-2">{formData.artist_name || "—"}</p>
-          )}
-        </div>
+          <div className="grid grid-cols-[180px_1fr] items-center gap-4">
+            <Label htmlFor="artist" className="text-right">Artist Name</Label>
+            {isEditing ? (
+              <Input
+                id="artist"
+                value={formData.artist_name}
+                onChange={(e) => setFormData({ ...formData, artist_name: e.target.value })}
+              />
+            ) : (
+              <p className="text-sm">{formData.artist_name || "—"}</p>
+            )}
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          {isEditing ? (
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={4}
-            />
-          ) : (
-            <p className="text-sm py-2 whitespace-pre-wrap">{formData.description || "—"}</p>
-          )}
-        </div>
+          <div className="grid grid-cols-[180px_1fr] items-start gap-4">
+            <Label htmlFor="description" className="text-right pt-2">Description</Label>
+            {isEditing ? (
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={4}
+              />
+            ) : (
+              <p className="text-sm whitespace-pre-wrap">{formData.description || "—"}</p>
+            )}
+          </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="space-y-2">
-            <Label htmlFor="art-medium">Art Medium</Label>
+          <div className="grid grid-cols-[180px_1fr] items-center gap-4">
+            <Label htmlFor="art-medium" className="text-right">Art Medium</Label>
             {isEditing ? (
               <Input
                 id="art-medium"
@@ -177,12 +171,12 @@ export function ArtworkInfoTab({ artwork }: ArtworkInfoTabProps) {
                 placeholder="e.g., Oil on Canvas"
               />
             ) : (
-              <p className="text-sm py-2">{formData.art_medium || "—"}</p>
+              <p className="text-sm">{formData.art_medium || "—"}</p>
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="original-dimensions">Original Dimensions</Label>
+          <div className="grid grid-cols-[180px_1fr] items-center gap-4">
+            <Label htmlFor="original-dimensions" className="text-right">Original Dimensions</Label>
             {isEditing ? (
               <Input
                 id="original-dimensions"
@@ -191,12 +185,12 @@ export function ArtworkInfoTab({ artwork }: ArtworkInfoTabProps) {
                 placeholder="e.g., 24 x 36 inches"
               />
             ) : (
-              <p className="text-sm py-2">{formData.original_dimensions || "—"}</p>
+              <p className="text-sm">{formData.original_dimensions || "—"}</p>
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="year-created">Year Created</Label>
+          <div className="grid grid-cols-[180px_1fr] items-center gap-4">
+            <Label htmlFor="year-created" className="text-right">Year Created</Label>
             {isEditing ? (
               <Input
                 id="year-created"
@@ -204,19 +198,20 @@ export function ArtworkInfoTab({ artwork }: ArtworkInfoTabProps) {
                 value={formData.year_created || ""}
                 onChange={(e) => setFormData({ ...formData, year_created: e.target.value ? parseInt(e.target.value) : undefined })}
                 placeholder="e.g., 2023"
+                className="w-[200px]"
               />
             ) : (
-              <p className="text-sm py-2">{formData.year_created || "—"}</p>
+              <p className="text-sm">{formData.year_created || "—"}</p>
             )}
           </div>
-        </div>
 
-        {artwork.brand && (
-          <div className="space-y-2">
-            <Label>Brand</Label>
-            <p className="text-sm py-2">{artwork.brand.brand_name}</p>
-          </div>
-        )}
+          {artwork.brand && (
+            <div className="grid grid-cols-[180px_1fr] items-center gap-4">
+              <Label className="text-right">Brand</Label>
+              <p className="text-sm">{artwork.brand.brand_name}</p>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
