@@ -179,8 +179,10 @@ export const BrandTagManager = ({
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Sidebar - Category Navigation */}
         <aside className="lg:col-span-1 h-full flex flex-col border rounded-lg bg-card">
-          <div className="p-6 pb-4 border-b space-y-3">
-            <h3 className="font-semibold text-base">Browse Categories</h3>
+          <div className="p-6 space-y-4">
+            <div className="pb-4 border-b">
+              <h3 className="text-base font-semibold">Browse Categories</h3>
+            </div>
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input 
