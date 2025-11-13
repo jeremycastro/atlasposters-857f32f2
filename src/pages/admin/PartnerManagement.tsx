@@ -17,9 +17,16 @@ export default function PartnerManagement() {
   const { data: partners, isLoading } = usePartners();
   const { data: stats } = usePartnerStats();
 
-  const filteredPartners = partners?.filter((partner) =>
-    partner.partner_name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredPartners = partners?.filter((partner) => {
+    const query = searchQuery.toLowerCase();
+    // Search partner name
+    if (partner.partner_name.toLowerCase().includes(query)) return true;
+    // Search brand names
+    if (partner.brands?.some(brand => 
+      brand.brand_name.toLowerCase().includes(query)
+    )) return true;
+    return false;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -101,7 +108,7 @@ export default function PartnerManagement() {
       <div className="relative">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search partners..."
+          placeholder="Search partners and brands..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10"
