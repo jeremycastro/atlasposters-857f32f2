@@ -60,28 +60,50 @@ export default function TagManagement() {
   
   const { data: tags, isLoading: tagsLoading } = useTags(selectedCategory || "");
 
-  // Global search across all categories
+  // Global search across all categories, grouped by category groups
   const globalSearchResults = useMemo(() => {
     if (!globalSearchTerm || !categories) return null;
     
-    const results: { category: Category, matchingTags: Tag[] }[] = [];
+    const groupedResults: { 
+      groupName: string, 
+      groupIcon: any, 
+      categories: { category: Category, matchingTags: Tag[] }[] 
+    }[] = [];
     
-    categories.forEach((category: any) => {
-      const categoryTags = category.tag_definitions || [];
-      const matches = categoryTags.filter((tag: Tag) => 
-        tag.display_name.toLowerCase().includes(globalSearchTerm.toLowerCase()) ||
-        tag.tag_key.toLowerCase().includes(globalSearchTerm.toLowerCase())
-      );
+    // Iterate through each category group
+    Object.entries(CATEGORY_GROUPS).forEach(([groupName, groupData]) => {
+      const categoriesInGroup: { category: Category, matchingTags: Tag[] }[] = [];
       
-      if (matches.length > 0) {
-        results.push({ category, matchingTags: matches });
+      // Find categories that belong to this group
+      categories.forEach((category: any) => {
+        if (groupData.categories.includes(category.category_key)) {
+          const categoryTags = category.tag_definitions || [];
+          const matches = categoryTags.filter((tag: Tag) => 
+            tag.display_name.toLowerCase().includes(globalSearchTerm.toLowerCase()) ||
+            tag.tag_key.toLowerCase().includes(globalSearchTerm.toLowerCase())
+          );
+          
+          if (matches.length > 0) {
+            categoriesInGroup.push({ category, matchingTags: matches });
+          }
+        }
+      });
+      
+      if (categoriesInGroup.length > 0) {
+        groupedResults.push({ 
+          groupName, 
+          groupIcon: groupData.icon, 
+          categories: categoriesInGroup 
+        });
       }
     });
     
-    return results;
+    return groupedResults;
   }, [globalSearchTerm, categories]);
 
-  const totalGlobalResults = globalSearchResults?.reduce((sum, r) => sum + r.matchingTags.length, 0) || 0;
+  const totalGlobalResults = globalSearchResults?.reduce((sum, group) => 
+    sum + group.categories.reduce((catSum, cat) => catSum + cat.matchingTags.length, 0), 0
+  ) || 0;
 
   // Local search within selected category
   const filteredTags = tags?.filter(tag =>
@@ -134,11 +156,11 @@ export default function TagManagement() {
                 <CollapsibleTrigger asChild>
                   <Button 
                     variant="ghost" 
-                    className="w-full justify-between text-xs font-semibold text-muted-foreground hover:text-foreground"
+                    className="w-full justify-between text-sm font-bold text-primary hover:text-primary hover:bg-primary/10 py-6"
                   >
-                    <div className="flex items-center">
-                      <group.icon className="h-4 w-4 mr-2" />
-                      {groupName}
+                    <div className="flex items-center gap-2">
+                      <group.icon className="h-5 w-5" />
+                      <span className="uppercase tracking-wide">{groupName}</span>
                     </div>
                     <ChevronDown className={`h-4 w-4 transition-transform ${openGroups[groupName] ? 'rotate-180' : ''}`} />
                   </Button>
@@ -246,77 +268,99 @@ export default function TagManagement() {
                 </div>
                 
                 {globalSearchResults && globalSearchResults.length > 0 ? (
-                  <div className="space-y-4">
-                    {globalSearchResults.map(({ category, matchingTags }) => (
-                      <Card key={category.id}>
-                        <CardHeader>
-                          <CardTitle className="text-lg">{category.display_name}</CardTitle>
-                          <CardDescription>
-                            {matchingTags.length} matching tag{matchingTags.length !== 1 ? 's' : ''}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead>Tag Name</TableHead>
-                                <TableHead>Key</TableHead>
-                                <TableHead>Type</TableHead>
-                                <TableHead className="text-right">Usage</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {matchingTags.map((tag) => (
-                                <TableRow 
-                                  key={tag.id}
-                                  className="cursor-pointer hover:bg-muted/50"
-                                  onClick={() => {
-                                    setSelectedTag(tag);
-                                    setEditTagOpen(true);
-                                  }}
-                                >
-                                  <TableCell className="font-medium">{tag.display_name}</TableCell>
-                                  <TableCell className="font-mono text-sm">{tag.tag_key}</TableCell>
-                                  <TableCell>
-                                    <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'}>
-                                      {tag.tag_type}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell className="text-right">{tag.usage_count}</TableCell>
-                                  <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setSelectedTag(tag);
-                                          setEditTagOpen(true);
-                                        }}
-                                      >
-                                        <Edit className="h-4 w-4" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setSelectedTag(tag);
-                                          setDeleteTagOpen(true);
-                                        }}
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </CardContent>
-                      </Card>
-                    ))}
+                  <div className="space-y-8">
+                    {globalSearchResults.map(({ groupName, groupIcon: GroupIcon, categories: categoriesInGroup }) => {
+                      const totalGroupTags = categoriesInGroup.reduce((sum, cat) => sum + cat.matchingTags.length, 0);
+                      
+                      return (
+                        <div key={groupName} className="space-y-4">
+                          {/* Category Group Header */}
+                          <div className="bg-primary/5 border-l-4 border-primary rounded-lg p-4">
+                            <div className="flex items-center gap-3">
+                              <GroupIcon className="h-6 w-6 text-primary" />
+                              <h3 className="text-xl font-bold text-primary">{groupName}</h3>
+                              <Badge variant="secondary" className="ml-auto">
+                                {categoriesInGroup.length} {categoriesInGroup.length === 1 ? 'category' : 'categories'} • {totalGroupTags} {totalGroupTags === 1 ? 'tag' : 'tags'}
+                              </Badge>
+                            </div>
+                          </div>
+                          
+                          {/* Categories within this group */}
+                          <div className="space-y-4 ml-4">
+                            {categoriesInGroup.map(({ category, matchingTags }) => (
+                              <Card key={category.id}>
+                                <CardHeader>
+                                  <CardTitle className="text-lg">{category.display_name}</CardTitle>
+                                  <CardDescription>
+                                    {matchingTags.length} matching tag{matchingTags.length !== 1 ? 's' : ''}
+                                  </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                  <Table>
+                                    <TableHeader>
+                                      <TableRow>
+                                        <TableHead>Tag Name</TableHead>
+                                        <TableHead>Key</TableHead>
+                                        <TableHead>Type</TableHead>
+                                        <TableHead className="text-right">Usage</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                      {matchingTags.map((tag) => (
+                                        <TableRow 
+                                          key={tag.id}
+                                          className="cursor-pointer hover:bg-muted/50"
+                                          onClick={() => {
+                                            setSelectedTag(tag);
+                                            setEditTagOpen(true);
+                                          }}
+                                        >
+                                          <TableCell className="font-medium">{tag.display_name}</TableCell>
+                                          <TableCell className="font-mono text-sm">{tag.tag_key}</TableCell>
+                                          <TableCell>
+                                            <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'}>
+                                              {tag.tag_type}
+                                            </Badge>
+                                          </TableCell>
+                                          <TableCell className="text-right">{tag.usage_count}</TableCell>
+                                          <TableCell className="text-right">
+                                            <div className="flex items-center justify-end gap-1">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  setSelectedTag(tag);
+                                                  setEditTagOpen(true);
+                                                }}
+                                              >
+                                                <Edit className="h-4 w-4" />
+                                              </Button>
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  setSelectedTag(tag);
+                                                  setDeleteTagOpen(true);
+                                                }}
+                                              >
+                                                <Trash2 className="h-4 w-4" />
+                                              </Button>
+                                            </div>
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : (
                   <Card>
