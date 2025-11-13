@@ -46,6 +46,7 @@ const CATEGORY_GROUPS = {
 export const BrandTagManager = ({ brandId, brandName }: BrandTagManagerProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sidebarSearchTerm, setSidebarSearchTerm] = useState("");
   const [createTagOpen, setCreateTagOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     'Core Artwork': true,
@@ -90,6 +91,17 @@ export const BrandTagManager = ({ brandId, brandName }: BrandTagManagerProps) =>
       tag.tag_key.toLowerCase().includes(searchLower)
     );
   }, [availableTags, searchTerm]);
+
+  // Filter categories by sidebar search
+  const filteredCategories = useMemo(() => {
+    if (!categories) return [];
+    if (!sidebarSearchTerm) return categories;
+    const searchLower = sidebarSearchTerm.toLowerCase();
+    return categories.filter(cat =>
+      cat.display_name.toLowerCase().includes(searchLower) ||
+      cat.category_key.toLowerCase().includes(searchLower)
+    );
+  }, [categories, sidebarSearchTerm]);
 
   // Count artworks under this brand
   const { data: artworkCount } = useQuery({
@@ -170,16 +182,28 @@ export const BrandTagManager = ({ brandId, brandName }: BrandTagManagerProps) =>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Sidebar - Category Navigation */}
         <aside className="lg:col-span-1 h-full flex flex-col border rounded-lg bg-card">
-          <div className="p-3 border-b">
+          <div className="p-3 border-b space-y-3">
             <h3 className="font-semibold text-sm">Browse Categories</h3>
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search categories..."
+                value={sidebarSearchTerm}
+                onChange={(e) => setSidebarSearchTerm(e.target.value)}
+                className="pl-8"
+              />
+            </div>
           </div>
           <ScrollArea className="flex-1">
             <div className="p-2 space-y-1">
               {Object.entries(CATEGORY_GROUPS).map(([groupName, groupData]) => {
                 const Icon = groupData.icon;
-                const groupCategories = categories?.filter(cat => 
+                const groupCategories = filteredCategories?.filter(cat => 
                   groupData.categories.includes(cat.category_key)
                 );
+
+                // Hide group if no matching categories
+                if (!groupCategories || groupCategories.length === 0) return null;
 
                 return (
                   <Collapsible
