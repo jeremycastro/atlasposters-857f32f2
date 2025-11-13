@@ -67,6 +67,7 @@ interface ArtworkTableViewProps {
   onView: (artwork: Artwork) => void;
   onEdit: (artwork: Artwork) => void;
   onArchive: (artwork: Artwork) => void;
+  searchBar?: React.ReactNode;
 }
 
 type SortField = "asc_code" | "title" | "artist_name" | "status" | "created_at" | null;
@@ -148,7 +149,7 @@ function SortableHeader({ column, sortField, sortDirection, onSort }: SortableHe
   );
 }
 
-export function ArtworkTableView({ artworks, onView, onEdit, onArchive }: ArtworkTableViewProps) {
+export function ArtworkTableView({ artworks, onView, onEdit, onArchive, searchBar }: ArtworkTableViewProps) {
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [columns, setColumns] = useState<ColumnConfig[]>(DEFAULT_COLUMNS);
@@ -420,7 +421,8 @@ export function ArtworkTableView({ artworks, onView, onEdit, onArchive }: Artwor
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex items-center gap-4">
+        {searchBar && <div className="flex-1">{searchBar}</div>}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
