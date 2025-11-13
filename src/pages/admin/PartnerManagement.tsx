@@ -1,18 +1,18 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { usePartners, usePartnerStats } from "@/hooks/usePartnerManagement";
 import { CreatePartnerDialog } from "@/components/partner/CreatePartnerDialog";
-import { PartnerDetailDialog } from "@/components/partner/PartnerDetailDialog";
 import { Plus, Search, Building2, Users, FileText, TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function PartnerManagement() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
 
   const { data: partners, isLoading } = usePartners();
   const { data: stats } = usePartnerStats();
@@ -129,7 +129,7 @@ export default function PartnerManagement() {
             <Card
               key={partner.id}
               className="cursor-pointer hover:border-primary transition-colors"
-              onClick={() => setSelectedPartnerId(partner.id)}
+              onClick={() => navigate(`/admin/partners/${partner.id}`)}
             >
               <CardHeader>
                 <div className="flex justify-between items-start">
@@ -192,11 +192,6 @@ export default function PartnerManagement() {
       )}
 
       <CreatePartnerDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />
-      <PartnerDetailDialog
-        partnerId={selectedPartnerId}
-        open={!!selectedPartnerId}
-        onOpenChange={(open) => !open && setSelectedPartnerId(null)}
-      />
     </div>
   );
 }

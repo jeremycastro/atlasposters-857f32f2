@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,8 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Plus, Edit, Palette, Save, X, Trash2, Tags } from "lucide-react";
 import { useCreateBrand, useUpdateBrand, useDeleteBrand } from "@/hooks/usePartnerMutations";
 import { BrandLogoUpload } from "@/components/partner/BrandLogoUpload";
-import { BrandTagDrawer } from "@/components/brands/BrandTagDrawer";
-import { BrandTagManager } from "@/components/brands/BrandTagManager";
 import { useEntityTags } from "@/hooks/useTags";
 import type { Brand } from "@/types/partner";
 interface BrandFormData {
@@ -237,12 +236,11 @@ export function BrandsTab({
   partnerId,
   brands
 }: BrandsTabProps) {
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
-  const [tagDrawerOpen, setTagDrawerOpen] = useState(false);
-  const [selectedBrandForTags, setSelectedBrandForTags] = useState<Brand | null>(null);
   const [formData, setFormData] = useState<BrandFormData>({
     brand_name: "",
     description: "",
@@ -380,8 +378,7 @@ export function BrandsTab({
 
   const handleManageTags = (brand: Brand, e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedBrandForTags(brand);
-    setTagDrawerOpen(true);
+    navigate(`/admin/partners/${partnerId}/brands/${brand.id}/tags`);
   };
   if (showForm) {
     return <div className="flex flex-col h-full">
@@ -648,17 +645,6 @@ export function BrandsTab({
                   Save the brand first to upload a logo
                 </p>}
             </div>
-
-            {/* Brand Tags */}
-            {editingBrand && (
-              <div className="border rounded-lg p-4 space-y-2">
-                <h4 className="font-medium text-sm text-muted-foreground mb-3 flex items-center gap-2">
-                  <Tags className="h-4 w-4" />
-                  Brand Tags
-                </h4>
-                <BrandTagManager brandId={editingBrand.id} brandName={editingBrand.brand_name} />
-              </div>
-            )}
           </form>
         </div>
         <div className="sticky bottom-0 left-0 right-0 bg-background border-t p-4 flex gap-2 justify-end">
@@ -772,18 +758,5 @@ export function BrandsTab({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {selectedBrandForTags && (
-        <BrandTagDrawer
-          isOpen={tagDrawerOpen}
-          onClose={() => {
-            setTagDrawerOpen(false);
-            setSelectedBrandForTags(null);
-          }}
-          brandId={selectedBrandForTags.id}
-          brandName={selectedBrandForTags.brand_name}
-          brandLogoUrl={selectedBrandForTags.logo_url}
-        />
-      )}
     </div>;
 }

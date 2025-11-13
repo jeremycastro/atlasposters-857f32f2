@@ -34,6 +34,8 @@ import PartnerDashboard from "./pages/partner/Dashboard";
 import ArtworkCatalog from "./pages/partner/ArtworkCatalog";
 import NavigationManager from "./pages/admin/NavigationManager";
 import PartnerManagement from "./pages/admin/PartnerManagement";
+import PartnerDetail from "./pages/admin/PartnerDetail";
+import BrandTagManagement from "./pages/admin/BrandTagManagement";
 import Payouts from "./pages/admin/Payouts";
 import CustomerDashboard from "./pages/customer/Dashboard";
 import BrandStory from "./pages/admin/knowledge/BrandStory";
@@ -94,6 +96,8 @@ const App = () => (
               <Route path="users" element={<UserManagement />} />
               <Route path="navigation" element={<NavigationManager />} />
               <Route path="partners" element={<PartnerManagement />} />
+              <Route path="partners/:partnerId" element={<PartnerDetail />} />
+              <Route path="partners/:partnerId/brands/:brandId/tags" element={<BrandTagManagement />} />
               <Route path="payouts" element={<Payouts />} />
               <Route path="tag-management" element={<TagManagement />} />
             </Route>
