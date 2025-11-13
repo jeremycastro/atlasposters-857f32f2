@@ -278,7 +278,7 @@ export const BrandTagManager = ({
             </Card>}
 
           {/* Browse & Add Tags */}
-          <Card>
+          <Card className="flex-1 flex flex-col overflow-hidden">
             {globalSearchTerm ? (
               // Global Search Results View
               <>
@@ -294,7 +294,7 @@ export const BrandTagManager = ({
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1 overflow-auto">
                   {globalSearchResults.length > 0 ? (
                     <div className="space-y-4">
                       {/* Group results by category */}
@@ -366,7 +366,7 @@ export const BrandTagManager = ({
                     <Input placeholder="Search tags..." value={localSearchTerm} onChange={e => setLocalSearchTerm(e.target.value)} className="pl-8" />
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1 overflow-auto">
                   {selectedCategory ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                       {filteredAvailableTags.map(tag => {
