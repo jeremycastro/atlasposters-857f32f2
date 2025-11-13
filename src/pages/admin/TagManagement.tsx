@@ -129,132 +129,134 @@ export default function TagManagement() {
 
   return (
     <>
-      <div className="flex min-h-screen w-full">
-      {/* Category Navigation Sidebar */}
-      <aside className="w-80 border-r bg-muted/40 flex flex-col fixed left-64 top-0 h-screen z-10">
-        <div className="p-4 border-b">
-          <h2 className="font-semibold text-lg mb-3">Categories</h2>
-          <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search all tags..."
-              value={globalSearchTerm}
-              onChange={(e) => setGlobalSearchTerm(e.target.value)}
-              className="pl-8"
-            />
+      <div className="p-8 space-y-6">
+        {/* Top Header - Full Width */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Tag Management</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage categories, tags, and taxonomy structure
+            </p>
           </div>
         </div>
-        
-        <ScrollArea className="flex-1">
-          <div className="p-2 space-y-1">
-            {Object.entries(CATEGORY_GROUPS).map(([groupName, group]) => (
-              <Collapsible
-                key={groupName}
-                open={openGroups[groupName]}
-                onOpenChange={() => toggleGroup(groupName)}
-              >
-                <CollapsibleTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-between text-sm font-bold text-primary hover:text-primary hover:bg-primary/10 py-6"
-                  >
-                    <div className="flex items-center gap-2">
-                      <group.icon className="h-5 w-5" />
-                      <span className="uppercase tracking-wide">{groupName}</span>
-                    </div>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${openGroups[groupName] ? 'rotate-180' : ''}`} />
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="space-y-1 mt-1">
-                  {group.categories.map(categoryKey => {
-                    const category = categories?.find(c => c.category_key === categoryKey);
-                    const tagCount = category?.tag_count || 0;
-                    
-                    if (!category) return null;
-                    
-                    return (
-                      <Button
-                        key={categoryKey}
-                        variant={selectedCategory === categoryKey ? "secondary" : "ghost"}
-                        className="w-full flex items-center justify-between text-sm pl-8 pr-2 gap-2"
-                        onClick={() => {
-                          setSelectedCategory(categoryKey);
-                          setGlobalSearchTerm("");
-                          setLocalSearchTerm("");
-                        }}
-                      >
-                        <span className="truncate">{category.display_name}</span>
-                        <Badge variant="secondary" className="shrink-0">
-                          {tagCount}
-                        </Badge>
-                      </Button>
-                    );
-                  })}
-                </CollapsibleContent>
-              </Collapsible>
-            ))}
-          </div>
-        </ScrollArea>
-        
-        <div className="p-4 border-t">
-          <Button variant="outline" onClick={() => setCreateCategoryOpen(true)} className="w-full">
-            <Plus className="h-4 w-4 mr-2" />
-            New Category
-          </Button>
-        </div>
-      </aside>
 
-      {/* Main Content Area - Offset by both sidebars */}
-      <main className="flex-1 ml-80">
-          <div className="p-8 space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold">Tag Management</h1>
-                <p className="text-muted-foreground mt-1">
-                  Manage categories, tags, and taxonomy structure
-                </p>
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Total Categories</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{categories?.length || 0}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Total Tags</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalTags}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Active Tags</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{tags?.filter(t => t.usage_count > 0).length || 0}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                Most Used Tag
+                <TrendingUp className="h-4 w-4" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-sm font-medium">{mostUsedTag?.display_name || "N/A"}</div>
+              <div className="text-xs text-muted-foreground">{mostUsedTag?.usage_count || 0} uses</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Two Column Layout: Sidebar + Content */}
+        <div className="grid grid-cols-[320px_1fr] gap-6">
+          {/* Category Navigation Sidebar */}
+          <aside className="border rounded-lg bg-card flex flex-col h-[calc(100vh-24rem)] sticky top-8">
+            <div className="p-4 border-b">
+              <h2 className="font-semibold text-lg mb-3">Categories</h2>
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search all tags..."
+                  value={globalSearchTerm}
+                  onChange={(e) => setGlobalSearchTerm(e.target.value)}
+                  className="pl-8"
+                />
               </div>
             </div>
-
-            <div className="grid gap-4 md:grid-cols-4">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium">Total Categories</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{categories?.length || 0}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium">Total Tags</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{totalTags}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium">Active Tags</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{tags?.filter(t => t.usage_count > 0).length || 0}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    Most Used Tag
-                    <TrendingUp className="h-4 w-4" />
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm font-medium">{mostUsedTag?.display_name || "N/A"}</div>
-                  <div className="text-xs text-muted-foreground">{mostUsedTag?.usage_count || 0} uses</div>
-                </CardContent>
-              </Card>
+            
+            <ScrollArea className="flex-1">
+              <div className="p-2 space-y-1">
+                {Object.entries(CATEGORY_GROUPS).map(([groupName, group]) => (
+                  <Collapsible
+                    key={groupName}
+                    open={openGroups[groupName]}
+                    onOpenChange={() => toggleGroup(groupName)}
+                  >
+                    <CollapsibleTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-between text-sm font-bold text-primary hover:text-primary hover:bg-primary/10 py-6"
+                      >
+                        <div className="flex items-center gap-2">
+                          <group.icon className="h-5 w-5" />
+                          <span className="uppercase tracking-wide">{groupName}</span>
+                        </div>
+                        <ChevronDown className={`h-4 w-4 transition-transform ${openGroups[groupName] ? 'rotate-180' : ''}`} />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-1 mt-1">
+                      {group.categories.map(categoryKey => {
+                        const category = categories?.find(c => c.category_key === categoryKey);
+                        const tagCount = category?.tag_count || 0;
+                        
+                        if (!category) return null;
+                        
+                        return (
+                          <Button
+                            key={categoryKey}
+                            variant={selectedCategory === categoryKey ? "secondary" : "ghost"}
+                            className="w-full flex items-center justify-between text-sm pl-8 pr-2 gap-2"
+                            onClick={() => {
+                              setSelectedCategory(categoryKey);
+                              setGlobalSearchTerm("");
+                              setLocalSearchTerm("");
+                            }}
+                          >
+                            <span className="truncate">{category.display_name}</span>
+                            <Badge variant="secondary" className="shrink-0">
+                              {tagCount}
+                            </Badge>
+                          </Button>
+                        );
+                      })}
+                    </CollapsibleContent>
+                  </Collapsible>
+                ))}
+              </div>
+            </ScrollArea>
+            
+            <div className="p-4 border-t">
+              <Button variant="outline" onClick={() => setCreateCategoryOpen(true)} className="w-full">
+                <Plus className="h-4 w-4 mr-2" />
+                New Category
+              </Button>
             </div>
+          </aside>
 
+          {/* Main Content Area */}
+          <div className="space-y-6">
             {globalSearchTerm ? (
               // Global search results view
               <div className="space-y-6">
@@ -488,7 +490,7 @@ export default function TagManagement() {
               )
             )}
           </div>
-        </main>
+        </div>
       </div>
 
       {/* Dialogs */}
