@@ -339,11 +339,6 @@ export const BrandTagManager = ({ brandId, brandName }: BrandTagManagerProps) =>
                       >
                         <span className="truncate">{tag.display_name}</span>
                         <div className="flex items-center gap-1 shrink-0">
-                          {tag.usage_count > 0 && (
-                            <Badge variant="secondary" className="text-xs px-1">
-                              {tag.usage_count}
-                            </Badge>
-                          )}
                           {isApplied && <Check className="h-3 w-3" />}
                           {!isApplied && <Plus className="h-3 w-3" />}
                         </div>
