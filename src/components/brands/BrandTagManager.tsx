@@ -55,6 +55,7 @@ export const BrandTagManager = ({
     'Seasonal & Occasion': false,
     'Technical & Production': false
   });
+  const [currentTagsOpen, setCurrentTagsOpen] = useState(true);
 
   // Fetch brand tags
   const {
@@ -218,28 +219,36 @@ export const BrandTagManager = ({
         {/* Main Content Area */}
         <div className="lg:col-span-3 space-y-4 flex flex-col h-full">
           {/* Current Brand Tags */}
-          {brandTags && brandTags.length > 0 && <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Current Brand Tags</CardTitle>
-                
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {Object.entries(tagsByCategory || {}).map(([categoryName, tags]) => <div key={categoryName} className="space-y-1">
-                      <div className="text-xs text-muted-foreground font-medium">
-                        {categoryName}
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {tags.map(tag => <TagPill key={tag.tag_id} tag={{
-                    display_name: tag.tag_name,
-                    category_name: tag.category_name,
-                    source: tag.source
-                  }} onRemove={() => handleRemoveTag(tag.tag_id)} />)}
-                      </div>
-                    </div>)}
-                </div>
-              </CardContent>
-            </Card>}
+          {brandTags && brandTags.length > 0 && <Collapsible open={currentTagsOpen} onOpenChange={setCurrentTagsOpen}>
+              <Card>
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Current Brand Tags</CardTitle>
+                      <ChevronDown className={cn("h-4 w-4 transition-transform", currentTagsOpen && "rotate-180")} />
+                    </div>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {Object.entries(tagsByCategory || {}).map(([categoryName, tags]) => <div key={categoryName} className="space-y-1">
+                          <div className="text-xs text-muted-foreground font-medium">
+                            {categoryName}
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {tags.map(tag => <TagPill key={tag.tag_id} tag={{
+                        display_name: tag.tag_name,
+                        category_name: tag.category_name,
+                        source: tag.source
+                      }} onRemove={() => handleRemoveTag(tag.tag_id)} />)}
+                          </div>
+                        </div>)}
+                    </div>
+                  </CardContent>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>}
 
 
           {/* Browse & Add Tags */}
