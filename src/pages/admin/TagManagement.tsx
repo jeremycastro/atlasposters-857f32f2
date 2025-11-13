@@ -222,12 +222,11 @@ export default function TagManagement() {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="w-[20%]">Tag Name</TableHead>
-                            <TableHead className="w-[18%]">Category</TableHead>
-                            <TableHead className="w-[20%]">Key</TableHead>
-                            <TableHead className="w-[12%]">Type</TableHead>
+                            <TableHead className="w-[25%]">Tag Name</TableHead>
+                            <TableHead className="w-[23%]">Category</TableHead>
+                            <TableHead className="w-[25%]">Key</TableHead>
                             <TableHead className="w-[10%] text-right">Usage</TableHead>
-                            <TableHead className="w-[20%] text-right">Actions</TableHead>
+                            <TableHead className="w-[17%] text-right">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -238,9 +237,6 @@ export default function TagManagement() {
                                 <Badge variant="outline" className="text-xs">{tag.category?.display_name || 'Unknown'}</Badge>
                               </TableCell>
                               <TableCell className="font-mono text-sm py-1.5">{tag.tag_key}</TableCell>
-                              <TableCell className="py-1.5">
-                                <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'} className="text-xs">{tag.tag_type}</Badge>
-                              </TableCell>
                               <TableCell className="text-right py-1.5">{tag.usage_count}</TableCell>
                               <TableCell className="text-right py-1.5">
                                 <div className="flex items-center justify-end gap-1">
@@ -314,10 +310,10 @@ export default function TagManagement() {
                             <TableHeader>
                               <TableRow>
                                 <TableHead className="w-[25%]">Tag Name</TableHead>
-                                <TableHead className="w-[30%]">Key</TableHead>
-                                <TableHead className="w-[15%]">Type</TableHead>
+                                <TableHead className="w-[23%]">Category</TableHead>
+                                <TableHead className="w-[25%]">Key</TableHead>
                                 <TableHead className="w-[10%] text-right">Usage</TableHead>
-                                <TableHead className="w-[20%] text-right">Actions</TableHead>
+                                <TableHead className="w-[17%] text-right">Actions</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -327,12 +323,10 @@ export default function TagManagement() {
                                   setEditTagOpen(true);
                                 }}>
                                   <TableCell className="font-medium py-1.5">{tag.display_name}</TableCell>
-                                  <TableCell className="font-mono text-sm py-1.5">{tag.tag_key}</TableCell>
                                   <TableCell className="py-1.5">
-                                    <Badge variant={tag.tag_type === 'system' ? 'secondary' : 'outline'} className="text-xs">
-                                      {tag.tag_type}
-                                    </Badge>
+                                    <Badge variant="outline" className="text-xs">{selectedCategoryData2?.display_name}</Badge>
                                   </TableCell>
+                                  <TableCell className="font-mono text-sm py-1.5">{tag.tag_key}</TableCell>
                                   <TableCell className="text-right py-1.5">{tag.usage_count}</TableCell>
                                   <TableCell className="text-right py-1.5">
                                     <div className="flex items-center justify-end gap-1">
