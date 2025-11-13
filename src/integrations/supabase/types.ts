@@ -2844,6 +2844,7 @@ export type Database = {
           entity_id: string
         }[]
       }
+      sync_brand_tags_to_artworks: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "editor" | "viewer" | "partner" | "customer"
