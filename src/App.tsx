@@ -35,6 +35,7 @@ import ArtworkCatalog from "./pages/partner/ArtworkCatalog";
 import NavigationManager from "./pages/admin/NavigationManager";
 import PartnerManagement from "./pages/admin/PartnerManagement";
 import PartnerDetail from "./pages/admin/PartnerDetail";
+import ArtworkDetail from "./pages/admin/ArtworkDetail";
 import BrandTagManagement from "./pages/admin/BrandTagManagement";
 import Payouts from "./pages/admin/Payouts";
 import CustomerDashboard from "./pages/customer/Dashboard";
@@ -93,6 +94,7 @@ const App = () => (
               <Route path="brand-story" element={<BrandStoryDashboard />} />
               <Route path="brand-story/timeline" element={<BrandTimeline />} />
               <Route path="artworks" element={<ArtworkCatalog />} />
+              <Route path="artworks/:artworkId" element={<ArtworkDetail />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="navigation" element={<NavigationManager />} />
               <Route path="partners" element={<PartnerManagement />} />
