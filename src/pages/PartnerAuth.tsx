@@ -96,7 +96,8 @@ export default function PartnerAuth() {
         .insert({
           user_id: session.user.id,
           role: 'partner',
-          notes: 'Partner application submitted'
+          is_active: false,
+          notes: 'Partner application submitted - pending admin approval'
         });
 
       toast({
