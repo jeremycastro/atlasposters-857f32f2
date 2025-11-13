@@ -13,6 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { CreateTagDialog } from "@/components/tags/CreateTagDialog";
 
 interface BrandTagManagerProps {
   brandId: string;
@@ -45,6 +46,7 @@ const CATEGORY_GROUPS = {
 export const BrandTagManager = ({ brandId, brandName }: BrandTagManagerProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [createTagOpen, setCreateTagOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     'Core Artwork': true,
     'Commercial Application': false,
@@ -295,12 +297,29 @@ export const BrandTagManager = ({ brandId, brandName }: BrandTagManagerProps) =>
           {/* Browse & Add Tags */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">
-                {selectedCategoryData?.display_name || 'Select a Category'}
-              </CardTitle>
-              <CardDescription>
-                Click tags to add or remove them from this brand
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base">
+                    {selectedCategoryData?.display_name || 'Select a Category'}
+                  </CardTitle>
+                  <CardDescription>
+                    Click tags to add or remove them from this brand
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">
+                    {filteredAvailableTags.length} tags
+                  </Badge>
+                  <Button
+                    size="sm"
+                    onClick={() => setCreateTagOpen(true)}
+                    disabled={!selectedCategory}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    New
+                  </Button>
+                </div>
+              </div>
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -346,6 +365,14 @@ export const BrandTagManager = ({ brandId, brandName }: BrandTagManagerProps) =>
           </Card>
         </div>
       </div>
+
+      {/* Create Tag Dialog */}
+      <CreateTagDialog
+        open={createTagOpen}
+        onOpenChange={setCreateTagOpen}
+        categoryKey={selectedCategory || ""}
+        categoryName={selectedCategoryData?.display_name || ""}
+      />
     </div>
   );
 };
