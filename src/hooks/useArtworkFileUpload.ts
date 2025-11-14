@@ -191,14 +191,45 @@ export const useArtworkFileUpload = () => {
 
   const deleteFile = async (fileId: string, filePath: string) => {
     try {
-      // Delete from storage
+      // Find all thumbnails associated with this original file
+      const { data: thumbnails, error: queryError } = await supabase
+        .from('artwork_files')
+        .select('id, file_path')
+        .eq('file_type', 'thumbnail')
+        .filter('metadata->>original_file_id', 'eq', fileId);
+
+      if (queryError) throw queryError;
+
+      // Delete thumbnails from storage
+      if (thumbnails && thumbnails.length > 0) {
+        const thumbnailPaths = thumbnails.map(t => t.file_path);
+        const { error: thumbnailStorageError } = await supabase.storage
+          .from('brand-assets')
+          .remove(thumbnailPaths);
+
+        if (thumbnailStorageError) {
+          console.warn('Failed to delete some thumbnails from storage:', thumbnailStorageError);
+        }
+
+        // Delete thumbnails from database
+        const { error: thumbnailDbError } = await supabase
+          .from('artwork_files')
+          .delete()
+          .in('id', thumbnails.map(t => t.id));
+
+        if (thumbnailDbError) {
+          console.warn('Failed to delete some thumbnails from database:', thumbnailDbError);
+        }
+      }
+
+      // Delete original file from storage
       const { error: storageError } = await supabase.storage
         .from('brand-assets')
         .remove([filePath]);
 
       if (storageError) throw storageError;
 
-      // Delete from database
+      // Delete original file from database
       const { error: dbError } = await supabase
         .from('artwork_files')
         .delete()
@@ -208,7 +239,9 @@ export const useArtworkFileUpload = () => {
 
       toast({
         title: 'File deleted',
-        description: 'File has been removed',
+        description: thumbnails && thumbnails.length > 0 
+          ? `File and ${thumbnails.length} thumbnail(s) removed`
+          : 'File has been removed',
       });
     } catch (error: any) {
       console.error('Delete error:', error);
