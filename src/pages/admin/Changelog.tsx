@@ -10,7 +10,61 @@ interface ChangelogEntry {
   }[];
 }
 
-export const changelogData: ChangelogEntry[] = [
+const changelogData: ChangelogEntry[] = [
+  {
+    version: "0.5.0",
+    date: "2025-11-14",
+    changes: [
+      {
+        type: "added",
+        description: "3-Variant SKU Architecture - Complete implementation of VAR1/VAR2/VAR3 system supporting up to 3 variant dimensions (color, size, finish) with 20-character SKU limit",
+      },
+      {
+        type: "added",
+        description: "Variant Hierarchy Configuration - Visual interface to define which variant dimension maps to VAR1, VAR2, VAR3 based on product type, with drag-and-drop reordering",
+      },
+      {
+        type: "added",
+        description: "Print File Auto-Assignment - Intelligent hierarchical SKU matching system that parses print file names (e.g., 11K001-UTS-01_print.png) and suggests assignments with confidence scores",
+      },
+      {
+        type: "added",
+        description: "Variant Builder Component - Structured variant creation UI with dropdown selectors for VAR1/VAR2/VAR3, automatic SKU generation, and real-time preview",
+      },
+      {
+        type: "added",
+        description: "Products Tab on Artwork Detail - Comprehensive product and variant management with tabs for variants, print file assignment, and configuration",
+      },
+      {
+        type: "added",
+        description: "Database Functions - parse_sku_from_filename() for intelligent SKU extraction from filenames with match level detection (exact, hierarchical, product-level)",
+      },
+      {
+        type: "changed",
+        description: "SKU Length Constraint - Increased from 16 to 20 characters to support 3D variant SKUs (e.g., 11K001-PST-00-02-01 = 19 chars)",
+      },
+      {
+        type: "changed",
+        description: "build_full_sku Function - Updated to accept VAR1, VAR2, VAR3 parameters with default '99' (N/A) for missing dimensions",
+      },
+      {
+        type: "changed",
+        description: "Print File Suggestions - Replaced tag-based matching with hierarchical SKU parsing for accurate file-to-variant assignments",
+      },
+      {
+        type: "changed",
+        description: "Variant Code Validation - Added database constraint restricting variant_codes to 00-98 range (99 reserved as N/A placeholder)",
+      },
+      {
+        type: "added",
+        description: "Variant Validation Utilities - Client-side validation helpers for SKU format, variant codes, and SKU parsing with user-friendly error messages",
+      },
+      {
+        type: "added",
+        description: "SKU Documentation Updates - Complete refresh of SKU Methodology page with VAR1/VAR2/VAR3 architecture, print file matching rules, and real-world examples",
+      },
+    ],
+  },
   {
     version: "0.4.1",
     date: "2024-11-12",
@@ -210,6 +264,8 @@ export const changelogData: ChangelogEntry[] = [
     ],
   },
 ];
+
+export { changelogData };
 
 const Changelog = () => {
   const getTypeBadgeVariant = (type: ChangelogEntry["changes"][0]["type"]) => {

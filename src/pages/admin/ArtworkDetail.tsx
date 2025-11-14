@@ -20,6 +20,7 @@ import { ArrowLeft, Archive } from "lucide-react";
 import { PartnerBreadcrumb } from "@/components/admin/PartnerBreadcrumb";
 import { ArtworkInfoTab } from "@/components/artworks/tabs/ArtworkInfoTab";
 import { ArtworkFilesTab } from "@/components/artworks/tabs/ArtworkFilesTab";
+import { ArtworkProductsTab } from "@/components/artworks/tabs/ArtworkProductsTab";
 import { ArtworkRightsTab } from "@/components/artworks/tabs/ArtworkRightsTab";
 import { ArtworkTagsTab } from "@/components/artworks/tabs/ArtworkTagsTab";
 import { ArtworkMetadataTab } from "@/components/artworks/tabs/ArtworkMetadataTab";
@@ -146,10 +147,11 @@ export default function ArtworkDetail() {
 
       {/* Tabs */}
       <Tabs defaultValue="info">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="info">Basic Info</TabsTrigger>
           <TabsTrigger value="files">Files</TabsTrigger>
-          <TabsTrigger value="rights">Rights & Licensing</TabsTrigger>
+          <TabsTrigger value="products">Products</TabsTrigger>
+          <TabsTrigger value="rights">Rights</TabsTrigger>
           <TabsTrigger value="tags">Tags</TabsTrigger>
           <TabsTrigger value="metadata">Metadata</TabsTrigger>
         </TabsList>
@@ -161,6 +163,10 @@ export default function ArtworkDetail() {
 
           <TabsContent value="files">
             <ArtworkFilesTab artworkId={artwork.id} />
+          </TabsContent>
+
+          <TabsContent value="products">
+            <ArtworkProductsTab artworkId={artwork.id} ascCode={artwork.asc_code} />
           </TabsContent>
 
           <TabsContent value="rights">
