@@ -21,15 +21,28 @@ interface PrintFileSuggestion {
 interface PrintFileAutoAssignmentProps {
   artworkId: string;
   variantCodes: string[]; // Full SKUs of variants to match
+  ascCode?: string; // Artwork's ASC code for dynamic examples
+  productTypeCode?: string; // First product's type code for examples
 }
 
 /**
  * Component for reviewing and approving print file auto-assignment suggestions
  * Uses hierarchical SKU matching to suggest which print files should be assigned to which variants
  */
-export function PrintFileAutoAssignment({ artworkId, variantCodes }: PrintFileAutoAssignmentProps) {
+export function PrintFileAutoAssignment({ 
+  artworkId, 
+  variantCodes, 
+  ascCode = '11K001', 
+  productTypeCode = 'UTS' 
+}: PrintFileAutoAssignmentProps) {
   const queryClient = useQueryClient();
   const [selectedSuggestions, setSelectedSuggestions] = useState<Set<string>>(new Set());
+
+  // Generate dynamic examples based on actual artwork data
+  const exampleProductLevel = `${ascCode}-${productTypeCode}_print.png`;
+  const exampleVar1 = `${ascCode}-${productTypeCode}-01_print.png`;
+  const exampleVar2 = `${ascCode}-${productTypeCode}-01-02_print.png`;
+  const exampleVar3 = `${ascCode}-${productTypeCode}-01-02-03_print.png`;
 
   // Fetch print file suggestions using the database function
   const { data: suggestions, isLoading } = useQuery({
@@ -197,12 +210,20 @@ export function PrintFileAutoAssignment({ artworkId, variantCodes }: PrintFileAu
         <CardContent>
           <div className="text-center py-6 text-muted-foreground">
             <AlertCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p className="text-sm">
+            <p className="text-sm mb-3">
               Upload print files with SKU patterns in filenames to enable auto-assignment.
             </p>
-            <p className="text-xs mt-2">
-              Example: <code className="bg-muted px-2 py-1 rounded">11K001-UTS-01_print.png</code>
-            </p>
+            <div className="space-y-2 text-xs">
+              <div className="text-left bg-muted/50 p-3 rounded-lg max-w-md mx-auto">
+                <p className="font-semibold mb-2">Example filenames:</p>
+                <div className="space-y-1 font-mono">
+                  <div><code className="bg-background px-2 py-1 rounded">{exampleProductLevel}</code> <span className="text-muted-foreground">→ All variants</span></div>
+                  <div><code className="bg-background px-2 py-1 rounded">{exampleVar1}</code> <span className="text-muted-foreground">→ VAR1 family</span></div>
+                  <div><code className="bg-background px-2 py-1 rounded">{exampleVar2}</code> <span className="text-muted-foreground">→ 2D group</span></div>
+                  <div><code className="bg-background px-2 py-1 rounded">{exampleVar3}</code> <span className="text-muted-foreground">→ Exact variant</span></div>
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -218,7 +239,7 @@ export function PrintFileAutoAssignment({ artworkId, variantCodes }: PrintFileAu
         </div>
         <CardDescription>
           Review and approve suggested print file assignments based on hierarchical SKU matching.
-          Files are matched from filenames like <code className="text-xs">11K001-UTS-01_print.png</code>
+          Files are matched from filenames like <code className="text-xs bg-muted px-2 py-1 rounded">{exampleVar1}</code>
         </CardDescription>
       </CardHeader>
       <CardContent>

@@ -201,6 +201,8 @@ export function ArtworkProductsTab({ artworkId, ascCode }: ArtworkProductsTabPro
             <PrintFileAutoAssignment
               artworkId={artworkId}
               variantCodes={variantCodes}
+              ascCode={ascCode}
+              productTypeCode={selectedProduct.product_type?.type_code || 'UTS'}
             />
           </TabsContent>
 
