@@ -186,19 +186,20 @@ export const ArtworkFileUpload = ({
         )}
       </div>
 
-      {/* Upload Progress */}
+      {/* Upload Progress - Fixed position to avoid modal overlap */}
       {uploading && (
-        <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
+        <div className="fixed top-4 right-4 z-[100] w-96 max-w-[calc(100vw-2rem)] space-y-3 p-4 border rounded-lg bg-background shadow-lg">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground font-medium">
+            <span className="text-muted-foreground font-medium truncate mr-2">
               {pendingFile?.name || 'Uploading file...'}
             </span>
-            <span className="font-semibold text-primary">{progress}%</span>
+            <span className="font-semibold text-primary shrink-0">{progress}%</span>
           </div>
           <Progress value={progress} className="h-2" />
           <div className="text-xs text-muted-foreground">
-            {progress < 90 && 'Uploading file...'}
-            {progress >= 90 && progress < 100 && 'Processing...'}
+            {progress < 5 && 'Preparing upload...'}
+            {progress >= 5 && progress < 90 && 'Uploading file...'}
+            {progress >= 90 && progress < 100 && 'Saving...'}
             {progress === 100 && 'Complete!'}
           </div>
         </div>
