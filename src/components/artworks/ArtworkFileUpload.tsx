@@ -188,12 +188,19 @@ export const ArtworkFileUpload = ({
 
       {/* Upload Progress */}
       {uploading && (
-        <div className="space-y-2">
+        <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Uploading...</span>
-            <span className="font-medium">{progress}%</span>
+            <span className="text-muted-foreground font-medium">
+              {pendingFile?.name || 'Uploading file...'}
+            </span>
+            <span className="font-semibold text-primary">{progress}%</span>
           </div>
-          <Progress value={progress} />
+          <Progress value={progress} className="h-2" />
+          <div className="text-xs text-muted-foreground">
+            {progress < 90 && 'Uploading file...'}
+            {progress >= 90 && progress < 100 && 'Processing...'}
+            {progress === 100 && 'Complete!'}
+          </div>
         </div>
       )}
 

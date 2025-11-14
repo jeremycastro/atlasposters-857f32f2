@@ -44,23 +44,60 @@ export const useArtworkFileUpload = () => {
       const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
       const filePath = `${artworkId}/${fileName}`;
 
-      setProgress(25);
+      // Get Supabase URL and anon key for XHR upload
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-      // Upload via Edge Function for server-side validation
+      // Upload via Edge Function with real-time progress tracking
       const formData = new FormData();
       formData.append('file', file);
       formData.append('bucket', 'brand-assets');
       formData.append('filePath', filePath);
       formData.append('maxSizeMB', '250');
 
-      const { data: uploadData, error: uploadError } = await supabase.functions.invoke('validate-upload', {
-        body: formData,
+      // Use XMLHttpRequest for progress tracking
+      const uploadData = await new Promise<any>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        // Track upload progress
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 90); // Reserve 90% for upload
+            setProgress(percentComplete);
+          }
+        });
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status === 200) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response);
+            } catch (error) {
+              reject(new Error('Failed to parse response'));
+            }
+          } else {
+            try {
+              const error = JSON.parse(xhr.responseText);
+              reject(new Error(error.error || 'Upload failed'));
+            } catch {
+              reject(new Error(`Upload failed with status ${xhr.status}`));
+            }
+          }
+        });
+
+        xhr.addEventListener('error', () => {
+          reject(new Error('Network error during upload'));
+        });
+
+        xhr.open('POST', `${supabaseUrl}/functions/v1/validate-upload`);
+        xhr.setRequestHeader('Authorization', `Bearer ${supabaseAnonKey}`);
+        xhr.setRequestHeader('apikey', supabaseAnonKey);
+        xhr.send(formData);
       });
 
-      if (uploadError) throw uploadError;
       if (!uploadData.success) throw new Error(uploadData.error || 'Upload failed');
 
-      setProgress(75);
+      setProgress(95);
 
       // Save file metadata to database
       const userId = (await supabase.auth.getUser()).data.user?.id;
