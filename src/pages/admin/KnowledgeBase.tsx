@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Search, Filter, Calendar, ArrowRight } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { knowledgeArticles, KnowledgeCategory } from "@/types/knowledge";
+import { changelogData } from "@/pages/admin/Changelog";
 import {
   Select,
   SelectContent,
@@ -257,7 +258,7 @@ const KnowledgeBase = () => {
         {/* Footer */}
         <div className="mt-12 p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground text-center">
-            <strong>Knowledge Base v0.4.0</strong> - Documentation continuously updated to reflect current methodologies and best practices
+            <strong>Knowledge Base v{changelogData[0].version}</strong> - Documentation continuously updated to reflect current methodologies and best practices
           </p>
         </div>
       </main>

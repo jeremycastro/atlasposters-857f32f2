@@ -8,6 +8,7 @@ import * as LucideIcons from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { changelogData } from '@/pages/admin/Changelog';
 
 export default function AdminLayout() {
   const { profile, activeRole, signOut } = useAuth();
@@ -25,7 +26,7 @@ export default function AdminLayout() {
         <div className="p-6 border-b">
           <h2 className="text-lg font-bold">Atlas Admin</h2>
           <p className="text-sm text-muted-foreground">Role: {activeRole}</p>
-          <p className="text-xs text-muted-foreground italic">v0.4.0</p>
+          <p className="text-xs text-muted-foreground italic">v{changelogData[0].version}</p>
         </div>
 
         <RoleSwitcher className="mx-4 my-4" />

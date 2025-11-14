@@ -10,7 +10,7 @@ interface ChangelogEntry {
   }[];
 }
 
-const changelogData: ChangelogEntry[] = [
+export const changelogData: ChangelogEntry[] = [
   {
     version: "0.4.1",
     date: "2024-11-12",
