@@ -17,7 +17,9 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, ArrowUpDown, Copy, Settings2, GripVertical, Image as ImageIcon } from "lucide-react";
+import { MoreVertical, ArrowUpDown, Copy, Settings2, GripVertical, Image as ImageIcon, Archive } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
@@ -67,6 +69,8 @@ interface ArtworkTableViewProps {
   onView: (artwork: Artwork) => void;
   onEdit: (artwork: Artwork) => void;
   onArchive: (artwork: Artwork) => void;
+  showArchived: boolean;
+  onToggleArchived: (show: boolean) => void;
   searchBar?: React.ReactNode;
 }
 
@@ -149,7 +153,7 @@ function SortableHeader({ column, sortField, sortDirection, onSort }: SortableHe
   );
 }
 
-export function ArtworkTableView({ artworks, onView, onEdit, onArchive, searchBar }: ArtworkTableViewProps) {
+export function ArtworkTableView({ artworks, onView, onEdit, onArchive, showArchived, onToggleArchived, searchBar }: ArtworkTableViewProps) {
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [columns, setColumns] = useState<ColumnConfig[]>(DEFAULT_COLUMNS);
@@ -446,6 +450,17 @@ export function ArtworkTableView({ artworks, onView, onEdit, onArchive, searchBa
     <div className="space-y-4">
       <div className="flex items-center gap-4">
         {searchBar && <div className="flex-1">{searchBar}</div>}
+        <div className="flex items-center gap-2">
+          <Switch
+            id="show-archived"
+            checked={showArchived}
+            onCheckedChange={onToggleArchived}
+          />
+          <Label htmlFor="show-archived" className="text-sm cursor-pointer flex items-center gap-1">
+            <Archive className="h-4 w-4" />
+            Show Archived
+          </Label>
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
