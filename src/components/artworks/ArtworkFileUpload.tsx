@@ -6,6 +6,8 @@ import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { useArtworkFileUpload, UploadedFile } from '@/hooks/useArtworkFileUpload';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -39,6 +41,7 @@ export const ArtworkFileUpload = ({
 }: ArtworkFileUploadProps) => {
   const [files, setFiles] = useState<UploadedFile[]>(existingFiles);
   const { uploadFile, deleteFile, uploading, progress } = useArtworkFileUpload();
+  const [showThumbnails, setShowThumbnails] = useState(true);
   
   // Tag & spec dialog state
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
@@ -211,7 +214,19 @@ export const ArtworkFileUpload = ({
       {/* Uploaded Files */}
       {files.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-medium">Uploaded Files</h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium">Uploaded Files</h4>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="thumbnail-toggle" className="text-sm text-muted-foreground">
+                Show thumbnails
+              </Label>
+              <Switch
+                id="thumbnail-toggle"
+                checked={showThumbnails}
+                onCheckedChange={setShowThumbnails}
+              />
+            </div>
+          </div>
           <div className="grid gap-2">
             {files.map((file) => (
               <div
@@ -219,17 +234,19 @@ export const ArtworkFileUpload = ({
                 className="flex items-center gap-3 p-3 border rounded-lg bg-card hover:bg-accent/50 transition-colors"
               >
                 {/* File Icon/Preview */}
-                <div className="shrink-0 w-12 h-12 rounded bg-muted flex items-center justify-center overflow-hidden">
-                  {file.mime_type.startsWith('image/') ? (
-                    <img
-                      src={file.url}
-                      alt={file.file_name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <File className="h-6 w-6 text-muted-foreground" />
-                  )}
-                </div>
+                {showThumbnails && (
+                  <div className="shrink-0 w-12 h-12 rounded bg-muted flex items-center justify-center overflow-hidden">
+                    {file.mime_type.startsWith('image/') ? (
+                      <img
+                        src={file.url}
+                        alt={file.file_name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <File className="h-6 w-6 text-muted-foreground" />
+                    )}
+                  </div>
+                )}
 
                 {/* File Info */}
                 <div className="flex-1 min-w-0">
