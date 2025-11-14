@@ -23,7 +23,7 @@ export const knowledgeArticles: KnowledgeArticle[] = [
     category: "Systems & Methodology",
     route: "/admin/knowledge/sku-methodology",
     icon: "Hash",
-    lastUpdated: "2024-11-10",
+    lastUpdated: "2025-11-14",
     tags: ["SKU", "ASC", "Catalog", "Database", "Product Codes"]
   },
   {
@@ -33,7 +33,7 @@ export const knowledgeArticles: KnowledgeArticle[] = [
     category: "Workflows & Processes",
     route: "/admin/knowledge/partner-management",
     icon: "Building2",
-    lastUpdated: "2024-11-10",
+    lastUpdated: "2025-11-10",
     tags: ["Partners", "Onboarding", "Relationships", "Agreements", "Contacts"]
   },
   {
@@ -43,7 +43,7 @@ export const knowledgeArticles: KnowledgeArticle[] = [
     category: "Brand & Design",
     route: "/admin/knowledge/brand-assets",
     icon: "Palette",
-    lastUpdated: "2024-11-10",
+    lastUpdated: "2025-11-10",
     tags: ["Branding", "Logos", "Colors", "Assets", "Design System"]
   },
   {
@@ -53,7 +53,7 @@ export const knowledgeArticles: KnowledgeArticle[] = [
     category: "Workflows & Processes",
     route: "/admin/knowledge/task-management",
     icon: "CheckSquare",
-    lastUpdated: "2024-11-10",
+    lastUpdated: "2025-11-10",
     tags: ["Tasks", "Projects", "Kanban", "Collaboration", "Workflows"]
   },
   {
