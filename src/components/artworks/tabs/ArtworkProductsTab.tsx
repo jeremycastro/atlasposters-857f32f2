@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VariantBuilder } from "@/components/artworks/VariantBuilder";
 import { VariantHierarchyConfig } from "@/components/artworks/VariantHierarchyConfig";
 import { PrintFileAutoAssignment } from "@/components/artworks/PrintFileAutoAssignment";
+import { PrintFileStatusBadge, ProductPrintFileStatus } from "@/components/artworks/PrintFileStatusBadge";
 import { Package, Settings } from "lucide-react";
 import { useState } from "react";
 
@@ -41,7 +42,7 @@ export function ArtworkProductsTab({ artworkId, ascCode }: ArtworkProductsTabPro
     },
   });
 
-  // Fetch variants for selected product
+  // Fetch variants for selected product with print file info
   const { data: variants, isLoading: isLoadingVariants } = useQuery({
     queryKey: ['product-variants', selectedProductId],
     queryFn: async () => {
@@ -49,7 +50,14 @@ export function ArtworkProductsTab({ artworkId, ascCode }: ArtworkProductsTabPro
 
       const { data, error } = await supabase
         .from('product_variants')
-        .select('*')
+        .select(`
+          *,
+          print_file:artwork_files(
+            id,
+            file_name,
+            tags
+          )
+        `)
         .eq('product_id', selectedProductId)
         .order('full_sku', { ascending: true });
 
@@ -57,6 +65,30 @@ export function ArtworkProductsTab({ artworkId, ascCode }: ArtworkProductsTabPro
       return data;
     },
     enabled: !!selectedProductId,
+  });
+
+  // Fetch all variants for each product to show status
+  const { data: allProductVariants } = useQuery({
+    queryKey: ['all-product-variants', products?.map(p => p.id)],
+    queryFn: async () => {
+      if (!products || products.length === 0) return {};
+
+      const variantsByProduct: Record<string, any[]> = {};
+      
+      for (const product of products) {
+        const { data, error } = await supabase
+          .from('product_variants')
+          .select('id, print_file_id, is_active')
+          .eq('product_id', product.id);
+
+        if (!error && data) {
+          variantsByProduct[product.id] = data;
+        }
+      }
+
+      return variantsByProduct;
+    },
+    enabled: !!products && products.length > 0,
   });
 
   const selectedProduct = products?.find(p => p.id === selectedProductId);
@@ -97,29 +129,39 @@ export function ArtworkProductsTab({ artworkId, ascCode }: ArtworkProductsTabPro
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {products.map((product) => (
-              <Button
-                key={product.id}
-                variant={selectedProductId === product.id ? 'default' : 'outline'}
-                className="h-auto p-4 flex flex-col items-start gap-2"
-                onClick={() => setSelectedProductId(product.id)}
-              >
-                <div className="flex items-center gap-2 w-full">
-                  <Package className="h-4 w-4" />
-                  <span className="font-semibold truncate">
-                    {product.product_name}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs">
-                    {product.product_type?.type_code}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {product.product_type?.type_name}
-                  </span>
-                </div>
-              </Button>
-            ))}
+            {products.map((product) => {
+              const productVariants = allProductVariants?.[product.id] || [];
+              const activeVariants = productVariants.filter(v => v.is_active);
+              const variantsWithFiles = activeVariants.filter(v => v.print_file_id).length;
+
+              return (
+                <Button
+                  key={product.id}
+                  variant={selectedProductId === product.id ? 'default' : 'outline'}
+                  className="h-auto p-4 flex flex-col items-start gap-2"
+                  onClick={() => setSelectedProductId(product.id)}
+                >
+                  <div className="flex items-center gap-2 w-full">
+                    <Package className="h-4 w-4" />
+                    <span className="font-semibold truncate">
+                      {product.product_name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge variant="secondary" className="text-xs">
+                      {product.product_type?.type_code}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {product.product_type?.type_name}
+                    </span>
+                    <ProductPrintFileStatus 
+                      totalVariants={activeVariants.length}
+                      variantsWithFiles={variantsWithFiles}
+                    />
+                  </div>
+                </Button>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
@@ -147,33 +189,45 @@ export function ArtworkProductsTab({ artworkId, ascCode }: ArtworkProductsTabPro
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {variants.map((variant) => (
-                      <div
-                        key={variant.id}
-                        className="flex items-center justify-between p-3 border rounded-lg"
-                      >
-                        <div className="flex-1">
-                          <p className="font-mono text-sm font-semibold">
-                            {variant.full_sku}
-                          </p>
-                          {variant.variant_name && (
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {variant.variant_name}
+                    {variants.map((variant) => {
+                      const printFile = variant.print_file as any;
+                      const hasFile = !!variant.print_file_id;
+                      const hasWarnings = hasFile && printFile?.tags?.warnings && 
+                        Object.keys(printFile.tags.warnings).length > 0;
+
+                      return (
+                        <div
+                          key={variant.id}
+                          className="flex items-center justify-between p-3 border rounded-lg"
+                        >
+                          <div className="flex-1">
+                            <p className="font-mono text-sm font-semibold">
+                              {variant.full_sku}
                             </p>
-                          )}
+                            {variant.variant_name && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {variant.variant_name}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <PrintFileStatusBadge 
+                              hasFile={hasFile}
+                              hasWarnings={hasWarnings}
+                              fileName={printFile?.file_name}
+                            />
+                            {variant.retail_price && (
+                              <span className="text-sm font-medium">
+                                ${variant.retail_price}
+                              </span>
+                            )}
+                            <Badge variant={variant.is_active ? 'default' : 'outline'}>
+                              {variant.is_active ? 'Active' : 'Inactive'}
+                            </Badge>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {variant.retail_price && (
-                            <span className="text-sm font-medium">
-                              ${variant.retail_price}
-                            </span>
-                          )}
-                          <Badge variant={variant.is_active ? 'default' : 'outline'}>
-                            {variant.is_active ? 'Active' : 'Inactive'}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
