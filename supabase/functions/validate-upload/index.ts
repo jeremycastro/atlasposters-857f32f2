@@ -95,9 +95,21 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Read file content for signature validation
-    const arrayBuffer = await file.arrayBuffer()
-    const buffer = new Uint8Array(arrayBuffer)
+    // For large files (>100MB), only read first 1KB for signature validation
+    const isLargeFile = file.size > 100 * 1024 * 1024
+    let buffer: Uint8Array
+    
+    if (isLargeFile) {
+      // Only read first 1KB for magic byte validation
+      const slice = file.slice(0, 1024)
+      const sliceBuffer = await slice.arrayBuffer()
+      buffer = new Uint8Array(sliceBuffer)
+      console.log(`Large file detected (${(file.size / 1024 / 1024).toFixed(1)}MB), using partial validation`)
+    } else {
+      // Read entire file for smaller files
+      const arrayBuffer = await file.arrayBuffer()
+      buffer = new Uint8Array(arrayBuffer)
+    }
     
     // Validate file signature (magic bytes)
     if (!validateFileSignature(buffer, file.type)) {
@@ -115,10 +127,12 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Upload to storage
+    // Upload to storage - use original file for large files to avoid memory issues
+    const uploadBlob = isLargeFile ? file : buffer
+    
     const { data, error } = await supabase.storage
       .from(bucket)
-      .upload(filePath, buffer, {
+      .upload(filePath, uploadBlob, {
         contentType: file.type,
         cacheControl: '3600',
         upsert: false,
@@ -148,8 +162,9 @@ Deno.serve(async (req) => {
     }> = []
 
     const isImage = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)
+    const shouldGenerateThumbnails = isImage && !isLargeFile
     
-    if (isImage) {
+    if (shouldGenerateThumbnails) {
       console.log('Generating thumbnails...')
       try {
         // Load the image
