@@ -44,19 +44,56 @@ export const useArtworkFileUpload = () => {
       const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
       const filePath = `${artworkId}/${fileName}`;
 
-      // Get Supabase URL and anon key for XHR upload
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const isLargeFile = file.size > 100 * 1024 * 1024; // 100MB threshold
 
-      // Upload via Edge Function with real-time progress tracking
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('bucket', 'brand-assets');
-      formData.append('filePath', filePath);
-      formData.append('maxSizeMB', '250');
+      let uploadData: any;
 
-      // Use XMLHttpRequest for progress tracking
-      const uploadData = await new Promise<any>((resolve, reject) => {
+      if (isLargeFile) {
+        // For large files (>100MB), upload directly to Supabase storage to avoid edge function memory limits
+        console.log(`Large file detected (${(file.size / 1024 / 1024).toFixed(1)}MB), using direct upload`);
+        
+        setProgress(5);
+        
+        const { data, error: uploadError } = await supabase.storage
+          .from('brand-assets')
+          .upload(filePath, file, {
+            contentType: file.type,
+            cacheControl: '3600',
+            upsert: false,
+          });
+
+        if (uploadError) throw uploadError;
+
+        setProgress(90);
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('brand-assets')
+          .getPublicUrl(filePath);
+
+        uploadData = {
+          success: true,
+          path: filePath,
+          publicUrl,
+          fileSize: file.size,
+          mimeType: file.type,
+          thumbnails: [], // No thumbnails for large files
+        };
+
+        setProgress(95);
+      } else {
+        // For smaller files, use edge function for validation and thumbnail generation
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('bucket', 'brand-assets');
+        formData.append('filePath', filePath);
+        formData.append('maxSizeMB', '250');
+
+        // Use XMLHttpRequest for progress tracking
+        uploadData = await new Promise<any>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
 
         // Track upload progress
@@ -89,15 +126,16 @@ export const useArtworkFileUpload = () => {
           reject(new Error('Network error during upload'));
         });
 
-        xhr.open('POST', `${supabaseUrl}/functions/v1/validate-upload`);
-        xhr.setRequestHeader('Authorization', `Bearer ${supabaseAnonKey}`);
-        xhr.setRequestHeader('apikey', supabaseAnonKey);
-        xhr.send(formData);
-      });
+          xhr.open('POST', `${supabaseUrl}/functions/v1/validate-upload`);
+          xhr.setRequestHeader('Authorization', `Bearer ${supabaseAnonKey}`);
+          xhr.setRequestHeader('apikey', supabaseAnonKey);
+          xhr.send(formData);
+        });
 
-      if (!uploadData.success) throw new Error(uploadData.error || 'Upload failed');
+        if (!uploadData.success) throw new Error(uploadData.error || 'Upload failed');
 
-      setProgress(95);
+        setProgress(95);
+      }
 
       // Save file metadata to database
       const userId = (await supabase.auth.getUser()).data.user?.id;
