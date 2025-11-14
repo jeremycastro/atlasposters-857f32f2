@@ -1,20 +1,35 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useArtworkMutations } from "@/hooks/useArtworkMutations";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Archive } from "lucide-react";
 import { PartnerBreadcrumb } from "@/components/admin/PartnerBreadcrumb";
 import { ArtworkInfoTab } from "@/components/artworks/tabs/ArtworkInfoTab";
 import { ArtworkFilesTab } from "@/components/artworks/tabs/ArtworkFilesTab";
 import { ArtworkRightsTab } from "@/components/artworks/tabs/ArtworkRightsTab";
 import { ArtworkTagsTab } from "@/components/artworks/tabs/ArtworkTagsTab";
 import { ArtworkMetadataTab } from "@/components/artworks/tabs/ArtworkMetadataTab";
+import { useState } from "react";
 
 export default function ArtworkDetail() {
   const { artworkId } = useParams<{ artworkId: string }>();
   const navigate = useNavigate();
+  const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
+  const { archiveArtwork } = useArtworkMutations();
 
   const { data: artwork, isLoading } = useQuery({
     queryKey: ['artwork', artworkId],
@@ -98,16 +113,34 @@ export default function ArtworkDetail() {
       </div>
 
       {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold">{artwork.title || "Untitled Artwork"}</h1>
-        {artwork.artist_name && (
-          <p className="text-lg text-muted-foreground">by {artwork.artist_name}</p>
-        )}
-        {artwork.brand && (
-          <p className="text-sm text-muted-foreground">
-            Brand: {artwork.brand.brand_name}
-            {artwork.brand.partner && ` • Partner: ${artwork.brand.partner.partner_name}`}
-          </p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-2 flex-1">
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold">{artwork.title || "Untitled Artwork"}</h1>
+            <Badge variant={artwork.status === 'active' ? 'default' : artwork.status === 'draft' ? 'secondary' : 'outline'}>
+              {artwork.status}
+            </Badge>
+          </div>
+          {artwork.artist_name && (
+            <p className="text-lg text-muted-foreground">by {artwork.artist_name}</p>
+          )}
+          {artwork.brand && (
+            <p className="text-sm text-muted-foreground">
+              Brand: {artwork.brand.brand_name}
+              {artwork.brand.partner && ` • Partner: ${artwork.brand.partner.partner_name}`}
+            </p>
+          )}
+        </div>
+        {artwork.status !== 'archived' && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setArchiveDialogOpen(true)}
+            className="shrink-0"
+          >
+            <Archive className="mr-2 h-4 w-4" />
+            Archive
+          </Button>
         )}
       </div>
 
@@ -143,6 +176,34 @@ export default function ArtworkDetail() {
           </TabsContent>
         </div>
       </Tabs>
+
+      {/* Archive Confirmation Dialog */}
+      <AlertDialog open={archiveDialogOpen} onOpenChange={setArchiveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Archive Artwork?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will archive "{artwork.title || 'Untitled Artwork'}". The artwork will be hidden from active listings but can be restored later.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                archiveArtwork.mutate(artwork.id, {
+                  onSuccess: () => {
+                    setArchiveDialogOpen(false);
+                    navigate('/admin/artworks');
+                  }
+                });
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Archive
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
