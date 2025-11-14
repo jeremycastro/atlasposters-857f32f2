@@ -29,8 +29,12 @@ export default function ArtworkCatalog() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
 
-  const { data: artworks, isLoading } = useArtworks({ search });
+  const { data: artworks, isLoading } = useArtworks({ 
+    search,
+    status: showArchived ? undefined : ['active', 'draft']
+  });
   const { archiveArtwork } = useArtworkMutations();
 
   const handleView = (artwork: Artwork) => {
@@ -75,6 +79,8 @@ export default function ArtworkCatalog() {
           onView={handleView}
           onEdit={handleEdit}
           onArchive={handleArchive}
+          showArchived={showArchived}
+          onToggleArchived={setShowArchived}
           searchBar={
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
