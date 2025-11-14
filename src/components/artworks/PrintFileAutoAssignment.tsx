@@ -242,41 +242,40 @@ export function PrintFileAutoAssignment({
           Files are matched from filenames like <code className="text-xs bg-muted px-2 py-1 rounded">{exampleVar1}</code>
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col h-[600px]">
         {/* Actions Bar */}
-        <div className="flex items-center justify-between mb-4 pb-4 border-b">
+        <div className="flex items-center justify-between mb-4 pb-4 border-b shrink-0">
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={selectAll}
-              disabled={selectedSuggestions.size === suggestions.length}
             >
-              Select All
+              Select All ({suggestions.length})
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={clearSelection}
               disabled={selectedSuggestions.size === 0}
             >
-              Clear Selection
+              Clear
             </Button>
           </div>
-          <div className="text-sm text-muted-foreground">
-            {selectedSuggestions.size} of {suggestions.length} selected
-          </div>
+          <Badge variant="secondary" className="font-medium">
+            {selectedSuggestions.size} selected
+          </Badge>
         </div>
 
         {/* Suggestions List */}
-        <ScrollArea className="h-[400px] pr-4">
+        <ScrollArea className="flex-1 pr-4">
           <div className="space-y-3">
             {suggestions.map((suggestion) => (
               <div
                 key={suggestion.file_id}
                 className={`p-4 border rounded-lg transition-colors ${
                   selectedSuggestions.has(suggestion.file_id)
-                    ? 'bg-primary/5 border-primary/50'
+                    ? 'bg-primary/5 border-primary'
                     : 'bg-muted/30'
                 }`}
               >
@@ -313,8 +312,8 @@ export function PrintFileAutoAssignment({
           </div>
         </ScrollArea>
 
-        {/* Apply Button */}
-        <div className="mt-6 pt-4 border-t">
+        {/* Apply Button - Sticky at bottom */}
+        <div className="sticky bottom-0 mt-4 pt-4 border-t bg-background shrink-0">
           <Button
             onClick={() => applyAssignments.mutate(Array.from(selectedSuggestions))}
             disabled={selectedSuggestions.size === 0 || applyAssignments.isPending}
