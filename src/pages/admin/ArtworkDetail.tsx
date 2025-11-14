@@ -117,7 +117,11 @@ export default function ArtworkDetail() {
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-2 flex-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold">{artwork.title || "Untitled Artwork"}</h1>
+            <h1 className="text-3xl font-bold">
+              <span className="text-muted-foreground font-normal">{artwork.asc_code}</span>
+              {' – '}
+              {artwork.title || "Untitled Artwork"}
+            </h1>
             <Badge variant={artwork.status === 'active' ? 'default' : artwork.status === 'draft' ? 'secondary' : 'outline'}>
               {artwork.status}
             </Badge>
