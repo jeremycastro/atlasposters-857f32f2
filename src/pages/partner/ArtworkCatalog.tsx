@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useArtworks } from '@/hooks/useArtworks';
+import { useArtworkMutations } from '@/hooks/useArtworkMutations';
 import { ArtworkStats } from '@/components/artworks/ArtworkStats';
 import { ArtworkTableView } from '@/components/artworks/ArtworkTableView';
 import { CreateArtworkDialog } from '@/components/artworks/CreateArtworkDialog';
@@ -30,6 +31,7 @@ export default function ArtworkCatalog() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const { data: artworks, isLoading } = useArtworks({ search });
+  const { archiveArtwork } = useArtworkMutations();
 
   const handleView = (artwork: Artwork) => {
     navigate(`/admin/artworks/${artwork.id}`);
@@ -40,8 +42,7 @@ export default function ArtworkCatalog() {
   };
 
   const handleArchive = (artwork: Artwork) => {
-    // Archive mutation is handled in the card component
-    console.log('Archive:', artwork);
+    archiveArtwork.mutate(artwork.id);
   };
 
   return (
