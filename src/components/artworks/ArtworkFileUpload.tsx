@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, X, File, Star, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,11 @@ export const ArtworkFileUpload = ({
   const [files, setFiles] = useState<UploadedFile[]>(existingFiles);
   const { uploadFile, deleteFile, uploading, progress } = useArtworkFileUpload();
   const [showThumbnails, setShowThumbnails] = useState(true);
+  
+  // Sync files when existingFiles changes
+  useEffect(() => {
+    setFiles(existingFiles);
+  }, [existingFiles]);
   
   // Tag & spec dialog state
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
@@ -234,19 +239,24 @@ export const ArtworkFileUpload = ({
                 className="flex items-center gap-3 p-3 border rounded-lg bg-card hover:bg-accent/50 transition-colors"
               >
                 {/* File Icon/Preview */}
-                {showThumbnails && (
-                  <div className="shrink-0 w-12 h-12 rounded bg-muted flex items-center justify-center overflow-hidden">
-                    {file.mime_type.startsWith('image/') ? (
-                      <img
-                        src={file.url}
-                        alt={file.file_name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <File className="h-6 w-6 text-muted-foreground" />
-                    )}
-                  </div>
-                )}
+                <div className={cn(
+                  "shrink-0 rounded bg-muted flex items-center justify-center overflow-hidden",
+                  showThumbnails ? "w-12 h-12" : "w-0 h-0 opacity-0"
+                )}>
+                  {showThumbnails && (
+                    <>
+                      {file.mime_type.startsWith('image/') ? (
+                        <img
+                          src={file.url}
+                          alt={file.file_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <File className="h-6 w-6 text-muted-foreground" />
+                      )}
+                    </>
+                  )}
+                </div>
 
                 {/* File Info */}
                 <div className="flex-1 min-w-0">
