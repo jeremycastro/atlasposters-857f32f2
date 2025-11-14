@@ -19,6 +19,7 @@ import { PrintFileSpecifications } from './PrintFileSpecifications';
 
 interface ArtworkFileUploadProps {
   artworkId: string;
+  artworkAscCode?: string;
   existingFiles?: UploadedFile[];
   onFilesChange?: (files: UploadedFile[]) => void;
   maxFiles?: number;
@@ -27,6 +28,7 @@ interface ArtworkFileUploadProps {
 
 export const ArtworkFileUpload = ({
   artworkId,
+  artworkAscCode,
   existingFiles = [],
   onFilesChange,
   maxFiles = 10,
@@ -77,7 +79,8 @@ export const ArtworkFileUpload = ({
       artworkId,
       files.length === 0, // First file is primary by default
       selectedTags,
-      printSpecs
+      printSpecs,
+      artworkAscCode
     );
 
     if (uploadedFile) {

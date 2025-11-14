@@ -10,6 +10,21 @@ interface ArtworkFilesTabProps {
 }
 
 export function ArtworkFilesTab({ artworkId }: ArtworkFilesTabProps) {
+  // Fetch artwork ASC code for validation
+  const { data: artwork } = useQuery({
+    queryKey: ['artwork-asc', artworkId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('artworks')
+        .select('asc_code')
+        .eq('id', artworkId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const { data: files, isLoading } = useQuery({
     queryKey: ['artwork-files', artworkId],
     queryFn: async () => {
@@ -59,7 +74,8 @@ export function ArtworkFilesTab({ artworkId }: ArtworkFilesTabProps) {
           </div>
         ) : (
           <ArtworkFileUpload 
-            artworkId={artworkId} 
+            artworkId={artworkId}
+            artworkAscCode={artwork?.asc_code}
             existingFiles={files || []}
           />
         )}

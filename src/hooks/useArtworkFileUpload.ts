@@ -20,6 +20,14 @@ export interface UploadedFile {
   is_latest?: boolean;
 }
 
+// Utility function to extract ASC code from filename
+// Expected format: {ASC}-{TYPE}(-{VAR1})?(-{VAR2})?(-{VAR3})?[_\.]
+// Example: 11T003-PST-01_print.jpg → 11T003
+const extractAscFromFilename = (filename: string): string | null => {
+  const match = filename.match(/^([0-9]{2}[A-Z][0-9]{3})-/i);
+  return match ? match[1].toUpperCase() : null;
+};
+
 export const useArtworkFileUpload = () => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -33,11 +41,25 @@ export const useArtworkFileUpload = () => {
       custom: string[];
       matches_variants: Record<string, string[]>;
     },
-    printSpecifications?: Record<string, any>
+    printSpecifications?: Record<string, any>,
+    artworkAscCode?: string
   ): Promise<UploadedFile | null> => {
     try {
       setUploading(true);
       setProgress(0);
+
+      // Validate ASC code if provided
+      if (artworkAscCode) {
+        const fileAsc = extractAscFromFilename(file.name);
+        if (fileAsc && fileAsc !== artworkAscCode.toUpperCase()) {
+          toast({
+            title: "⚠️ ASC Mismatch Detected",
+            description: `File ASC "${fileAsc}" doesn't match artwork ASC "${artworkAscCode}". You may have uploaded this to the wrong artwork.`,
+            variant: "destructive",
+            duration: 8000,
+          });
+        }
+      }
 
       // Create unique file path
       const fileExt = file.name.split('.').pop();
