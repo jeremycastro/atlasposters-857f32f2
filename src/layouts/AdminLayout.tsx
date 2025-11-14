@@ -19,7 +19,7 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       {/* Sidebar - Fixed */}
       <aside className="w-64 border-r bg-muted/40 fixed left-0 top-0 h-screen flex flex-col">
         <div className="p-6 border-b">
@@ -79,7 +79,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main content - Offset by sidebar width */}
-      <main className="flex-1 ml-64">
+      <main className="flex-1 ml-64 h-screen overflow-y-auto">
         <Outlet />
       </main>
     </div>

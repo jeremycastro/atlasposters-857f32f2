@@ -8,9 +8,9 @@ export default function PartnerLayout() {
   const { profile, signOut } = useAuth();
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 border-r bg-muted/40">
+      <aside className="w-64 border-r bg-muted/40 fixed left-0 top-0 h-screen flex flex-col">
         <div className="p-6">
           <h2 className="text-lg font-bold">Partner Portal</h2>
           <p className="text-sm text-muted-foreground">{profile?.partner_company_name}</p>
@@ -46,7 +46,7 @@ export default function PartnerLayout() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1">
+      <main className="flex-1 ml-64 h-screen overflow-y-auto">
         <Outlet />
       </main>
     </div>
