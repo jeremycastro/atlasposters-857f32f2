@@ -188,9 +188,14 @@ export const useArtworkFileUpload = () => {
       if (uploadData.thumbnails && uploadData.thumbnails.length > 0) {
         console.log(`Saving ${uploadData.thumbnails.length} thumbnail records...`);
         
+        // Extract base name and extension for proper naming
+        const lastDotIndex = file.name.lastIndexOf('.');
+        const baseName = lastDotIndex > 0 ? file.name.substring(0, lastDotIndex) : file.name;
+        const extension = lastDotIndex > 0 ? file.name.substring(lastDotIndex) : '';
+        
         const thumbnailRecords = uploadData.thumbnails.map((thumb: any) => ({
           artwork_id: artworkId,
-          file_name: `${file.name}_${thumb.variant}`,
+          file_name: `${baseName}_${thumb.variant}${extension}`,
           file_path: thumb.path,
           file_type: "thumbnail",
           file_size: thumb.size,
