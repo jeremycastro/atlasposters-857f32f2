@@ -1,13 +1,10 @@
 import { useCallback, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, X, File, Star, Tag } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { useArtworkFileUpload, UploadedFile } from '@/hooks/useArtworkFileUpload';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { FileTagSelector } from './FileTagSelector';
 import { PrintFileSpecifications } from './PrintFileSpecifications';
+import { ArtworkFileTable } from './ArtworkFileTable';
 
 interface ArtworkFileUploadProps {
   artworkId: string;
@@ -41,7 +39,6 @@ export const ArtworkFileUpload = ({
 }: ArtworkFileUploadProps) => {
   const [files, setFiles] = useState<UploadedFile[]>(existingFiles);
   const { uploadFile, deleteFile, uploading, progress } = useArtworkFileUpload();
-  const [showThumbnails, setShowThumbnails] = useState(true);
   
   // Sync files when existingFiles changes
   useEffect(() => {
@@ -123,14 +120,6 @@ export const ArtworkFileUpload = ({
     }));
     setFiles(newFiles);
     onFilesChange?.(newFiles);
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   };
 
   return (
@@ -216,107 +205,16 @@ export const ArtworkFileUpload = ({
         </div>
       )}
 
-      {/* Uploaded Files */}
+      {/* Uploaded Files Table */}
       {files.length > 0 && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium">Uploaded Files</h4>
-            <div className="flex items-center gap-2">
-              <Label htmlFor="thumbnail-toggle" className="text-sm text-muted-foreground">
-                Show thumbnails
-              </Label>
-              <Switch
-                id="thumbnail-toggle"
-                checked={showThumbnails}
-                onCheckedChange={setShowThumbnails}
-              />
-            </div>
-          </div>
-          <div className="grid gap-2">
-            {files.map((file) => (
-              <div
-                key={file.id}
-                className="flex items-center gap-3 p-3 border rounded-lg bg-card hover:bg-accent/50 transition-colors"
-              >
-                {/* File Icon/Preview */}
-                <div className={cn(
-                  "shrink-0 rounded bg-muted flex items-center justify-center overflow-hidden",
-                  showThumbnails ? "w-12 h-12" : "w-0 h-0 opacity-0"
-                )}>
-                  {showThumbnails && (
-                    <>
-                      {file.mime_type.startsWith('image/') ? (
-                        <img
-                          src={file.url}
-                          alt={file.file_name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <File className="h-6 w-6 text-muted-foreground" />
-                      )}
-                    </>
-                  )}
-                </div>
-
-                {/* File Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-medium truncate">
-                      {file.file_name}
-                    </p>
-                    {file.is_primary && (
-                      <Badge variant="secondary" className="shrink-0">
-                        <Star className="h-3 w-3 mr-1 fill-current" />
-                        Primary
-                      </Badge>
-                    )}
-                    {file.version_number && file.version_number > 1 && (
-                      <Badge variant="outline" className="shrink-0">
-                        v{file.version_number}
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>{formatFileSize(file.file_size)}</span>
-                    {file.tags && (
-                      <>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <Tag className="h-3 w-3" />
-                          {Object.values(file.tags.structured).flat().length +
-                            file.tags.custom.length}{' '}
-                          tags
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-1 shrink-0">
-                  {!file.is_primary && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleSetPrimary(file.id)}
-                      title="Set as primary"
-                    >
-                      <Star className="h-4 w-4" />
-                    </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(file.id, file.file_path)}
-                    disabled={uploading}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ArtworkFileTable
+          files={files}
+          onSetPrimary={handleSetPrimary}
+          onDelete={(fileId) => {
+            const file = files.find(f => f.id === fileId);
+            if (file) handleDelete(fileId, file.file_path);
+          }}
+        />
       )}
     </div>
   );
