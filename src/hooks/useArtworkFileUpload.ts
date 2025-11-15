@@ -18,6 +18,13 @@ export interface UploadedFile {
   print_specifications?: Record<string, any>;
   version_number?: number;
   is_latest?: boolean;
+  thumbnails?: Array<{
+    id: string;
+    file_name: string;
+    file_path: string;
+    file_size: number;
+    url: string;
+  }>;
 }
 
 // Utility function to extract ASC code from filename

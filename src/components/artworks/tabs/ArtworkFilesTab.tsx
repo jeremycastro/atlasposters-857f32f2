@@ -25,6 +25,7 @@ export function ArtworkFilesTab({ artworkId }: ArtworkFilesTabProps) {
     },
   });
 
+  // Fetch all files (original and thumbnails)
   const { data: files, isLoading } = useQuery({
     queryKey: ['artwork-files', artworkId],
     queryFn: async () => {
@@ -32,17 +33,52 @@ export function ArtworkFilesTab({ artworkId }: ArtworkFilesTabProps) {
         .from('artwork_files')
         .select('*')
         .eq('artwork_id', artworkId)
-        .eq('file_type', 'original')
         .order('uploaded_at', { ascending: false });
 
       if (error) throw error;
 
-      // Transform to UploadedFile format with public URLs
+      // Separate originals and thumbnails
+      const originalFiles = data.filter(f => f.file_type === 'original');
+      const thumbnailFiles = data.filter(f => f.file_type === 'thumbnail');
+
+      // Group thumbnails by parent original file
+      const thumbnailsByOriginal = new Map<string, any[]>();
+      
+      thumbnailFiles.forEach((thumb) => {
+        // Extract the base name by removing the variant suffix
+        // e.g., "image_large.jpg" -> "image.jpg"
+        const match = thumb.file_name.match(/^(.+)_(small|medium|large)(\.[^.]+)$/);
+        if (match) {
+          const baseName = match[1] + match[3];
+          if (!thumbnailsByOriginal.has(baseName)) {
+            thumbnailsByOriginal.set(baseName, []);
+          }
+          thumbnailsByOriginal.get(baseName)!.push(thumb);
+        }
+      });
+
+      // Transform original files to include public URLs and associated thumbnails
       const filesWithUrls = await Promise.all(
-        (data || []).map(async (file) => {
+        originalFiles.map(async (file) => {
           const { data: urlData } = supabase.storage
             .from('brand-assets')
             .getPublicUrl(file.file_path);
+
+          // Get thumbnails for this file
+          const associatedThumbnails = thumbnailsByOriginal.get(file.file_name) || [];
+          const thumbnailsWithUrls = associatedThumbnails.map(thumb => {
+            const { data: thumbUrlData } = supabase.storage
+              .from('brand-assets')
+              .getPublicUrl(thumb.file_path);
+            
+            return {
+              id: thumb.id,
+              file_name: thumb.file_name,
+              file_path: thumb.file_path,
+              file_size: thumb.file_size || 0,
+              url: thumbUrlData.publicUrl,
+            };
+          });
 
           return {
             id: file.id,
@@ -54,6 +90,7 @@ export function ArtworkFilesTab({ artworkId }: ArtworkFilesTabProps) {
             tags: file.tags || { structured: {}, custom: [], matches_variants: {} },
             print_specifications: file.print_specifications || {},
             url: urlData.publicUrl,
+            thumbnails: thumbnailsWithUrls,
           } as UploadedFile;
         })
       );
