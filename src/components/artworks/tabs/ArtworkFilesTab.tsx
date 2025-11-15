@@ -32,6 +32,7 @@ export function ArtworkFilesTab({ artworkId }: ArtworkFilesTabProps) {
         .from('artwork_files')
         .select('*')
         .eq('artwork_id', artworkId)
+        .eq('file_type', 'original')
         .order('uploaded_at', { ascending: false });
 
       if (error) throw error;
