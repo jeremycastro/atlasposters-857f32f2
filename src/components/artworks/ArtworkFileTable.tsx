@@ -33,6 +33,14 @@ import {
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
+interface ThumbnailFile {
+  id: string;
+  file_name: string;
+  file_path: string;
+  file_size: number;
+  url: string;
+}
+
 interface UploadedFile {
   id: string;
   file_name: string;
@@ -55,6 +63,7 @@ interface UploadedFile {
   dpi?: number;
   color_profile?: string;
   file_type?: string;
+  thumbnails?: ThumbnailFile[];
 }
 
 interface ArtworkFileTableProps {
@@ -243,6 +252,35 @@ export function ArtworkFileTable({ files, onSetPrimary, onDelete }: ArtworkFileT
                         <Collapsible open={isExpanded}>
                           <CollapsibleContent>
                             <div className="bg-muted/50 p-4 space-y-4 border-t">
+                              {/* Generated Thumbnails Section */}
+                              {file.thumbnails && file.thumbnails.length > 0 && (
+                                <div>
+                                  <h4 className="text-sm font-semibold mb-2">Generated Thumbnails</h4>
+                                  <div className="grid grid-cols-3 gap-3">
+                                    {file.thumbnails.map((thumb) => {
+                                      const variant = thumb.file_name.match(/_(small|medium|large)\./)?.[1] || 'unknown';
+                                      return (
+                                        <div key={thumb.id} className="space-y-1">
+                                          <img
+                                            src={thumb.url}
+                                            alt={`${variant} thumbnail`}
+                                            className="w-full aspect-square object-cover rounded border border-border"
+                                          />
+                                          <div className="text-center">
+                                            <Badge variant="secondary" className="text-xs capitalize">
+                                              {variant}
+                                            </Badge>
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                              {formatFileSize(thumb.file_size)}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+
                               {/* Metadata Section */}
                               <div>
                                 <h4 className="text-sm font-semibold mb-2">File Metadata</h4>
