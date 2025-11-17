@@ -74,7 +74,7 @@ interface ArtworkFileTableProps {
 
 export function ArtworkFileTable({ files, onSetPrimary, onDelete }: ArtworkFileTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  const [showThumbnails, setShowThumbnails] = useState(true);
+  const [showPreviewImages, setShowPreviewImages] = useState(true);
 
   const toggleRow = (fileId: string) => {
     const newExpanded = new Set(expandedRows);
@@ -129,12 +129,12 @@ export function ArtworkFileTable({ files, onSetPrimary, onDelete }: ArtworkFileT
         <CardTitle className="text-lg font-semibold">Uploaded Files</CardTitle>
         <div className="flex items-center space-x-2">
           <Switch
-            id="show-thumbnails"
-            checked={showThumbnails}
-            onCheckedChange={setShowThumbnails}
+            id="show-preview-images"
+            checked={showPreviewImages}
+            onCheckedChange={setShowPreviewImages}
           />
-          <Label htmlFor="show-thumbnails" className="text-sm cursor-pointer">
-            Show Thumbnails
+          <Label htmlFor="show-preview-images" className="text-sm cursor-pointer">
+            Show Preview Images
           </Label>
         </div>
       </CardHeader>
@@ -143,7 +143,7 @@ export function ArtworkFileTable({ files, onSetPrimary, onDelete }: ArtworkFileT
           <Table>
             <TableHeader>
               <TableRow>
-                {showThumbnails && <TableHead className="w-20">Preview</TableHead>}
+                <TableHead className="w-20">Preview</TableHead>
                 <TableHead className="w-8"></TableHead>
                 <TableHead>File Name</TableHead>
                 <TableHead className="w-24">Type</TableHead>
@@ -162,15 +162,13 @@ export function ArtworkFileTable({ files, onSetPrimary, onDelete }: ArtworkFileT
                 return (
                   <React.Fragment key={file.id}>
                     <TableRow className="group">
-                      {showThumbnails && (
-                        <TableCell>
-                          <img
-                            src={file.url}
-                            alt={file.file_name}
-                            className="w-16 h-16 object-cover rounded border border-border"
-                          />
-                        </TableCell>
-                      )}
+                      <TableCell>
+                        <img
+                          src={file.url}
+                          alt={file.file_name}
+                          className="w-16 h-16 object-cover rounded border border-border"
+                        />
+                      </TableCell>
                       <TableCell>
                         <Collapsible open={isExpanded} onOpenChange={() => toggleRow(file.id)}>
                           <CollapsibleTrigger asChild>
@@ -248,14 +246,14 @@ export function ArtworkFileTable({ files, onSetPrimary, onDelete }: ArtworkFileT
                     </TableRow>
                     
                     <TableRow>
-                      <TableCell colSpan={showThumbnails ? 9 : 8} className="p-0 border-0">
+                      <TableCell colSpan={9} className="p-0 border-0">
                         <Collapsible open={isExpanded}>
                           <CollapsibleContent>
                             <div className="bg-muted/50 p-4 space-y-4 border-t">
-                              {/* Generated Thumbnails Section */}
-                              {file.thumbnails && file.thumbnails.length > 0 && (
+                              {/* Preview Images Section */}
+                              {showPreviewImages && file.thumbnails && file.thumbnails.length > 0 && (
                                 <div>
-                                  <h4 className="text-sm font-semibold mb-2">Generated Thumbnails</h4>
+                                  <h4 className="text-sm font-semibold mb-2">Preview Images</h4>
                                   <div className="grid grid-cols-3 gap-3">
                                     {file.thumbnails.map((thumb) => {
                                       const variant = thumb.file_name.match(/_(small|medium|large)\./)?.[1] || 'unknown';
@@ -263,7 +261,7 @@ export function ArtworkFileTable({ files, onSetPrimary, onDelete }: ArtworkFileT
                                         <div key={thumb.id} className="space-y-1">
                                           <img
                                             src={thumb.url}
-                                            alt={`${variant} thumbnail`}
+                                            alt={`${variant} preview`}
                                             className="w-full aspect-square object-cover rounded border border-border"
                                           />
                                           <div className="text-center">
