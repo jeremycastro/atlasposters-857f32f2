@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { Json } from "@/integrations/supabase/types";
@@ -11,11 +11,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { useDropzone } from "react-dropzone";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, FileSpreadsheet, Package, Check, AlertTriangle, Trash2, RefreshCw } from "lucide-react";
+import { Upload, FileSpreadsheet, Package, Check, AlertTriangle, Trash2, RefreshCw, Filter } from "lucide-react";
 
 interface ParsedProduct {
   handle: string;
@@ -55,8 +62,23 @@ const SyncioImport = () => {
     errors: number;
   } | null>(null);
 
-  // SNB Store ID - will be fetched dynamically
+  // Filter state
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+
+  // Atlas Store ID - will be fetched dynamically
   const [storeId, setStoreId] = useState<string | null>(null);
+
+  // Get unique product types for filter
+  const productTypes = useMemo(() => {
+    const types = new Set(parsedProducts.map(p => p.productType).filter(Boolean));
+    return Array.from(types).sort();
+  }, [parsedProducts]);
+
+  // Filtered products based on type filter
+  const filteredProducts = useMemo(() => {
+    if (typeFilter === "all") return parsedProducts;
+    return parsedProducts.filter(p => p.productType === typeFilter);
+  }, [parsedProducts, typeFilter]);
 
   // Fetch Atlas store ID on mount
   useEffect(() => {
@@ -425,9 +447,34 @@ const SyncioImport = () => {
         {parsedProducts.length > 0 && (
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">
-                Parsed Products ({parsedProducts.length})
-              </h2>
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-bold">
+                  Parsed Products ({filteredProducts.length}
+                  {typeFilter !== "all" && ` of ${parsedProducts.length}`})
+                </h2>
+                
+                {/* Type Filter */}
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-muted-foreground" />
+                  <Select value={typeFilter} onValueChange={setTypeFilter}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Filter by Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types ({parsedProducts.length})</SelectItem>
+                      {productTypes.map(type => {
+                        const count = parsedProducts.filter(p => p.productType === type).length;
+                        return (
+                          <SelectItem key={type} value={type}>
+                            {type} ({count})
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -460,7 +507,7 @@ const SyncioImport = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {parsedProducts.slice(0, 100).map((product) => {
+                  {filteredProducts.slice(0, 100).map((product) => {
                     const artworkCodes = product.variants
                       .map((v) => extractArtworkCode(v.sku))
                       .filter(Boolean)
@@ -500,9 +547,9 @@ const SyncioImport = () => {
                 </TableBody>
               </Table>
             </div>
-            {parsedProducts.length > 100 && (
+            {filteredProducts.length > 100 && (
               <p className="text-sm text-muted-foreground mt-2 text-center">
-                Showing first 100 of {parsedProducts.length} products
+                Showing first 100 of {filteredProducts.length} products
               </p>
             )}
           </Card>
