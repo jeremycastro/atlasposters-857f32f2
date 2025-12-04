@@ -14,7 +14,7 @@ interface VariantHierarchyConfigProps {
  * Based on sort_order: 0=VAR1, 1=VAR2, 2=VAR3
  */
 export function VariantHierarchyConfig({ productTypeId }: VariantHierarchyConfigProps) {
-  const { variantGroups, isLoading, updateHierarchy, getVariantMapping } = useVariantHierarchy(productTypeId);
+  const { productTypeVariantGroups, isLoading, updateHierarchy, getVariantMapping } = useVariantHierarchy(productTypeId);
 
   if (isLoading) {
     return (
@@ -34,7 +34,7 @@ export function VariantHierarchyConfig({ productTypeId }: VariantHierarchyConfig
     );
   }
 
-  if (!variantGroups || variantGroups.length === 0) {
+  if (!productTypeVariantGroups || productTypeVariantGroups.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -48,7 +48,7 @@ export function VariantHierarchyConfig({ productTypeId }: VariantHierarchyConfig
   }
 
   const mapping = getVariantMapping();
-  const sorted = [...variantGroups].sort((a, b) => a.sort_order - b.sort_order);
+  const sorted = [...productTypeVariantGroups].sort((a, b) => a.sort_order - b.sort_order);
 
   const moveUp = (index: number) => {
     if (index === 0) return;
@@ -93,9 +93,9 @@ export function VariantHierarchyConfig({ productTypeId }: VariantHierarchyConfig
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {sorted.map((group, index) => (
+          {sorted.map((ptg, index) => (
             <div
-              key={group.id}
+              key={ptg.id}
               className="flex items-center gap-3 p-4 border rounded-lg bg-muted/30"
             >
               {/* Reorder Buttons */}
@@ -122,25 +122,25 @@ export function VariantHierarchyConfig({ productTypeId }: VariantHierarchyConfig
 
               {/* VAR Badge */}
               <Badge className="shrink-0 font-mono text-xs">
-                {getVarLabel(group.sort_order)}
+                {getVarLabel(ptg.sort_order)}
               </Badge>
 
               {/* Group Info */}
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <p className="font-semibold">{group.group_name}</p>
-                  {group.is_required && (
+                  <p className="font-semibold">{ptg.variant_group?.group_name}</p>
+                  {ptg.is_required && (
                     <Badge variant="outline" className="text-xs">Required</Badge>
                   )}
                 </div>
-                {group.description && (
-                  <p className="text-xs text-muted-foreground">{group.description}</p>
+                {ptg.variant_group?.description && (
+                  <p className="text-xs text-muted-foreground">{ptg.variant_group.description}</p>
                 )}
               </div>
 
               {/* Sort Order */}
               <div className="text-xs text-muted-foreground">
-                Order: {group.sort_order}
+                Order: {ptg.sort_order}
               </div>
             </div>
           ))}

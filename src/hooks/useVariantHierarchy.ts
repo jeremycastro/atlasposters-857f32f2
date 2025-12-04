@@ -6,11 +6,20 @@ export interface VariantGroup {
   id: string;
   group_name: string;
   description: string | null;
+  is_active: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface ProductTypeVariantGroup {
+  id: string;
   product_type_id: string;
+  variant_group_id: string;
   sort_order: number;
   is_required: boolean;
-  is_active: boolean;
   allow_multiple: boolean;
+  created_at: string | null;
+  variant_group?: VariantGroup;
 }
 
 export interface VariantCode {
@@ -25,33 +34,38 @@ export interface VariantCode {
 
 /**
  * Hook to manage variant groups and their hierarchy per product type
- * Determines which variant dimension (color, size, finish) maps to VAR1, VAR2, VAR3
+ * Uses junction table product_type_variant_groups for many-to-many relationship
  */
 export function useVariantHierarchy(productTypeId?: string) {
   const queryClient = useQueryClient();
 
-  // Fetch variant groups for a product type
-  const { data: variantGroups, isLoading: isLoadingGroups } = useQuery({
-    queryKey: ['variant-groups', productTypeId],
+  // Fetch variant groups for a product type via junction table
+  const { data: productTypeVariantGroups, isLoading: isLoadingGroups } = useQuery({
+    queryKey: ['product-type-variant-groups', productTypeId],
     queryFn: async () => {
-      const query = supabase
-        .from('variant_groups')
-        .select('*')
-        .eq('is_active', true)
+      if (!productTypeId) return [];
+
+      const { data, error } = await supabase
+        .from('product_type_variant_groups')
+        .select(`
+          *,
+          variant_group:variant_groups(*)
+        `)
+        .eq('product_type_id', productTypeId)
         .order('sort_order', { ascending: true });
 
-      if (productTypeId) {
-        query.eq('product_type_id', productTypeId);
-      }
-
-      const { data, error } = await query;
       if (error) throw error;
-      return data as VariantGroup[];
+      return data as ProductTypeVariantGroup[];
     },
     enabled: !!productTypeId,
   });
 
-  // Fetch variant codes for specific groups
+  // Extract variant groups from junction data
+  const variantGroups = productTypeVariantGroups
+    ?.map(ptg => ptg.variant_group)
+    .filter((vg): vg is VariantGroup => !!vg) || [];
+
+  // Fetch variant codes for the groups
   const { data: variantCodes, isLoading: isLoadingCodes } = useQuery({
     queryKey: ['variant-codes', variantGroups?.map(g => g.id)],
     queryFn: async () => {
@@ -70,12 +84,12 @@ export function useVariantHierarchy(productTypeId?: string) {
     enabled: !!variantGroups && variantGroups.length > 0,
   });
 
-  // Update variant group hierarchy (sort_order)
+  // Update variant group hierarchy (sort_order in junction table)
   const updateHierarchy = useMutation({
     mutationFn: async (updates: { id: string; sort_order: number }[]) => {
       const promises = updates.map(({ id, sort_order }) =>
         supabase
-          .from('variant_groups')
+          .from('product_type_variant_groups')
           .update({ sort_order })
           .eq('id', id)
       );
@@ -87,7 +101,7 @@ export function useVariantHierarchy(productTypeId?: string) {
       return results;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['variant-groups'] });
+      queryClient.invalidateQueries({ queryKey: ['product-type-variant-groups'] });
       toast.success('Variant hierarchy updated');
     },
     onError: (error) => {
@@ -100,14 +114,14 @@ export function useVariantHierarchy(productTypeId?: string) {
    * sort_order 0 = VAR1, 1 = VAR2, 2 = VAR3
    */
   const getVariantMapping = () => {
-    if (!variantGroups) return { var1: null, var2: null, var3: null };
+    if (!productTypeVariantGroups) return { var1: null, var2: null, var3: null };
 
-    const sorted = [...variantGroups].sort((a, b) => a.sort_order - b.sort_order);
+    const sorted = [...productTypeVariantGroups].sort((a, b) => a.sort_order - b.sort_order);
     
     return {
-      var1: sorted[0] || null,
-      var2: sorted[1] || null,
-      var3: sorted[2] || null,
+      var1: sorted[0]?.variant_group || null,
+      var2: sorted[1]?.variant_group || null,
+      var3: sorted[2]?.variant_group || null,
     };
   };
 
@@ -130,6 +144,7 @@ export function useVariantHierarchy(productTypeId?: string) {
   return {
     variantGroups,
     variantCodes,
+    productTypeVariantGroups,
     isLoading: isLoadingGroups || isLoadingCodes,
     updateHierarchy,
     getVariantMapping,

@@ -1,18 +1,26 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Package, Layers, Tags, Plus, Upload } from "lucide-react";
+import { Package, Layers, Tags, Plus, Upload, Library } from "lucide-react";
 import { useProducts, useProductStats, useProductTypes } from "@/hooks/useProducts";
 import { ProductTableView } from "@/components/products/ProductTableView";
+import { VariantLibraryTab } from "@/components/products/VariantLibraryTab";
+import { ProductTypeSheet } from "@/components/products/ProductTypeSheet";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+
 export default function ProductManagement() {
   const navigate = useNavigate();
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: stats, isLoading: statsLoading } = useProductStats();
   const { data: productTypes = [], isLoading: typesLoading } = useProductTypes();
+
+  const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null);
+  const [isCreateTypeOpen, setIsCreateTypeOpen] = useState(false);
+
+  const selectedType = productTypes.find(t => t.id === selectedTypeId);
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -114,7 +122,10 @@ export default function ProductManagement() {
         <TabsList>
           <TabsTrigger value="products">Products</TabsTrigger>
           <TabsTrigger value="types">Product Types</TabsTrigger>
-          <TabsTrigger value="variants">Variant Config</TabsTrigger>
+          <TabsTrigger value="library">
+            <Library className="mr-2 h-4 w-4" />
+            Variant Library
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="products" className="space-y-4">
@@ -125,7 +136,7 @@ export default function ProductManagement() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Product Types</CardTitle>
-              <Button size="sm">
+              <Button size="sm" onClick={() => setIsCreateTypeOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add Type
               </Button>
@@ -155,7 +166,7 @@ export default function ProductManagement() {
                       <TableRow 
                         key={type.id} 
                         className="cursor-pointer hover:bg-muted/50"
-                        onClick={() => console.log('Edit type:', type.id)}
+                        onClick={() => setSelectedTypeId(type.id)}
                       >
                         <TableCell className="font-medium">{type.type_name}</TableCell>
                         <TableCell>
@@ -181,19 +192,24 @@ export default function ProductManagement() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="variants" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Variant Configuration</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-32 flex items-center justify-center text-muted-foreground">
-                Select a product type to configure its variant hierarchy
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="library" className="space-y-4">
+          <VariantLibraryTab />
         </TabsContent>
       </Tabs>
+
+      {/* Edit Product Type Sheet */}
+      <ProductTypeSheet
+        productType={selectedType as any}
+        open={!!selectedTypeId}
+        onOpenChange={(open) => !open && setSelectedTypeId(null)}
+      />
+
+      {/* Create Product Type Sheet */}
+      <ProductTypeSheet
+        productType={undefined}
+        open={isCreateTypeOpen}
+        onOpenChange={setIsCreateTypeOpen}
+      />
     </div>
   );
 }

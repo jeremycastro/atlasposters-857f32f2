@@ -64,7 +64,7 @@ export function VariantBuilder({
 }: VariantBuilderProps) {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
-  const { variantGroups, getCodesForGroup, getVariantMapping } = useVariantHierarchy(productTypeId);
+  const { variantGroups, productTypeVariantGroups, getCodesForGroup, getVariantMapping } = useVariantHierarchy(productTypeId);
 
   const {
     register,
@@ -89,6 +89,13 @@ export function VariantBuilder({
 
   // Build preview SKU
   const previewSKU = `${ascCode}-${typeCode}-${var1Value || '99'}-${var2Value || '99'}-${var3Value || '99'}`;
+
+  // Get is_required from junction table
+  const getIsRequired = (varIndex: number): boolean => {
+    if (!productTypeVariantGroups) return false;
+    const sorted = [...productTypeVariantGroups].sort((a, b) => a.sort_order - b.sort_order);
+    return sorted[varIndex]?.is_required || false;
+  };
 
   const createVariant = useMutation({
     mutationFn: async (data: VariantFormData) => {
@@ -161,7 +168,7 @@ export function VariantBuilder({
             <div className="space-y-2">
               <Label htmlFor="var1">
                 VAR1: {mapping.var1.group_name}
-                {mapping.var1.is_required && <span className="text-destructive ml-1">*</span>}
+                {getIsRequired(0) && <span className="text-destructive ml-1">*</span>}
               </Label>
               <Select
                 value={var1Value}
@@ -190,7 +197,7 @@ export function VariantBuilder({
             <div className="space-y-2">
               <Label htmlFor="var2">
                 VAR2: {mapping.var2.group_name}
-                {mapping.var2.is_required && <span className="text-destructive ml-1">*</span>}
+                {getIsRequired(1) && <span className="text-destructive ml-1">*</span>}
               </Label>
               <Select
                 value={var2Value}
@@ -219,7 +226,7 @@ export function VariantBuilder({
             <div className="space-y-2">
               <Label htmlFor="var3">
                 VAR3: {mapping.var3.group_name}
-                {mapping.var3.is_required && <span className="text-destructive ml-1">*</span>}
+                {getIsRequired(2) && <span className="text-destructive ml-1">*</span>}
               </Label>
               <Select
                 value={var3Value}
