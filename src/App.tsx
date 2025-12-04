@@ -10,6 +10,7 @@ import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import Collection from "./pages/Collection";
 import About from "./pages/About";
+import PosterHistory from "./pages/PosterHistory";
 import Changelog from "./pages/admin/Changelog";
 import TechStack from "./pages/admin/TechStack";
 import SKUMethodology from "./pages/admin/SKUMethodology";
@@ -70,6 +71,7 @@ const App = () => (
             {/* Public routes */}
             <Route path="/" element={<Index />} />
             <Route path="/pitch01" element={<Pitch01 />} />
+            <Route path="/poster-history" element={<PosterHistory />} />
             <Route path="/products" element={<Products />} />
             <Route path="/product/:handle" element={<ProductDetail />} />
             <Route path="/collections/:handle" element={<Collection />} />
