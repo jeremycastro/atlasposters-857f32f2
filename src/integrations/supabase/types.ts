@@ -2486,6 +2486,42 @@ export type Database = {
           },
         ]
       }
+      static_article_versions: {
+        Row: {
+          archived_at: string | null
+          archived_by: string | null
+          change_summary: string | null
+          component_path: string
+          created_at: string | null
+          id: string
+          is_current: boolean | null
+          slug: string
+          version_number: number
+        }
+        Insert: {
+          archived_at?: string | null
+          archived_by?: string | null
+          change_summary?: string | null
+          component_path: string
+          created_at?: string | null
+          id?: string
+          is_current?: boolean | null
+          slug: string
+          version_number: number
+        }
+        Update: {
+          archived_at?: string | null
+          archived_by?: string | null
+          change_summary?: string | null
+          component_path?: string
+          created_at?: string | null
+          id?: string
+          is_current?: boolean | null
+          slug?: string
+          version_number?: number
+        }
+        Relationships: []
+      }
       sync_log: {
         Row: {
           duration_ms: number | null
