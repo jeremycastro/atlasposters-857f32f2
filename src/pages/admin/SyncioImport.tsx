@@ -97,7 +97,7 @@ const SyncioImport = () => {
       const { data } = await supabase
         .from("shopify_stores")
         .select("id, partner_id")
-        .eq("store_domain", "atlas-posters.myshopify.com")
+        .eq("store_domain", "atlasposters-z1qa3.myshopify.com")
         .single();
       if (data) {
         setStoreId(data.id);
@@ -433,8 +433,8 @@ const SyncioImport = () => {
             <div className="flex items-center gap-3">
               <Package className="w-5 h-5 text-primary" />
               <div>
-                <p className="font-semibold">Target Store: Atlas Posters</p>
-                <p className="text-sm text-muted-foreground">atlas-posters.myshopify.com</p>
+              <p className="font-semibold">Target Store: Atlas Posters</p>
+              <p className="text-sm text-muted-foreground">atlasposters-z1qa3.myshopify.com</p>
               </div>
             </div>
             {storeId ? (
