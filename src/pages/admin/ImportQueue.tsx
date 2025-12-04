@@ -35,7 +35,7 @@ import {
   PartnerProduct,
 } from "@/hooks/usePartnerProducts";
 import { useArtworks } from "@/hooks/useArtworks";
-import { usePartners } from "@/hooks/usePartnerManagement";
+import { usePartners, useBrands } from "@/hooks/usePartnerManagement";
 import {
   Package,
   Search,
@@ -47,6 +47,8 @@ import {
   Link2,
   AlertTriangle,
   Loader2,
+  Users,
+  Building2,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -64,7 +66,10 @@ const ImportQueue = () => {
   const [selectedProduct, setSelectedProduct] = useState<PartnerProduct | null>(null);
   const [mapDialogOpen, setMapDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [assignPartnerDialogOpen, setAssignPartnerDialogOpen] = useState(false);
   const [selectedArtworkId, setSelectedArtworkId] = useState<string>("");
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string>("");
+  const [selectedBrandId, setSelectedBrandId] = useState<string>("");
   const [mappingNotes, setMappingNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
 
@@ -74,10 +79,17 @@ const ImportQueue = () => {
   const { data: stats } = usePartnerProductStats();
   const { data: artworks } = useArtworks();
   const { data: partners } = usePartners();
+  const { data: brands } = useBrands();
 
   const mapMutation = useMapPartnerProductToArtwork();
   const rejectMutation = useRejectPartnerProduct();
   const updateMutation = useUpdatePartnerProduct();
+
+  // Filter brands by selected partner
+  const filteredBrands = useMemo(() => {
+    if (!brands || !selectedPartnerId) return [];
+    return brands.filter(b => b.partner_id === selectedPartnerId);
+  }, [brands, selectedPartnerId]);
 
   // Filter products by search
   const filteredProducts = useMemo(() => {
@@ -144,6 +156,27 @@ const ImportQueue = () => {
       id: product.id,
       updates: { import_status: "reviewing" },
     });
+  };
+
+  const handleAssignPartner = () => {
+    if (!selectedProduct || !selectedPartnerId) return;
+    updateMutation.mutate(
+      {
+        id: selectedProduct.id,
+        updates: { 
+          partner_id: selectedPartnerId,
+          brand_id: selectedBrandId || null,
+        },
+      },
+      {
+        onSuccess: () => {
+          setAssignPartnerDialogOpen(false);
+          setSelectedProduct(null);
+          setSelectedPartnerId("");
+          setSelectedBrandId("");
+        },
+      }
+    );
   };
 
   return (
@@ -236,6 +269,7 @@ const ImportQueue = () => {
                 <TableHeader className="sticky top-0 bg-background">
                   <TableRow>
                     <TableHead>Status</TableHead>
+                    <TableHead>Partner</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Artwork Code</TableHead>
                     <TableHead>Type</TableHead>
@@ -258,6 +292,19 @@ const ImportQueue = () => {
                             <StatusIcon className="w-3 h-3 mr-1" />
                             {status?.label}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {product.partner ? (
+                            <div className="flex items-center gap-1">
+                              <Building2 className="w-3 h-3 text-muted-foreground" />
+                              <span className="text-sm">{product.partner.partner_name}</span>
+                            </div>
+                          ) : (
+                            <Badge variant="outline" className="text-amber-600 border-amber-300">
+                              <Users className="w-3 h-3 mr-1" />
+                              Unassigned
+                            </Badge>
+                          )}
                         </TableCell>
                         <TableCell className="font-medium max-w-[200px] truncate">
                           {product.original_title}
@@ -295,6 +342,19 @@ const ImportQueue = () => {
                             )}
                             {["pending", "reviewing"].includes(product.import_status) && (
                               <>
+                                {!product.partner_id && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      setSelectedProduct(product);
+                                      setAssignPartnerDialogOpen(true);
+                                    }}
+                                  >
+                                    <Users className="w-4 h-4 mr-1" />
+                                    Assign
+                                  </Button>
+                                )}
                                 <Button
                                   size="sm"
                                   variant="default"
@@ -302,6 +362,8 @@ const ImportQueue = () => {
                                     setSelectedProduct(product);
                                     setMapDialogOpen(true);
                                   }}
+                                  disabled={!product.partner_id}
+                                  title={!product.partner_id ? "Assign partner first" : ""}
                                 >
                                   <Link2 className="w-4 h-4 mr-1" />
                                   Map
@@ -475,6 +537,81 @@ const ImportQueue = () => {
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 )}
                 Reject
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Assign Partner Dialog */}
+        <Dialog open={assignPartnerDialogOpen} onOpenChange={setAssignPartnerDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-primary" />
+                Assign Partner
+              </DialogTitle>
+            </DialogHeader>
+            {selectedProduct && (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Product</p>
+                  <p className="font-medium">{selectedProduct.original_title}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Partner *</p>
+                  <Select value={selectedPartnerId} onValueChange={(val) => {
+                    setSelectedPartnerId(val);
+                    setSelectedBrandId(""); // Reset brand when partner changes
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select partner..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {partners?.map((partner) => (
+                        <SelectItem key={partner.id} value={partner.id}>
+                          {partner.partner_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {selectedPartnerId && filteredBrands.length > 0 && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Brand (optional)</p>
+                    <Select value={selectedBrandId} onValueChange={setSelectedBrandId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select brand..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filteredBrands.map((brand) => (
+                          <SelectItem key={brand.id} value={brand.id}>
+                            {brand.brand_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => {
+                setAssignPartnerDialogOpen(false);
+                setSelectedPartnerId("");
+                setSelectedBrandId("");
+              }}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleAssignPartner}
+                disabled={!selectedPartnerId || updateMutation.isPending}
+              >
+                {updateMutation.isPending && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
+                Assign Partner
               </Button>
             </DialogFooter>
           </DialogContent>
