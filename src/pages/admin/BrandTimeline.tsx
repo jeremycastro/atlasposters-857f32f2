@@ -6,9 +6,10 @@ import { Plus, Filter } from "lucide-react";
 import { BrandMultiSelector } from "@/components/brandStory/BrandMultiSelector";
 import { CreateTimelineDialog } from "@/components/brandStory/CreateTimelineDialog";
 import { TimelineEventCard } from "@/components/brandStory/TimelineEventCard";
+import { TimelineEventDetailDialog } from "@/components/brandStory/TimelineEventDetailDialog";
 import { useBrandTimeline } from "@/hooks/useBrandStory";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BrandEventType, EVENT_TYPE_LABELS } from "@/types/brandStory";
+import { BrandEventType, BrandTimelineEvent, EVENT_TYPE_LABELS } from "@/types/brandStory";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -27,6 +28,10 @@ export default function BrandTimeline() {
   });
   
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false);
+  const [eventToEdit, setEventToEdit] = useState<BrandTimelineEvent | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<BrandTimelineEvent | null>(null);
+  
   const [filterEventType, setFilterEventType] = useState<BrandEventType | "all">(() => {
     return (searchParams.get("type") as BrandEventType) || "all";
   });
@@ -81,6 +86,23 @@ export default function BrandTimeline() {
   }, {} as Record<string, typeof filteredEvents>);
 
   const years = Object.keys(groupedByYear).sort((a, b) => parseInt(b) - parseInt(a));
+
+  const handleViewEvent = (event: BrandTimelineEvent) => {
+    setSelectedEvent(event);
+    setDetailDialogOpen(true);
+  };
+
+  const handleEditEvent = (event: BrandTimelineEvent) => {
+    setEventToEdit(event);
+    setTimelineDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = (open: boolean) => {
+    setTimelineDialogOpen(open);
+    if (!open) {
+      setEventToEdit(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -179,7 +201,13 @@ export default function BrandTimeline() {
                           style={{ backgroundColor: dotColor }}
                         />
                         <div className="absolute -left-12 top-8 w-8 h-px bg-border" />
-                        <TimelineEventCard event={event} brandName={brand?.brand_name} brandColor={brand?.primary_color} />
+                        <TimelineEventCard 
+                          event={event} 
+                          brandName={brand?.brand_name} 
+                          brandColor={brand?.primary_color}
+                          onView={handleViewEvent}
+                          onEdit={handleEditEvent}
+                        />
                       </div>
                     );
                   })}
@@ -191,7 +219,15 @@ export default function BrandTimeline() {
 
       <CreateTimelineDialog
         open={timelineDialogOpen}
-        onOpenChange={setTimelineDialogOpen}
+        onOpenChange={handleCloseEditDialog}
+        eventToEdit={eventToEdit}
+      />
+
+      <TimelineEventDetailDialog
+        event={selectedEvent}
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        onEdit={handleEditEvent}
       />
     </div>
   );
