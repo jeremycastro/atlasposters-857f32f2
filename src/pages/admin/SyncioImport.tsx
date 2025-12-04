@@ -72,6 +72,10 @@ const SyncioImport = () => {
   const [storeId, setStoreId] = useState<string | null>(null);
   const [partnerId, setPartnerId] = useState<string | null>(null);
 
+  // Database product counts
+  const [dbProductCount, setDbProductCount] = useState<number>(0);
+  const [partnerProductCount, setPartnerProductCount] = useState<number>(0);
+
   // Translate mutation
   const translateMutation = useTranslateShopifyProducts();
 
@@ -87,9 +91,9 @@ const SyncioImport = () => {
     return parsedProducts.filter(p => p.productType === typeFilter);
   }, [parsedProducts, typeFilter]);
 
-  // Fetch Atlas store ID and partner ID on mount
+  // Fetch Atlas store ID, partner ID, and product counts on mount
   useEffect(() => {
-    const fetchStoreId = async () => {
+    const fetchStoreData = async () => {
       const { data } = await supabase
         .from("shopify_stores")
         .select("id, partner_id")
@@ -98,10 +102,18 @@ const SyncioImport = () => {
       if (data) {
         setStoreId(data.id);
         setPartnerId(data.partner_id);
+
+        // Fetch counts
+        const [shopifyRes, partnerRes] = await Promise.all([
+          supabase.from("shopify_products").select("id", { count: "exact", head: true }).eq("shopify_store_id", data.id),
+          supabase.from("partner_products").select("id", { count: "exact", head: true }).eq("partner_id", data.partner_id),
+        ]);
+        setDbProductCount(shopifyRes.count || 0);
+        setPartnerProductCount(partnerRes.count || 0);
       }
     };
-    fetchStoreId();
-  }, []);
+    fetchStoreData();
+  }, [translateMutation.isSuccess]);
 
   const parseCSV = (content: string): ParsedProduct[] => {
     // Parse CSV handling multi-line quoted fields
@@ -453,15 +465,22 @@ const SyncioImport = () => {
           </div>
         )}
 
-        {/* Next Steps - Translate to Partner Products */}
-        {importStats && importStats.imported > 0 && (
+        {/* Database Status - Always show if products exist */}
+        {dbProductCount > 0 && (
           <Card className="p-6 mb-6 border-primary/20 bg-primary/5">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold mb-1">Next Step: Translate to Partner Products</h3>
+                <h3 className="text-lg font-semibold mb-1">Database Status</h3>
                 <p className="text-sm text-muted-foreground">
-                  Move imported Shopify products to the staging layer for artwork mapping
+                  <span className="font-medium text-foreground">{dbProductCount}</span> products in shopify_products
+                  {" → "}
+                  <span className="font-medium text-foreground">{partnerProductCount}</span> in partner_products staging
                 </p>
+                {dbProductCount > partnerProductCount && (
+                  <p className="text-sm text-amber-600 mt-1">
+                    {dbProductCount - partnerProductCount} products ready to translate
+                  </p>
+                )}
               </div>
               <div className="flex gap-2">
                 <Button
@@ -471,17 +490,19 @@ const SyncioImport = () => {
                   View Import Queue
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
-                <Button
-                  onClick={() => partnerId && translateMutation.mutate(partnerId)}
-                  disabled={!partnerId || translateMutation.isPending}
-                >
-                  {translateMutation.isPending ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <ArrowRight className="w-4 h-4 mr-2" />
-                  )}
-                  Translate to Partner Products
-                </Button>
+                {dbProductCount > partnerProductCount && (
+                  <Button
+                    onClick={() => partnerId && translateMutation.mutate(partnerId)}
+                    disabled={!partnerId || translateMutation.isPending}
+                  >
+                    {translateMutation.isPending ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <ArrowRight className="w-4 h-4 mr-2" />
+                    )}
+                    Translate to Partner Products
+                  </Button>
+                )}
               </div>
             </div>
           </Card>
