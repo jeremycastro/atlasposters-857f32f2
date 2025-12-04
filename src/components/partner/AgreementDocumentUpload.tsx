@@ -14,7 +14,6 @@ interface AgreementDocumentUploadProps {
 }
 
 export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUploadProps) => {
-  const [dragActive, setDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
   const [previewFile, setPreviewFile] = useState<any | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -66,36 +65,6 @@ export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUpload
     }
   };
 
-  const handleDrag = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  }, []);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    const allFiles = Array.from(e.dataTransfer.files);
-    console.log('Files dropped:', allFiles.map(f => ({ name: f.name, type: f.type, size: f.size })));
-    
-    if (!agreementId) {
-      toast.error("Agreement ID is missing. Please save the agreement first.");
-      return;
-    }
-
-    const validFiles = filterAndValidateFiles(allFiles);
-    
-    if (validFiles.length > 0) {
-      handleUpload(validFiles);
-    }
-  }, [agreementId]);
-
   const filterAndValidateFiles = (files: File[]) => {
     const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
     const allowedExtensions = ['.pdf', '.doc', '.docx', '.txt', '.jpg', '.jpeg', '.png'];
@@ -126,13 +95,10 @@ export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUpload
 
     // Show feedback for rejected files
     if (rejectedFiles.length > 0) {
-      console.log('Rejected files:', rejectedFiles);
       rejectedFiles.forEach(({ name, reason }) => {
         toast.error(`${name}: ${reason}`);
       });
     }
-
-    console.log('Valid files for upload:', validFiles.map(f => ({ name: f.name, size: f.size })));
     
     return validFiles;
   };
@@ -140,7 +106,6 @@ export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUpload
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const allFiles = Array.from(e.target.files);
-      console.log('Files selected:', allFiles.map(f => ({ name: f.name, type: f.type, size: f.size })));
       
       if (!agreementId) {
         toast.error("Agreement ID is missing. Please save the agreement first.");
@@ -277,50 +242,38 @@ export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUpload
       />
       
       {/* Upload Area */}
-      <Card
-        className={cn(
-          "border-2 border-dashed transition-colors",
-          dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25",
-          isUploading && "opacity-50 pointer-events-none"
-        )}
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
-        onDrop={handleDrop}
-      >
-        <CardContent className="flex flex-col items-center justify-center py-8 px-4">
-          {isUploading ? (
-            <div className="flex flex-col items-center gap-2">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground">Uploading documents...</p>
-            </div>
-          ) : (
-            <>
-              <Upload className="h-10 w-10 text-muted-foreground mb-4" />
-              <h3 className="font-medium mb-2">Upload Agreement Documents</h3>
-              <p className="text-sm text-muted-foreground text-center mb-4">
-                Drag and drop documents here, or click to browse
-              </p>
-              <input
-                type="file"
-                id="agreement-file-upload"
-                className="hidden"
-                multiple
-                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-                onChange={handleFileInput}
-              />
-              <label htmlFor="agreement-file-upload">
-                <Button type="button" variant="outline" size="sm" asChild>
-                  <span>Browse Files</span>
-                </Button>
-              </label>
-              <p className="text-xs text-muted-foreground mt-4">
-                Supports: PDF, DOC, DOCX, TXT, JPG, PNG (max 100MB each)
-              </p>
-            </>
-          )}
-        </CardContent>
-      </Card>
+      <div className="flex items-center gap-3">
+        <input
+          type="file"
+          id="agreement-file-upload"
+          className="hidden"
+          multiple
+          accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+          onChange={handleFileInput}
+          disabled={isUploading}
+        />
+        <label htmlFor="agreement-file-upload">
+          <Button 
+            type="button" 
+            variant="outline" 
+            size="sm" 
+            asChild 
+            disabled={isUploading}
+          >
+            <span className="flex items-center gap-2">
+              {isUploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+              {isUploading ? "Uploading..." : "Upload Document"}
+            </span>
+          </Button>
+        </label>
+        <span className="text-xs text-muted-foreground">
+          PDF, DOC, DOCX, TXT, JPG, PNG (max 100MB)
+        </span>
+      </div>
 
       {/* Upload Progress */}
       {uploadProgress.length > 0 && (
