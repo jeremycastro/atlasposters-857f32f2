@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BookOpen, Search, Filter, Calendar, ArrowRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { useKnowledgeArticles, useKnowledgeCategories } from "@/hooks/useKnowledgeBase";
+import { knowledgeArticles as staticArticles } from "@/types/knowledge";
 import { changelogData } from "@/pages/admin/Changelog";
 import { format } from "date-fns";
 import {
@@ -29,6 +30,33 @@ import {
 type SortField = "title" | "category" | "lastUpdated";
 type SortDirection = "asc" | "desc";
 
+// Static article slugs that have custom React components
+const staticArticleSlugs = new Set([
+  "sku-methodology",
+  "partner-management", 
+  "brand-assets",
+  "task-management",
+  "artwork-catalog",
+  "admin-brand-guide",
+  "brand-story",
+  "prodigi-api",
+  "product-importing",
+  "readymades-framing",
+]);
+
+interface UnifiedArticle {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  icon: string;
+  lastUpdated: string;
+  tags: string[];
+  isStatic: boolean;
+  isPublished: boolean;
+}
+
 const KnowledgeBase = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,27 +64,64 @@ const KnowledgeBase = () => {
   const [sortField, setSortField] = useState<SortField>("lastUpdated");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
-  const { data: articles = [], isLoading: articlesLoading } = useKnowledgeArticles();
+  const { data: dbArticles = [], isLoading: articlesLoading } = useKnowledgeArticles();
   const { data: categories = [], isLoading: categoriesLoading } = useKnowledgeCategories();
 
   const isLoading = articlesLoading || categoriesLoading;
 
-  // Get unique category display names
+  // Merge static articles with database articles, preferring static for display
+  const allArticles = useMemo((): UnifiedArticle[] => {
+    const dbArticleSlugs = new Set(dbArticles.map(a => a.slug));
+    
+    // Convert static articles to unified format
+    const staticUnified: UnifiedArticle[] = staticArticles.map(article => ({
+      id: article.id,
+      slug: article.id,
+      title: article.title,
+      description: article.description,
+      category: article.category,
+      icon: article.icon,
+      lastUpdated: article.lastUpdated,
+      tags: article.tags,
+      isStatic: true,
+      isPublished: true,
+    }));
+
+    // Add any DB articles that don't have static versions
+    const dbOnlyArticles: UnifiedArticle[] = dbArticles
+      .filter(a => !staticArticleSlugs.has(a.slug))
+      .map(article => ({
+        id: article.id,
+        slug: article.slug,
+        title: article.title,
+        description: article.description || "",
+        category: article.category?.display_name || "Uncategorized",
+        icon: article.icon || "BookOpen",
+        lastUpdated: article.updated_at,
+        tags: article.tags || [],
+        isStatic: false,
+        isPublished: article.is_published,
+      }));
+
+    return [...staticUnified, ...dbOnlyArticles];
+  }, [dbArticles]);
+
+  // Get unique categories
   const categoryOptions = useMemo(() => {
-    const cats = categories.map(c => c.display_name);
+    const cats = Array.from(new Set(allArticles.map(a => a.category)));
     return ["all", ...cats];
-  }, [categories]);
+  }, [allArticles]);
 
   // Filter and sort articles
   const filteredArticles = useMemo(() => {
-    let filtered = articles.filter(article => {
+    let filtered = allArticles.filter(article => {
       const matchesSearch = 
         article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (article.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
-        (article.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ?? false);
+        article.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        article.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
       
       const matchesCategory = 
-        selectedCategory === "all" || article.category?.display_name === selectedCategory;
+        selectedCategory === "all" || article.category === selectedCategory;
       
       return matchesSearch && matchesCategory;
     });
@@ -67,15 +132,15 @@ const KnowledgeBase = () => {
       if (sortField === "title") {
         comparison = a.title.localeCompare(b.title);
       } else if (sortField === "category") {
-        comparison = (a.category?.display_name || "").localeCompare(b.category?.display_name || "");
+        comparison = a.category.localeCompare(b.category);
       } else if (sortField === "lastUpdated") {
-        comparison = new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
+        comparison = new Date(a.lastUpdated).getTime() - new Date(b.lastUpdated).getTime();
       }
       return sortDirection === "asc" ? comparison : -comparison;
     });
 
     return filtered;
-  }, [articles, searchQuery, selectedCategory, sortField, sortDirection]);
+  }, [allArticles, searchQuery, selectedCategory, sortField, sortDirection]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -93,8 +158,9 @@ const KnowledgeBase = () => {
       : <ArrowDown className="h-4 w-4 ml-1" />;
   };
 
-  const handleArticleClick = (slug: string) => {
-    navigate(`/admin/knowledge/article/${slug}`);
+  const handleArticleClick = (article: UnifiedArticle) => {
+    // Always use the new article route - it handles both static and DB articles
+    navigate(`/admin/knowledge/article/${article.slug}`);
   };
 
   if (isLoading) {
@@ -242,7 +308,7 @@ const KnowledgeBase = () => {
         {/* Results Summary */}
         <div className="mb-6">
           <p className="text-sm text-muted-foreground">
-            Showing {filteredArticles.length} of {articles.length} articles
+            Showing {filteredArticles.length} of {allArticles.length} articles
           </p>
         </div>
 
@@ -285,13 +351,13 @@ const KnowledgeBase = () => {
             </TableHeader>
             <TableBody>
               {filteredArticles.map(article => {
-                const IconComponent = (LucideIcons as any)[article.icon || "BookOpen"] || LucideIcons.BookOpen;
+                const IconComponent = (LucideIcons as any)[article.icon] || LucideIcons.BookOpen;
                 
                 return (
                   <TableRow 
                     key={article.id}
                     className="cursor-pointer hover:bg-muted/50 h-16"
-                    onClick={() => handleArticleClick(article.slug)}
+                    onClick={() => handleArticleClick(article)}
                   >
                     <TableCell className="py-3">
                       <div className="p-2 bg-primary/10 rounded-lg w-fit">
@@ -300,13 +366,13 @@ const KnowledgeBase = () => {
                     </TableCell>
                     <TableCell className="py-3">
                       <span className="font-semibold">{article.title}</span>
-                      {!article.is_published && (
+                      {!article.isPublished && (
                         <Badge variant="outline" className="ml-2 text-xs">Draft</Badge>
                       )}
                     </TableCell>
                     <TableCell className="hidden md:table-cell py-3 whitespace-nowrap">
                       <Badge variant="outline" className="whitespace-nowrap">
-                        {article.category?.display_name || "Uncategorized"}
+                        {article.category}
                       </Badge>
                     </TableCell>
                     <TableCell className="hidden lg:table-cell py-3">
@@ -317,7 +383,7 @@ const KnowledgeBase = () => {
                     <TableCell className="py-3">
                       <div className="flex items-center text-xs text-muted-foreground whitespace-nowrap">
                         <Calendar className="h-3 w-3 mr-1" />
-                        {format(new Date(article.updated_at), "yyyy-MM-dd")}
+                        {format(new Date(article.lastUpdated), "yyyy-MM-dd")}
                       </div>
                     </TableCell>
                     <TableCell className="py-3">
@@ -336,25 +402,17 @@ const KnowledgeBase = () => {
             <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">No articles found</h3>
             <p className="text-muted-foreground mb-4">
-              {articles.length === 0 
-                ? "No articles have been migrated yet. Use Content Migration to add articles."
-                : "Try adjusting your search or filters"}
+              Try adjusting your search or filters
             </p>
-            {articles.length === 0 ? (
-              <Button onClick={() => navigate("/admin/knowledge/migrate")}>
-                Go to Content Migration
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedCategory("all");
-                }}
-              >
-                Clear filters
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedCategory("all");
+              }}
+            >
+              Clear filters
+            </Button>
           </Card>
         )}
 
