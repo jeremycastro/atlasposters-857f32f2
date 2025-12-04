@@ -14,6 +14,8 @@ import { AgreementDocumentUpload } from "@/components/partner/AgreementDocumentU
 import { RoyaltyGroupsBuilder } from "@/components/partner/RoyaltyGroupsBuilder";
 import { RevenueDefinitionBuilder, defaultRevenueDefinition, type RevenueDefinition } from "@/components/partner/RevenueDefinitionBuilder";
 import { RoyaltyGroup } from "@/types/partner";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Agreement {
   id: string;
@@ -646,15 +648,20 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                 <AgreementDocumentUpload 
                   agreementId={editingAgreement.id}
                   activeDocumentPath={editingAgreement.agreement_document_path}
-                  onSetActive={(filePath) => {
-                    updateAgreement.mutate(
-                      { id: editingAgreement.id, updates: { agreement_document_path: filePath } },
-                      {
-                        onSuccess: () => {
-                          setEditingAgreement(prev => prev ? { ...prev, agreement_document_path: filePath } : null);
-                        },
-                      }
-                    );
+                  onSetActive={async (filePath) => {
+                    try {
+                      const { error } = await supabase
+                        .from("partner_agreements")
+                        .update({ agreement_document_path: filePath })
+                        .eq("id", editingAgreement.id);
+                      
+                      if (error) throw error;
+                      
+                      setEditingAgreement(prev => prev ? { ...prev, agreement_document_path: filePath } : null);
+                      toast.success("Active document updated");
+                    } catch (error: any) {
+                      toast.error(`Failed to set active document: ${error.message}`);
+                    }
                   }}
                 />
               </div>
