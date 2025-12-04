@@ -356,24 +356,29 @@ const SyncioImport = () => {
   };
 
   const clearImportedData = async () => {
-    if (!storeId) return;
+    if (!storeId || !partnerId) return;
 
     const confirmed = window.confirm(
-      "This will delete all imported SNB products from the database. Continue?"
+      "This will delete all imported products from both shopify_products AND partner_products staging tables. Continue?"
     );
     if (!confirmed) return;
 
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from("shopify_products")
-        .delete()
-        .eq("shopify_store_id", storeId);
+      // Delete from both tables
+      const [shopifyResult, partnerResult] = await Promise.all([
+        supabase.from("shopify_products").delete().eq("shopify_store_id", storeId),
+        supabase.from("partner_products").delete().eq("partner_id", partnerId),
+      ]);
 
-      if (error) throw error;
-      toast.success("Cleared all SNB product data");
+      if (shopifyResult.error) throw shopifyResult.error;
+      if (partnerResult.error) throw partnerResult.error;
+
+      toast.success("Cleared all product data from both tables");
       setParsedProducts([]);
       setImportStats(null);
+      setDbProductCount(0);
+      setPartnerProductCount(0);
     } catch (error) {
       console.error("Clear error:", error);
       toast.error("Failed to clear data");
@@ -483,6 +488,16 @@ const SyncioImport = () => {
                 )}
               </div>
               <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearImportedData}
+                  disabled={isLoading}
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  Clear All
+                </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate("/admin/import-queue")}
