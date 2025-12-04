@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Calendar, Image, Download } from "lucide-react";
+import { Plus, FileText, Calendar, Image, Download, Scroll, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import { BrandSelector } from "@/components/brandStory/BrandSelector";
 import { CreateComponentDialog } from "@/components/brandStory/CreateComponentDialog";
 import { CreateTimelineDialog } from "@/components/brandStory/CreateTimelineDialog";
@@ -152,6 +153,27 @@ export default function BrandStoryDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Featured Exhibition */}
+      <Card className="bg-gradient-to-r from-amber-950/30 to-stone-900/50 border-amber-500/20">
+        <CardContent className="flex items-center justify-between py-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full bg-amber-500/10">
+              <Scroll className="h-6 w-6 text-amber-400" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-amber-100">The History of Posters</h3>
+              <p className="text-sm text-amber-200/60">An exhibition curated by Atlas — 500+ years of visual communication</p>
+            </div>
+          </div>
+          <Button asChild variant="outline" className="border-amber-500/30 text-amber-200 hover:bg-amber-500/10">
+            <Link to="/admin/brand-story/poster-history">
+              View Exhibition
+              <ExternalLink className="h-4 w-4 ml-2" />
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Quick Actions */}
       <Card>

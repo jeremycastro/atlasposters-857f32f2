@@ -47,6 +47,7 @@ import KnowledgeArticle from "./pages/admin/knowledge/Article";
 import ContentMigration from "./pages/admin/ContentMigration";
 import BrandStoryDashboard from "./pages/admin/BrandStoryDashboard";
 import BrandTimeline from "./pages/admin/BrandTimeline";
+import PosterHistoryExhibition from "./pages/admin/PosterHistoryExhibition";
 import TagManagement from "./pages/admin/TagManagement";
 import Pitch01 from "./pages/Pitch01";
 import SyncioImport from "./pages/admin/SyncioImport";
@@ -110,6 +111,7 @@ const App = () => (
               <Route path="knowledge/migrate" element={<ContentMigration />} />
               <Route path="brand-story" element={<BrandStoryDashboard />} />
               <Route path="brand-story/timeline" element={<BrandTimeline />} />
+              <Route path="brand-story/poster-history" element={<PosterHistoryExhibition />} />
               <Route path="artworks" element={<ArtworkCatalog />} />
               <Route path="artworks/:artworkId" element={<ArtworkDetail />} />
               <Route path="users" element={<UserManagement />} />
