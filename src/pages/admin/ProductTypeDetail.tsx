@@ -452,7 +452,7 @@ export default function ProductTypeDetail() {
                 </div>
 
                 <div className="text-sm space-y-1">
-                  <div><span className="text-blue-500 font-mono">[ASC]</span> = Artwork Source Code (e.g., A001)</div>
+                  <div><span className="text-blue-500 font-mono">[ASC]</span> = Artwork Source Code (e.g., ABC)</div>
                   <div><span className="text-green-500 font-mono">{typeCode || 'XXX'}</span> = Product Type Code</div>
                   {assignedGroups.map((ag, idx) => (
                     <div key={ag.variant_group_id}>
@@ -467,7 +467,7 @@ export default function ProductTypeDetail() {
                 <div className="pt-4 border-t">
                   <Label className="text-sm">Example SKU:</Label>
                   <div className="font-mono text-sm mt-1">
-                    A001-{typeCode || 'XXX'}-{assignedGroups.length > 0 ? '04' : '99'}-{assignedGroups.length > 1 ? '02' : '99'}-99
+                    ABC-{typeCode || 'XXX'}-{assignedGroups.length > 0 ? '04' : '99'}-{assignedGroups.length > 1 ? '02' : '99'}-99
                   </div>
                 </div>
               </CardContent>
