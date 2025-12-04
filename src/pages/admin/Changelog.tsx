@@ -12,6 +12,24 @@ interface ChangelogEntry {
 
 const changelogData: ChangelogEntry[] = [
   {
+    version: "0.5.2",
+    date: "2025-12-04",
+    changes: [
+      {
+        type: "changed",
+        description: "SKU Methodology - Added Universal Size Codes section (00=XS through 05=2XL) with metric/imperial mapping and Prodigi SKU translation",
+      },
+      {
+        type: "changed",
+        description: "SKU Methodology - Added Product-Type VAR Assignment section documenting VAR1/VAR2 meaning by product type (Posters: Size→Edition, Apparel: Color→Size)",
+      },
+      {
+        type: "changed",
+        description: "Knowledge Base - Converted to sortable table with column sorting by Title, Category, and Last Updated date",
+      },
+    ],
+  },
+  {
     version: "0.5.1",
     date: "2025-12-04",
     changes: [

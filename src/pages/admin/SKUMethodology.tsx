@@ -156,15 +156,152 @@ const SKUMethodology = () => {
                 <strong>Placeholder:</strong> 99 indicates "not applicable" for that dimension
                 <br />
                 <strong>Valid values:</strong> 00-98 (99 reserved for N/A)
-                <br />
-                <strong>Examples:</strong>
               </p>
-              <ul className="text-sm text-muted-foreground ml-6 mt-2 space-y-1">
-                <li><strong>VAR1:</strong> Color (00=White, 01=Black, 02=Forest Green)</li>
-                <li><strong>VAR2:</strong> Size (00=XS, 01=S, 02=M, 03=L, 04=XL)</li>
-                <li><strong>VAR3:</strong> Material/Finish (00=Glossy Paper, 01=Matte Paper, 02=Oak Frame)</li>
-              </ul>
             </div>
+          </div>
+        </Card>
+
+        {/* Product-Type Dependent VAR Assignment */}
+        <Card className="p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Package className="w-6 h-6 text-primary" />
+            <h2 className="text-2xl font-bold">Product-Type VAR Assignment</h2>
+          </div>
+
+          <p className="text-foreground mb-4">
+            The meaning of VAR1, VAR2, and VAR3 varies by product type to optimize print file matching 
+            and inventory management. Size position depends on whether different sizes require different print files.
+          </p>
+
+          <div className="space-y-4">
+            <div className="bg-muted p-4 rounded-lg">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <Badge>Posters & Prints</Badge>
+                Size as VAR1
+              </h3>
+              <div className="grid md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <p className="font-semibold text-primary">VAR1 = Size</p>
+                  <p className="text-muted-foreground">00=XS, 01=SM, 02=MD...</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-purple-600">VAR2 = Edition/Quality</p>
+                  <p className="text-muted-foreground">00=Premium, 01=Museum...</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-orange-600">VAR3 = Frame Config</p>
+                  <p className="text-muted-foreground">Frame Configuration ID</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                <strong>Rationale:</strong> Different sizes need different print files, so Size as VAR1 enables hierarchical file matching.
+              </p>
+            </div>
+
+            <div className="bg-muted p-4 rounded-lg">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <Badge variant="secondary">Apparel (T-Shirts, Hoodies)</Badge>
+                Size as VAR2
+              </h3>
+              <div className="grid md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <p className="font-semibold text-primary">VAR1 = Color</p>
+                  <p className="text-muted-foreground">00=White, 01=Black...</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-purple-600">VAR2 = Size</p>
+                  <p className="text-muted-foreground">00=XS, 01=SM, 02=MD...</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-orange-600">VAR3 = N/A</p>
+                  <p className="text-muted-foreground">Usually 99</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                <strong>Rationale:</strong> Same print file works for all sizes; color affects print (dark vs light garments).
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Universal Size Codes */}
+        <Card className="p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Hash className="w-6 h-6 text-primary" />
+            <h2 className="text-2xl font-bold">Universal Size Codes</h2>
+          </div>
+
+          <p className="text-foreground mb-4">
+            Atlas uses t-shirt-style size labels (XS, SM, MD, LG, XL, 2XL) that map to different 
+            physical dimensions based on the customer's geographic region (metric vs imperial).
+          </p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2 px-3 font-semibold">Code</th>
+                  <th className="text-left py-2 px-3 font-semibold">Label</th>
+                  <th className="text-left py-2 px-3 font-semibold">Poster (Imperial)</th>
+                  <th className="text-left py-2 px-3 font-semibold">Poster (Metric)</th>
+                  <th className="text-left py-2 px-3 font-semibold">Prodigi SKU</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b bg-muted/30">
+                  <td className="py-2 px-3 font-mono font-bold">00</td>
+                  <td className="py-2 px-3">XS</td>
+                  <td className="py-2 px-3">8×10"</td>
+                  <td className="py-2 px-3">A5</td>
+                  <td className="py-2 px-3 font-mono text-xs">GLOBAL-CFPM-8X10 / -A5</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2 px-3 font-mono font-bold">01</td>
+                  <td className="py-2 px-3">SM</td>
+                  <td className="py-2 px-3">12×16"</td>
+                  <td className="py-2 px-3">A4</td>
+                  <td className="py-2 px-3 font-mono text-xs">GLOBAL-CFPM-12X16 / -A4</td>
+                </tr>
+                <tr className="border-b bg-muted/30">
+                  <td className="py-2 px-3 font-mono font-bold">02</td>
+                  <td className="py-2 px-3">MD</td>
+                  <td className="py-2 px-3">16×20"</td>
+                  <td className="py-2 px-3">A3</td>
+                  <td className="py-2 px-3 font-mono text-xs">GLOBAL-CFPM-16X20 / -A3</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2 px-3 font-mono font-bold">03</td>
+                  <td className="py-2 px-3">LG</td>
+                  <td className="py-2 px-3">18×24"</td>
+                  <td className="py-2 px-3">A2</td>
+                  <td className="py-2 px-3 font-mono text-xs">GLOBAL-CFPM-18X24 / -A2</td>
+                </tr>
+                <tr className="border-b bg-muted/30">
+                  <td className="py-2 px-3 font-mono font-bold">04</td>
+                  <td className="py-2 px-3">XL</td>
+                  <td className="py-2 px-3">24×36"</td>
+                  <td className="py-2 px-3">A1</td>
+                  <td className="py-2 px-3 font-mono text-xs">GLOBAL-CFPM-24X36 / -A1</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2 px-3 font-mono font-bold">05</td>
+                  <td className="py-2 px-3">2XL</td>
+                  <td className="py-2 px-3">30×40"</td>
+                  <td className="py-2 px-3">A0</td>
+                  <td className="py-2 px-3 font-mono text-xs">GLOBAL-CFPM-30X40 / -A0</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="font-semibold text-blue-900 mb-2">Geographic Routing</h4>
+            <p className="text-sm text-blue-800">
+              At order time, the customer's shipping address determines which dimension system is used. 
+              The size label (MD) stays constant in the Atlas SKU, but the actual print dimensions 
+              and manufacturer SKU (e.g., <code>GLOBAL-CFPM-16X20</code> vs <code>GLOBAL-CFPM-A3</code>) 
+              adapt automatically via a size mapping table.
+            </p>
           </div>
         </Card>
 
@@ -621,7 +758,7 @@ $$ LANGUAGE plpgsql IMMUTABLE;
         {/* Footer */}
         <div className="mt-8 p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground text-center">
-            <strong>Version 1.0.0</strong> - Updated with Print File Hierarchical Matching - Atlas SKU Methodology - Admin Knowledge Base
+            <strong>Version 1.1.0</strong> - Updated with Universal Size Codes & Product-Type VAR Assignment - Atlas SKU Methodology
           </p>
         </div>
       </main>

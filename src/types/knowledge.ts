@@ -23,8 +23,8 @@ export const knowledgeArticles: KnowledgeArticle[] = [
     category: "Systems & Methodology",
     route: "/admin/knowledge/sku-methodology",
     icon: "Hash",
-    lastUpdated: "2025-11-14",
-    tags: ["SKU", "ASC", "Catalog", "Database", "Product Codes"]
+    lastUpdated: "2025-12-04",
+    tags: ["SKU", "ASC", "Catalog", "Database", "Product Codes", "Size Codes", "Framing"]
   },
   {
     id: "partner-management",
