@@ -44,6 +44,7 @@ import ProdigiAPI from "./pages/admin/knowledge/ProdigiAPI";
 import ProductImporting from "./pages/admin/knowledge/ProductImporting";
 import ReadymadesFraming from "./pages/admin/knowledge/ReadymadesFraming";
 import KnowledgeArticle from "./pages/admin/knowledge/Article";
+import ContentMigration from "./pages/admin/ContentMigration";
 import BrandStoryDashboard from "./pages/admin/BrandStoryDashboard";
 import BrandTimeline from "./pages/admin/BrandTimeline";
 import TagManagement from "./pages/admin/TagManagement";
@@ -102,6 +103,7 @@ const App = () => (
               <Route path="knowledge/readymades-framing" element={<ReadymadesFraming />} />
               {/* Dynamic article route - must be after static routes */}
               <Route path="knowledge/article/:slug" element={<KnowledgeArticle />} />
+              <Route path="knowledge/migrate" element={<ContentMigration />} />
               <Route path="brand-story" element={<BrandStoryDashboard />} />
               <Route path="brand-story/timeline" element={<BrandTimeline />} />
               <Route path="artworks" element={<ArtworkCatalog />} />
