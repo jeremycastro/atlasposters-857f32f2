@@ -916,8 +916,23 @@ const ImportQueue = () => {
             open={quickCreateDialogOpen}
             onOpenChange={setQuickCreateDialogOpen}
             onSuccess={(artworkId, ascCode) => {
-              setSelectedArtworkId(artworkId);
-              setMappingNotes(`Artwork created from import queue (${ascCode})`);
+              // Auto-map the newly created artwork
+              mapMutation.mutate(
+                {
+                  partnerProductId: selectedProduct.id,
+                  artworkId: artworkId,
+                  notes: `Artwork created from import queue (${ascCode})`,
+                },
+                {
+                  onSuccess: () => {
+                    setMapDialogOpen(false);
+                    setSelectedProduct(null);
+                    setSelectedArtworkId("");
+                    setMappingNotes("");
+                    toast.success(`Artwork created and mapped successfully`);
+                  },
+                }
+              );
             }}
             prefillData={{
               title: selectedProduct.original_title,
