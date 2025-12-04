@@ -163,7 +163,6 @@ export function RoyaltyGroupsBuilder({ value, onChange }: RoyaltyGroupsBuilderPr
                     <Select
                       value={group.calculation_basis}
                       onValueChange={(v) => updateGroup(group.id, { calculation_basis: v as 'revenue' })}
-                      disabled
                     >
                       <SelectTrigger className="h-8">
                         <SelectValue />
