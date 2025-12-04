@@ -3,9 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Image, Database, Code, Lock, Layers, GitBranch, ArrowLeft, FileText, Upload, Settings } from "lucide-react";
+import { Image, Database, Code, Lock, Layers, GitBranch, ArrowLeft } from "lucide-react";
 
-const ArtworkCatalog = () => {
+const ArtworkCatalogV1 = () => {
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8 max-w-5xl">
@@ -35,7 +35,6 @@ const ArtworkCatalog = () => {
             <Badge variant="outline">Technical Documentation</Badge>
             <Badge variant="outline">Database Schema</Badge>
             <Badge variant="outline">Frontend Architecture</Badge>
-            <Badge variant="secondary">v2.0</Badge>
           </div>
         </div>
 
@@ -52,8 +51,7 @@ const ArtworkCatalog = () => {
           <CardContent className="space-y-4">
             <p className="text-muted-foreground">
               The Artwork Catalog is the central module for managing artwork submissions, tracking ASC codes, 
-              and organizing the complete artwork lifecycle from draft to active status. It now includes 
-              comprehensive file management, print file assignment, and variant configuration.
+              and organizing the complete artwork lifecycle from draft to active status.
             </p>
             
             <div className="space-y-2">
@@ -62,12 +60,10 @@ const ArtworkCatalog = () => {
                 <li>Automated ASC (Atlas Sequential Code) generation with decade-based system</li>
                 <li>Partner-based artwork submission and management</li>
                 <li>Status lifecycle management (draft → active → archived)</li>
-                <li><strong>File management system</strong> with versioning, tagging, and print specifications</li>
-                <li><strong>Print file assignment</strong> with auto-suggestions based on SKU patterns</li>
+                <li>File attachment system for artwork files with metadata tracking</li>
                 <li>Full audit trail through asc_history table</li>
-                <li>Advanced search and filtering with <strong>table view</strong></li>
+                <li>Advanced search and filtering capabilities</li>
                 <li>Role-based access control (Admin, Partner, Public)</li>
-                <li><strong>Tabbed detail view</strong> for Info, Files, Tags, Rights, Products, and Metadata</li>
               </ul>
             </div>
           </CardContent>
@@ -131,32 +127,70 @@ const ArtworkCatalog = () => {
             </div>
 
             <div className="space-y-3">
-              <h4 className="font-semibold text-lg">Current Query Structure</h4>
-              <p className="text-sm text-muted-foreground">
-                The useArtworks hook now fetches nested brand→partner relationships:
+              <h4 className="font-semibold text-lg">Relationship Rules</h4>
+              <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground ml-4">
+                <li>
+                  <strong>Partner → Artwork:</strong> Every artwork must have exactly one partner (partner_id is required).
+                </li>
+                <li>
+                  <strong>Brand → Artwork:</strong> An artwork can optionally belong to a brand. If linked, the brand must belong to the same partner.
+                </li>
+                <li>
+                  <strong>Artwork → Product:</strong> An artwork can have zero or more products created from it (e.g., posters, prints, merchandise).
+                </li>
+                <li>
+                  <strong>Partner → Brand:</strong> A partner can have multiple brands, but a brand belongs to exactly one partner.
+                </li>
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-semibold text-lg">Database References</h4>
+              <p className="text-sm text-muted-foreground mb-3">
+                Foreign key relationships that enforce data integrity:
               </p>
-              <div className="bg-muted/50 p-4 rounded-lg font-mono text-sm">
-                <pre className="text-xs whitespace-pre-wrap">
-{`supabase.from('artworks').select(\`
-  *,
-  brand:brands(
-    id,
-    brand_name,
-    partner:partners(
-      id,
-      partner_name
-    )
-  ),
-  created_by_profile:profiles!artworks_created_by_fkey(full_name, email),
-  artwork_files(
-    id,
-    file_path,
-    is_primary,
-    file_type,
-    mime_type
-  )
-\`)`}
-                </pre>
+              <div className="bg-muted/50 p-4 rounded-lg space-y-2 font-mono text-sm">
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground">→</span>
+                  <div>
+                    <strong>artworks.partner_id</strong> → <strong>partners.id</strong>
+                    <p className="text-xs text-muted-foreground mt-1 font-sans">Every artwork is linked to a partner</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground">→</span>
+                  <div>
+                    <strong>artworks.brand_id</strong> → <strong>brands.id</strong>
+                    <p className="text-xs text-muted-foreground mt-1 font-sans">Optional link to a brand (nullable)</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground">→</span>
+                  <div>
+                    <strong>brands.partner_id</strong> → <strong>partners.id</strong>
+                    <p className="text-xs text-muted-foreground mt-1 font-sans">Every brand belongs to a partner</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground">→</span>
+                  <div>
+                    <strong>products.artwork_id</strong> → <strong>artworks.id</strong>
+                    <p className="text-xs text-muted-foreground mt-1 font-sans">Products are created from artworks</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-semibold text-lg">Practical Example</h4>
+              <div className="bg-muted/50 p-4 rounded-lg space-y-2 text-sm">
+                <p className="font-semibold">Scenario: A partner submits artwork</p>
+                <ol className="list-decimal list-inside space-y-2 text-muted-foreground ml-4">
+                  <li><strong>Partner created:</strong> "ABC Art Studios" (partners table)</li>
+                  <li><strong>Brand created (optional):</strong> "ABC Modern Collection" linked to ABC Art Studios</li>
+                  <li><strong>Artwork submitted:</strong> "Sunset Dreams" linked to ABC Art Studios and optionally to "ABC Modern Collection"</li>
+                  <li><strong>Products created:</strong> "Sunset Dreams Poster 18x24" and "Sunset Dreams Canvas 24x36" both linked to the "Sunset Dreams" artwork</li>
+                </ol>
               </div>
             </div>
           </CardContent>
@@ -188,7 +222,7 @@ const ArtworkCatalog = () => {
                 <div><strong>art_medium</strong> text - Painting, sculpture, photography, etc.</div>
                 <div><strong>year_created</strong> integer</div>
                 <div><strong>original_dimensions</strong> text - HxWxD format</div>
-                <div><strong>partner_id</strong> uuid NOT NULL REFERENCES partners(id)</div>
+                <div><strong>partner_id</strong> uuid NOT NULL REFERENCES profiles(id)</div>
                 <div><strong>brand_id</strong> uuid REFERENCES brands(id)</div>
                 <div><strong>created_by</strong> uuid REFERENCES profiles(id)</div>
                 <div><strong>status</strong> artwork_status DEFAULT 'draft' - draft | active | archived</div>
@@ -206,7 +240,7 @@ const ArtworkCatalog = () => {
             <div className="space-y-3">
               <h4 className="font-semibold text-lg">artwork_files Table</h4>
               <p className="text-sm text-muted-foreground">
-                Stores file attachments for artworks with comprehensive metadata and versioning.
+                Stores file attachments for artworks with comprehensive metadata.
               </p>
               <div className="bg-muted/50 p-4 rounded-lg space-y-2 font-mono text-sm">
                 <div><strong>id</strong> uuid PRIMARY KEY</div>
@@ -220,31 +254,29 @@ const ArtworkCatalog = () => {
                 <div><strong>dpi</strong> integer</div>
                 <div><strong>color_profile</strong> text - RGB, CMYK, etc.</div>
                 <div><strong>is_primary</strong> boolean DEFAULT false</div>
-                <div><strong>is_latest</strong> boolean DEFAULT true</div>
-                <div><strong>version_number</strong> integer DEFAULT 1</div>
-                <div><strong>replaced_by</strong> uuid REFERENCES artwork_files(id)</div>
-                <div><strong>tags</strong> jsonb - File tag assignments</div>
-                <div><strong>print_specifications</strong> jsonb - Print-ready specs</div>
                 <div><strong>uploaded_by</strong> uuid REFERENCES profiles(id)</div>
                 <div><strong>uploaded_at</strong> timestamptz DEFAULT now()</div>
                 <div><strong>metadata</strong> jsonb DEFAULT '{}'</div>
               </div>
             </div>
 
-            {/* File Tags Table */}
+            {/* ASC History Table */}
             <div className="space-y-3">
-              <h4 className="font-semibold text-lg">file_tags Table</h4>
+              <h4 className="font-semibold text-lg">asc_history Table</h4>
               <p className="text-sm text-muted-foreground">
-                Defines available tags for categorizing artwork files.
+                Audit trail for ASC code assignments and lifecycle changes.
               </p>
               <div className="bg-muted/50 p-4 rounded-lg space-y-2 font-mono text-sm">
                 <div><strong>id</strong> uuid PRIMARY KEY</div>
-                <div><strong>category</strong> text NOT NULL - file_type | print_method | usage</div>
-                <div><strong>tag_value</strong> text NOT NULL</div>
-                <div><strong>display_name</strong> text NOT NULL</div>
-                <div><strong>description</strong> text</div>
-                <div><strong>sort_order</strong> integer</div>
-                <div><strong>is_active</strong> boolean DEFAULT true</div>
+                <div><strong>asc_code</strong> text NOT NULL</div>
+                <div><strong>artwork_id</strong> uuid REFERENCES artworks(id)</div>
+                <div><strong>status</strong> asc_status NOT NULL - assigned | voided | reassigned</div>
+                <div><strong>assigned_by</strong> uuid REFERENCES profiles(id)</div>
+                <div><strong>assigned_at</strong> timestamptz DEFAULT now()</div>
+                <div><strong>voided_by</strong> uuid REFERENCES profiles(id)</div>
+                <div><strong>voided_at</strong> timestamptz</div>
+                <div><strong>void_reason</strong> text</div>
+                <div><strong>notes</strong> text</div>
               </div>
             </div>
 
@@ -262,25 +294,9 @@ const ArtworkCatalog = () => {
                     <li>• <strong>L</strong>: Letter code (A-Z cycling based on sequence)</li>
                     <li>• <strong>nnn</strong>: 3-digit number (000-999)</li>
                   </ul>
-                </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2"><strong>get_print_file_suggestions(artwork_id, variant_codes[])</strong></div>
-                  <p className="text-sm text-muted-foreground">
-                    Returns ranked file suggestions based on SKU pattern matching in filenames.
-                  </p>
-                  <ul className="text-sm text-muted-foreground ml-4 mt-2 space-y-1">
-                    <li>• Parses SKU from filename: {'{ASC}-{TYPE}(-{VAR1})?(-{VAR2})?(-{VAR3})?'}</li>
-                    <li>• Returns match_score and match_reasons</li>
-                    <li>• Used by PrintFileAutoAssignment component</li>
-                  </ul>
-                </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2"><strong>create_file_version(original_file_id, new_file_data)</strong></div>
-                  <p className="text-sm text-muted-foreground">
-                    Creates a new version of an existing file, maintaining version history.
-                  </p>
+                  <div className="bg-background p-2 rounded mt-2 text-xs font-mono">
+                    Example: 10A001, 10A002... 10B000, 10B001...
+                  </div>
                 </div>
               </div>
             </div>
@@ -309,7 +325,7 @@ Form Validation (Zod Schema)
   ↓
 Valid? → No → Show Validation Errors
   ↓ Yes
-useArtworkMutations.createArtwork({ artwork, partnerId? })
+useArtworkMutations.createArtwork()
   ↓
 Check Auth User
   ↓
@@ -319,49 +335,37 @@ Insert into artworks table
   ↓
 Log to asc_history table
   ↓
-Invalidate React Query Cache ['artworks', 'artwork-stats']
+Invalidate React Query Cache
   ↓
-Show Success Toast with ASC Code
+Show Success Toast
   ↓
 Close Dialog
   ↓
-Table Refreshes with New Artwork`}
+Grid Refreshes with New Artwork`}
                 </pre>
               </div>
             </div>
 
             <div className="space-y-3">
-              <h4 className="font-semibold">Component Hierarchy (Current)</h4>
+              <h4 className="font-semibold">Component Hierarchy</h4>
               <div className="bg-muted/50 p-4 rounded-lg overflow-x-auto">
                 <pre className="text-xs whitespace-pre-wrap">
-{`ArtworkCatalog (Page - src/pages/partner/ArtworkCatalog.tsx)
+{`ArtworkCatalog (Page)
 ├── ArtworkStats Component
 │   └── useArtworkStats Hook
-├── ArtworkTableView Component (sortable table with actions)
-│   ├── Search Input (passed as searchBar prop)
-│   ├── Show Archived Toggle
-│   ├── Sortable Table Headers
-│   └── Row Actions: View, Edit, Archive
+├── Search Input
+├── ArtworkCardView Component
+│   ├── useArtworks Hook
+│   ├── Card per Artwork
+│   └── Dropdown Menu (Actions)
 ├── CreateArtworkDialog
 │   ├── useForm (react-hook-form)
 │   ├── useArtworkMutations.createArtwork
-│   └── Partner/Brand Selection
-└── Navigation to /admin/artworks/{id} (ArtworkDetail page)
-
-ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
-├── useArtworkById Hook
-├── Tabbed Interface:
-│   ├── ArtworkInfoTab - Basic artwork information
-│   ├── ArtworkFilesTab - File management
-│   │   ├── ArtworkFileUpload
-│   │   ├── ArtworkFileTable
-│   │   ├── FileTagSelector
-│   │   └── PrintFileSpecifications
-│   ├── ArtworkTagsTab - Tag management
-│   ├── ArtworkRightsTab - Rights and exclusivity
-│   ├── ArtworkProductsTab - Linked products
-│   └── ArtworkMetadataTab - System metadata
-└── EditArtworkDialog`}
+│   └── useProfiles (Partner Select)
+└── ArtworkDetailDialog
+    ├── useArtworkById Hook
+    ├── useArtworkMutations.updateArtwork
+    └── useArtworkMutations.archiveArtwork`}
                 </pre>
               </div>
             </div>
@@ -386,25 +390,24 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
                 <div className="bg-muted/50 p-4 rounded-lg">
                   <div className="font-mono text-sm mb-2"><strong>useArtworks(filters?)</strong></div>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Query hook for fetching and filtering artworks with nested brand/partner data.
+                    Query hook for fetching and filtering artworks with related data.
                   </p>
                   <div className="text-xs space-y-1 text-muted-foreground">
                     <div>• Returns: <code>&#123; data, isLoading, error &#125;</code></div>
                     <div>• Filters: search, status[], tags[], isExclusive, dateFrom, dateTo</div>
-                    <div>• Includes: brand.partner, created_by_profile, artwork_files</div>
-                    <div>• Search fields: title, artist_name, asc_code</div>
+                    <div>• Includes: created_by_profile, partner_profile (joined data)</div>
                     <div>• Ordering: created_at DESC</div>
                   </div>
                 </div>
 
                 <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2"><strong>useArtworkById(id: string | null)</strong></div>
+                  <div className="font-mono text-sm mb-2"><strong>useArtworkById(id)</strong></div>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Query hook for fetching a single artwork with all file attachments.
+                    Query hook for fetching a single artwork with file attachments.
                   </p>
                   <div className="text-xs space-y-1 text-muted-foreground">
                     <div>• Returns: <code>&#123; data, isLoading, error &#125;</code></div>
-                    <div>• Includes: created_by_profile, artwork_files(*)</div>
+                    <div>• Includes: created_by_profile, artwork_files</div>
                     <div>• Enabled only when id is provided</div>
                   </div>
                 </div>
@@ -421,38 +424,16 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
                 </div>
 
                 <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2"><strong>useArtworkMutations()</strong></div>
+                  <div className="font-mono text-sm mb-2"><strong>useArtworkMutations</strong></div>
                   <p className="text-sm text-muted-foreground mb-2">
                     Mutation hooks for creating, updating, and archiving artworks.
                   </p>
                   <div className="text-xs space-y-1 text-muted-foreground">
-                    <div>• <strong>createArtwork(&#123; artwork, partnerId? &#125;)</strong>: Handles ASC generation, supports admin partner assignment</div>
-                    <div>• <strong>updateArtwork(&#123; id, updates &#125;)</strong>: Updates artwork fields by ID</div>
-                    <div>• <strong>archiveArtwork(id)</strong>: Sets status to 'archived'</div>
-                    <div>• Invalidates: ['artworks'], ['artwork'], ['artwork-stats']</div>
-                    <div>• Shows toast notifications on success/error</div>
+                    <div>• <strong>createArtwork</strong>: Handles ASC generation and history logging</div>
+                    <div>• <strong>updateArtwork</strong>: Updates artwork fields by ID</div>
+                    <div>• <strong>archiveArtwork</strong>: Sets status to 'archived'</div>
+                    <div>• All mutations invalidate relevant queries and show toasts</div>
                   </div>
-                </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2"><strong>useArtworkFileUpload(artworkId)</strong></div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Hook for managing artwork file uploads with metadata extraction.
-                  </p>
-                </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2"><strong>usePrintFileSuggestions(artworkId, variantCodes)</strong></div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Hook for fetching AI-powered print file suggestions based on SKU patterns.
-                  </p>
-                </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2"><strong>useFileTags()</strong></div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Hook for managing file categorization tags.
-                  </p>
                 </div>
               </div>
             </div>
@@ -461,126 +442,66 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
             <div className="space-y-3">
               <h4 className="font-semibold text-lg">Key Components</h4>
               
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-4">
                 <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2 flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    <strong>ArtworkTableView</strong>
-                  </div>
+                  <div className="font-mono text-sm mb-2"><strong>ArtworkCatalog</strong> (Page)</div>
                   <p className="text-sm text-muted-foreground">
-                    Sortable table view with search, status filters, and row actions.
+                    Main page component managing state and orchestrating child components.
                   </p>
+                  <div className="text-xs space-y-1 text-muted-foreground mt-2">
+                    <div>• Manages search, dialog visibility, and selected artwork state</div>
+                    <div>• Handles view, edit, and archive actions</div>
+                    <div>• Coordinates between card view and detail dialog</div>
+                  </div>
                 </div>
 
                 <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2 flex items-center gap-2">
-                    <Image className="h-4 w-4" />
-                    <strong>ArtworkCardView</strong>
-                  </div>
+                  <div className="font-mono text-sm mb-2"><strong>ArtworkStats</strong></div>
                   <p className="text-sm text-muted-foreground">
-                    Grid display with artwork thumbnails and quick actions.
+                    Displays summary statistics in a responsive grid of cards.
                   </p>
+                  <div className="text-xs space-y-1 text-muted-foreground mt-2">
+                    <div>• Shows: Total, Active, Draft, Archived counts</div>
+                    <div>• Loading state with skeleton placeholders</div>
+                  </div>
                 </div>
 
                 <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2 flex items-center gap-2">
-                    <Upload className="h-4 w-4" />
-                    <strong>ArtworkFileUpload</strong>
-                  </div>
+                  <div className="font-mono text-sm mb-2"><strong>ArtworkCardView</strong></div>
                   <p className="text-sm text-muted-foreground">
-                    Drag-and-drop file upload with metadata extraction.
+                    Grid display of artwork cards with action menus.
                   </p>
-                </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2 flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    <strong>ArtworkFileTable</strong>
+                  <div className="text-xs space-y-1 text-muted-foreground mt-2">
+                    <div>• Responsive grid layout</div>
+                    <div>• Color-coded status badges</div>
+                    <div>• Dropdown menu: View Details, Edit, Archive</div>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Table of uploaded files with version history and actions.
-                  </p>
-                </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2 flex items-center gap-2">
-                    <Settings className="h-4 w-4" />
-                    <strong>PrintFileSpecifications</strong>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Configure print-ready specs: DPI, color profile, bleed, etc.
-                  </p>
-                </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2 flex items-center gap-2">
-                    <Settings className="h-4 w-4" />
-                    <strong>PrintFileAutoAssignment</strong>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Auto-suggest print files based on SKU patterns in filenames.
-                  </p>
                 </div>
 
                 <div className="bg-muted/50 p-4 rounded-lg">
                   <div className="font-mono text-sm mb-2"><strong>CreateArtworkDialog</strong></div>
                   <p className="text-sm text-muted-foreground">
-                    Form dialog with Zod validation and partner/brand selection.
+                    Form dialog for creating new artworks with validation.
                   </p>
-                </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2"><strong>EditArtworkDialog</strong></div>
-                  <p className="text-sm text-muted-foreground">
-                    Edit existing artwork details with pre-populated form.
-                  </p>
+                  <div className="text-xs space-y-1 text-muted-foreground mt-2">
+                    <div>• Zod schema validation</div>
+                    <div>• React Hook Form integration</div>
+                    <div>• Admin: Can assign to any partner</div>
+                    <div>• Partner: Auto-assigned to self</div>
+                  </div>
                 </div>
 
                 <div className="bg-muted/50 p-4 rounded-lg">
                   <div className="font-mono text-sm mb-2"><strong>ArtworkDetailDialog</strong></div>
                   <p className="text-sm text-muted-foreground">
-                    Quick-view dialog for artwork details without navigation.
+                    Tabbed view showing complete artwork details and metadata.
                   </p>
+                  <div className="text-xs space-y-1 text-muted-foreground mt-2">
+                    <div>• Details Tab: Core artwork information</div>
+                    <div>• Metadata Tab: System tracking fields</div>
+                    <div>• Actions: Copy ASC, Edit, Archive</div>
+                  </div>
                 </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2"><strong>QuickCreateArtworkDialog</strong></div>
-                  <p className="text-sm text-muted-foreground">
-                    Streamlined creation flow for rapid artwork entry.
-                  </p>
-                </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2"><strong>VariantBuilder</strong></div>
-                  <p className="text-sm text-muted-foreground">
-                    Configure product variants from artwork.
-                  </p>
-                </div>
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="font-mono text-sm mb-2"><strong>FileTagSelector</strong></div>
-                  <p className="text-sm text-muted-foreground">
-                    Multi-select tag assignment for files.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Tab Components */}
-            <div className="space-y-3">
-              <h4 className="font-semibold text-lg">Detail Page Tabs</h4>
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground mb-3">
-                  Located in <code>src/components/artworks/tabs/</code>:
-                </p>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• <strong>ArtworkInfoTab</strong> - Basic artwork information and status</li>
-                  <li>• <strong>ArtworkFilesTab</strong> - File upload, management, and specifications</li>
-                  <li>• <strong>ArtworkTagsTab</strong> - Tag assignment and management</li>
-                  <li>• <strong>ArtworkRightsTab</strong> - Rights, exclusivity, and date ranges</li>
-                  <li>• <strong>ArtworkProductsTab</strong> - Products created from this artwork</li>
-                  <li>• <strong>ArtworkMetadataTab</strong> - System metadata and audit info</li>
-                </ul>
               </div>
             </div>
           </CardContent>
@@ -605,7 +526,7 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
                       SELECT | "Active artworks are publicly viewable"
                     </div>
                     <p className="text-muted-foreground ml-2">
-                      status = 'active'
+                      Anyone can view artworks with status = 'active' (no authentication required)
                     </p>
                   </div>
                   
@@ -614,7 +535,7 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
                       SELECT | "Partners can view own artworks"
                     </div>
                     <p className="text-muted-foreground ml-2">
-                      partner_id = auth.uid() OR has_role(auth.uid(), 'partner')
+                      Partners can view all artworks where partner_id = auth.uid() (any status)
                     </p>
                   </div>
                   
@@ -623,7 +544,7 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
                       ALL | "Admins can manage all artworks"
                     </div>
                     <p className="text-muted-foreground ml-2">
-                      has_role(auth.uid(), 'admin')
+                      Users with 'admin' role can perform any operation via has_role() function
                     </p>
                   </div>
                   
@@ -632,7 +553,7 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
                       INSERT | "Partners can create artworks"
                     </div>
                     <p className="text-muted-foreground ml-2">
-                      partner_id = auth.uid()
+                      Partners can only insert artworks where partner_id = auth.uid()
                     </p>
                   </div>
                   
@@ -641,7 +562,39 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
                       UPDATE | "Partners can update own artworks"
                     </div>
                     <p className="text-muted-foreground ml-2">
-                      partner_id = auth.uid()
+                      Partners can update artworks where partner_id = auth.uid()
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <h4 className="font-semibold mb-2">artwork_files Table Policies</h4>
+                <div className="space-y-2 text-sm">
+                  <div>
+                    <div className="font-mono text-xs bg-background p-2 rounded mb-1">
+                      SELECT | "Anyone can view files for active artworks"
+                    </div>
+                    <p className="text-muted-foreground ml-2">
+                      Public access to files for artworks with status = 'active'
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <div className="font-mono text-xs bg-background p-2 rounded mb-1">
+                      ALL | "Partners can manage own artwork files"
+                    </div>
+                    <p className="text-muted-foreground ml-2">
+                      Full access to files for artworks where partner_id = auth.uid()
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <div className="font-mono text-xs bg-background p-2 rounded mb-1">
+                      ALL | "Admins can manage all artwork files"
+                    </div>
+                    <p className="text-muted-foreground ml-2">
+                      Complete access for admin role users
                     </p>
                   </div>
                 </div>
@@ -655,7 +608,7 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
                       INSERT | "System can log ASC history"
                     </div>
                     <p className="text-muted-foreground ml-2">
-                      true (allows automated logging)
+                      Allows automated logging during artwork creation (used by mutations)
                     </p>
                   </div>
                   
@@ -664,7 +617,7 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
                       SELECT | "Admins can view ASC history"
                     </div>
                     <p className="text-muted-foreground ml-2">
-                      has_role(auth.uid(), 'admin')
+                      Admin users can view complete audit trail
                     </p>
                   </div>
                   
@@ -673,7 +626,7 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
                       SELECT | "Partners can view own ASC history"
                     </div>
                     <p className="text-muted-foreground ml-2">
-                      EXISTS (SELECT 1 FROM artworks WHERE artworks.id = artwork_id AND partner_id = auth.uid())
+                      Partners can view history for their own artworks only
                     </p>
                   </div>
                 </div>
@@ -692,48 +645,51 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
             <div className="space-y-3">
               <div className="bg-muted/50 p-4 rounded-lg">
                 <h4 className="font-semibold mb-2">Partner Management</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Artworks linked via <code>partner_id</code> → <code>partners.id</code></li>
-                  <li>• Nested query: brand.partner for display</li>
-                  <li>• Admin can assign artworks to any partner</li>
-                </ul>
+                <p className="text-sm text-muted-foreground">
+                  • Artworks are linked to partners via <code className="bg-background px-1 py-0.5 rounded">partner_id</code>
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  • Partner profile data is joined for display (company name, contact info)
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  • Admin can assign artworks to any partner, partners only see/manage own artworks
+                </p>
               </div>
 
               <div className="bg-muted/50 p-4 rounded-lg">
                 <h4 className="font-semibold mb-2">Brand System</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Optional <code>brand_id</code> association</li>
-                  <li>• Brand inherits partner relationship</li>
-                  <li>• Supports multi-brand partners</li>
-                </ul>
+                <p className="text-sm text-muted-foreground">
+                  • Artworks can be associated with brands via optional <code className="bg-background px-1 py-0.5 rounded">brand_id</code>
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  • Supports multi-brand partners with separate brand identities
+                </p>
               </div>
 
               <div className="bg-muted/50 p-4 rounded-lg">
-                <h4 className="font-semibold mb-2">Product Creation</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• ASC code forms SKU prefix: ASC-TYPE-VARIANT</li>
-                  <li>• Only 'active' artworks can create products</li>
-                  <li>• Print files assigned to product variants</li>
-                </ul>
+                <h4 className="font-semibold mb-2">Product Creation (Future)</h4>
+                <p className="text-sm text-muted-foreground">
+                  • Artworks serve as the base for product creation
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  • ASC code becomes the first part of product SKUs (ASC-TYPE-VARIANT)
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  • Only 'active' artworks can be used for product creation
+                </p>
               </div>
 
               <div className="bg-muted/50 p-4 rounded-lg">
                 <h4 className="font-semibold mb-2">File Storage</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Files stored in Supabase storage buckets</li>
-                  <li>• Version tracking with <code>replaced_by</code> chain</li>
-                  <li>• Print specifications stored as JSON</li>
-                  <li>• File tags for categorization</li>
-                </ul>
-              </div>
-
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <h4 className="font-semibold mb-2">Tagging System</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Entity tags via <code>entity_tags</code> table</li>
-                  <li>• Tag inheritance from brands</li>
-                  <li>• File-specific tags for categorization</li>
-                </ul>
+                <p className="text-sm text-muted-foreground">
+                  • Artwork files stored in storage buckets (implementation pending)
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  • Supports multiple file types: original, print-ready, thumbnails
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  • Comprehensive metadata tracking (dimensions, DPI, color profiles)
+                </p>
               </div>
             </div>
           </CardContent>
@@ -741,7 +697,7 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
 
         {/* Footer */}
         <div className="text-center text-sm text-muted-foreground border-t pt-6">
-          <p>Last Updated: December 4, 2025 | Version 2.0</p>
+          <p>Last Updated: November 11, 2025 | Version 1.0</p>
           <p className="mt-2">Part of Atlas Platform Knowledge Base</p>
         </div>
       </div>
@@ -750,4 +706,4 @@ ArtworkDetail (Page - src/pages/admin/ArtworkDetail.tsx)
   );
 };
 
-export default ArtworkCatalog;
+export default ArtworkCatalogV1;

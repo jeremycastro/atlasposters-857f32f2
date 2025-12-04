@@ -9,10 +9,9 @@ type ArchivedComponents = Record<string, Record<number, React.LazyExoticComponen
 // This will be populated as archives are created
 // Format: { "slug": { versionNumber: LazyComponent } }
 export const archivedComponents: ArchivedComponents = {
-  // Example structure (populated when archives are created):
-  // "product-importing": {
-  //   1: lazy(() => import("./ProductImporting.v1")),
-  // },
+  "artwork-catalog": {
+    1: lazy(() => import("./ArtworkCatalog.v1")),
+  },
 };
 
 // Helper function to get an archived component
