@@ -1014,6 +1014,143 @@ export type Database = {
           },
         ]
       }
+      knowledge_article_versions: {
+        Row: {
+          article_id: string
+          change_summary: string | null
+          content_markdown: string
+          created_at: string
+          created_by: string | null
+          id: string
+          version_number: number
+        }
+        Insert: {
+          article_id: string
+          change_summary?: string | null
+          content_markdown: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          version_number?: number
+        }
+        Update: {
+          article_id?: string
+          change_summary?: string | null
+          content_markdown?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_article_versions_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_articles: {
+        Row: {
+          category_id: string
+          created_at: string
+          created_by: string | null
+          current_version_id: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_published: boolean
+          slug: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          created_by?: string | null
+          current_version_id?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_published?: boolean
+          slug: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          created_by?: string | null
+          current_version_id?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_published?: boolean
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_articles_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_articles_current_version_fkey"
+            columns: ["current_version_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_article_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_categories: {
+        Row: {
+          category_key: string
+          color: string | null
+          created_at: string
+          description: string | null
+          display_name: string
+          icon: string | null
+          id: string
+          is_active: boolean
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category_key: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          display_name: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category_key?: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          display_name?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_print_files: {
         Row: {
           created_at: string | null
@@ -2961,6 +3098,14 @@ export type Database = {
         }
         Returns: string
       }
+      create_article_version: {
+        Args: {
+          p_article_id: string
+          p_change_summary?: string
+          p_content_markdown: string
+        }
+        Returns: string
+      }
       create_file_version: {
         Args: { p_new_file_data: Json; p_original_file_id: string }
         Returns: string
@@ -3006,6 +3151,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      restore_article_version: {
+        Args: { p_version_id: string }
+        Returns: string
       }
       search_by_tags: {
         Args: {
