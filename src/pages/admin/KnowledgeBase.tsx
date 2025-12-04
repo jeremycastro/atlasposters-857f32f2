@@ -1,12 +1,12 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Search, Filter, Calendar, ArrowRight } from "lucide-react";
+import { BookOpen, Search, Filter, Calendar, ArrowRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import * as LucideIcons from "lucide-react";
-import { knowledgeArticles, KnowledgeCategory } from "@/types/knowledge";
+import { knowledgeArticles, KnowledgeCategory, KnowledgeArticle } from "@/types/knowledge";
 import { changelogData } from "@/pages/admin/Changelog";
 import {
   Select,
@@ -24,9 +24,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+type SortField = "title" | "category" | "lastUpdated";
+type SortDirection = "asc" | "desc";
+
 const KnowledgeBase = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [sortField, setSortField] = useState<SortField>("lastUpdated");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   // Get unique categories
   const categories = useMemo(() => {
@@ -34,9 +40,9 @@ const KnowledgeBase = () => {
     return ["all", ...cats];
   }, []);
 
-  // Filter articles based on search and category
+  // Filter and sort articles
   const filteredArticles = useMemo(() => {
-    return knowledgeArticles.filter(article => {
+    let articles = knowledgeArticles.filter(article => {
       const matchesSearch = 
         article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         article.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -47,21 +53,38 @@ const KnowledgeBase = () => {
       
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
 
-  // Group articles by category
-  const groupedArticles = useMemo(() => {
-    const grouped: Record<KnowledgeCategory, typeof knowledgeArticles> = {} as any;
-    
-    filteredArticles.forEach(article => {
-      if (!grouped[article.category]) {
-        grouped[article.category] = [];
+    // Sort articles
+    articles.sort((a, b) => {
+      let comparison = 0;
+      if (sortField === "title") {
+        comparison = a.title.localeCompare(b.title);
+      } else if (sortField === "category") {
+        comparison = a.category.localeCompare(b.category);
+      } else if (sortField === "lastUpdated") {
+        comparison = new Date(a.lastUpdated).getTime() - new Date(b.lastUpdated).getTime();
       }
-      grouped[article.category].push(article);
+      return sortDirection === "asc" ? comparison : -comparison;
     });
-    
-    return grouped;
-  }, [filteredArticles]);
+
+    return articles;
+  }, [searchQuery, selectedCategory, sortField, sortDirection]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />;
+    return sortDirection === "asc" 
+      ? <ArrowUp className="h-4 w-4 ml-1" />
+      : <ArrowDown className="h-4 w-4 ml-1" />;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -178,62 +201,84 @@ const KnowledgeBase = () => {
           </p>
         </div>
 
-        {/* Articles Table - Grouped by Category */}
-        {Object.entries(groupedArticles).map(([category, articles]) => (
-          <div key={category} className="mb-8">
-            <h2 className="text-2xl font-bold mb-4 text-foreground">{category}</h2>
-            
-            <Card>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[60px]">Icon</TableHead>
-                    <TableHead className="min-w-[200px]">Title</TableHead>
-                    <TableHead className="hidden lg:table-cell">Description</TableHead>
-                    <TableHead className="w-[120px]">Updated</TableHead>
-                    <TableHead className="w-[60px]"></TableHead>
+        {/* Articles Table - Sortable */}
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[60px]">Icon</TableHead>
+                <TableHead 
+                  className="min-w-[200px] cursor-pointer select-none"
+                  onClick={() => handleSort("title")}
+                >
+                  <div className="flex items-center">
+                    Title
+                    <SortIcon field="title" />
+                  </div>
+                </TableHead>
+                <TableHead 
+                  className="hidden md:table-cell cursor-pointer select-none"
+                  onClick={() => handleSort("category")}
+                >
+                  <div className="flex items-center">
+                    Category
+                    <SortIcon field="category" />
+                  </div>
+                </TableHead>
+                <TableHead className="hidden lg:table-cell">Description</TableHead>
+                <TableHead 
+                  className="w-[120px] cursor-pointer select-none"
+                  onClick={() => handleSort("lastUpdated")}
+                >
+                  <div className="flex items-center">
+                    Updated
+                    <SortIcon field="lastUpdated" />
+                  </div>
+                </TableHead>
+                <TableHead className="w-[60px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredArticles.map(article => {
+                const IconComponent = (LucideIcons as any)[article.icon] || LucideIcons.BookOpen;
+                
+                return (
+                  <TableRow 
+                    key={article.id}
+                    className="cursor-pointer hover:bg-muted/50 h-16"
+                    onClick={() => navigate(article.route)}
+                  >
+                    <TableCell className="py-3">
+                      <div className="p-2 bg-primary/10 rounded-lg w-fit">
+                        <IconComponent className="h-5 w-5 text-primary" />
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <span className="font-semibold">{article.title}</span>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell py-3">
+                      <Badge variant="outline">{article.category}</Badge>
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell py-3">
+                      <p className="text-sm text-muted-foreground line-clamp-1">
+                        {article.description}
+                      </p>
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <div className="flex items-center text-xs text-muted-foreground whitespace-nowrap">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        {article.lastUpdated}
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {articles.map(article => {
-                    const IconComponent = (LucideIcons as any)[article.icon] || LucideIcons.BookOpen;
-                    
-                    return (
-                      <TableRow 
-                        key={article.id}
-                        className="cursor-pointer hover:bg-muted/50 h-16"
-                        onClick={() => window.location.href = article.route}
-                      >
-                        <TableCell className="py-3">
-                          <div className="p-2 bg-primary/10 rounded-lg w-fit">
-                            <IconComponent className="h-5 w-5 text-primary" />
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-3">
-                          <span className="font-semibold">{article.title}</span>
-                        </TableCell>
-                        <TableCell className="hidden lg:table-cell py-3">
-                          <p className="text-sm text-muted-foreground line-clamp-1">
-                            {article.description}
-                          </p>
-                        </TableCell>
-                        <TableCell className="py-3">
-                          <div className="flex items-center text-xs text-muted-foreground whitespace-nowrap">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            {article.lastUpdated}
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-3">
-                          <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </Card>
-          </div>
-        ))}
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Card>
 
         {/* No Results */}
         {filteredArticles.length === 0 && (
