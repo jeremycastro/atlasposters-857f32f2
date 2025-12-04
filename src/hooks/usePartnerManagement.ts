@@ -64,7 +64,7 @@ export const usePartnerById = (partnerId: string | null) => {
           ),
           partner_contacts(id, first_name, last_name, full_name, email, mobile_phone, country_code, designation, is_primary, user_id),
           partner_addresses(id, designation, address_line1, address_line2, city, state, postal_code, country, is_primary),
-          partner_agreements(id, agreement_type, effective_date, expiration_date, royalty_rate, commission_rate, payment_period, status, agreement_document_path, payment_model, flat_fee_amount, advance_amount, advance_balance, advance_recoupment_rate, marketing_attribution_cap_percent, calculation_basis, initiation_fee, initiation_fee_due_days, initiation_fee_paid_at, minimum_guarantee, minimum_guarantee_start_month, royalty_groups),
+          partner_agreements(id, agreement_type, effective_date, expiration_date, royalty_rate, commission_rate, payment_period, status, agreement_document_path, payment_model, flat_fee_amount, advance_amount, advance_balance, advance_recoupment_rate, marketing_attribution_cap_percent, calculation_basis, initiation_fee, initiation_fee_due_days, initiation_fee_paid_at, minimum_guarantee, minimum_guarantee_start_month, royalty_groups, revenue_definition),
           partner_assets(id, asset_type, file_name, file_path, uploaded_at)
         `)
         .eq("id", partnerId)

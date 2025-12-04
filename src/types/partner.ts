@@ -69,6 +69,13 @@ export interface RoyaltyGroup {
   product_ids?: string[];
 }
 
+export interface RevenueDefinition {
+  exclude_shipping: boolean;
+  exclude_taxes_vat: boolean;
+  deduct_discounts: boolean;
+  deduct_returns: boolean;
+}
+
 export interface PartnerAgreement {
   id: string;
   partner_id: string;
@@ -99,6 +106,8 @@ export interface PartnerAgreement {
   minimum_guarantee?: number;
   minimum_guarantee_start_month?: number;
   royalty_groups?: RoyaltyGroup[];
+  // Revenue definition for tiered royalty
+  revenue_definition?: RevenueDefinition;
 }
 
 export interface PartnerContact {
