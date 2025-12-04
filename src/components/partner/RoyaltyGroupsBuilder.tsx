@@ -162,14 +162,14 @@ export function RoyaltyGroupsBuilder({ value, onChange }: RoyaltyGroupsBuilderPr
                     <Label className="text-xs">Basis</Label>
                     <Select
                       value={group.calculation_basis}
-                      onValueChange={(v) => updateGroup(group.id, { calculation_basis: v as 'revenue' | 'profit' })}
+                      onValueChange={(v) => updateGroup(group.id, { calculation_basis: v as 'revenue' })}
+                      disabled
                     >
                       <SelectTrigger className="h-8">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="revenue">Revenue</SelectItem>
-                        <SelectItem value="profit">Profit</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
