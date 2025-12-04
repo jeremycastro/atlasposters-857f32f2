@@ -8,9 +8,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2, FileText, Info } from "lucide-react";
+import { Plus, Trash2, FileText, Info, Layers } from "lucide-react";
 import { useCreateAgreement, useUpdateAgreement, useDeleteAgreement } from "@/hooks/usePartnerMutations";
 import { AgreementDocumentUpload } from "@/components/partner/AgreementDocumentUpload";
+import { RoyaltyGroupsBuilder } from "@/components/partner/RoyaltyGroupsBuilder";
+import { RoyaltyGroup } from "@/types/partner";
 
 interface Agreement {
   id: string;
@@ -28,6 +30,13 @@ interface Agreement {
   advance_recoupment_rate?: number;
   marketing_attribution_cap_percent?: number;
   calculation_basis?: string;
+  // Tiered royalty fields
+  initiation_fee?: number;
+  initiation_fee_due_days?: number;
+  initiation_fee_paid_at?: string;
+  minimum_guarantee?: number;
+  minimum_guarantee_start_month?: number;
+  royalty_groups?: RoyaltyGroup[];
 }
 
 interface AgreementsTabProps {
@@ -40,6 +49,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
   const [editingAgreement, setEditingAgreement] = useState<Agreement | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [agreementToDelete, setAgreementToDelete] = useState<Agreement | null>(null);
+  const [royaltyGroups, setRoyaltyGroups] = useState<RoyaltyGroup[]>([]);
   const [formData, setFormData] = useState({
     agreement_type: "",
     effective_date: "",
@@ -54,6 +64,11 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
     advance_recoupment_rate: "",
     marketing_attribution_cap_percent: "",
     calculation_basis: "",
+    // Tiered royalty fields
+    initiation_fee: "",
+    initiation_fee_due_days: "",
+    minimum_guarantee: "",
+    minimum_guarantee_start_month: "",
   });
 
   const createAgreement = useCreateAgreement();
@@ -81,6 +96,12 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
       advance_recoupment_rate: formData.advance_recoupment_rate ? parseFloat(formData.advance_recoupment_rate) : null,
       marketing_attribution_cap_percent: formData.marketing_attribution_cap_percent ? parseFloat(formData.marketing_attribution_cap_percent) : null,
       calculation_basis: formData.calculation_basis || null,
+      // Tiered royalty fields
+      initiation_fee: formData.initiation_fee ? parseFloat(formData.initiation_fee) : null,
+      initiation_fee_due_days: formData.initiation_fee_due_days ? parseInt(formData.initiation_fee_due_days) : null,
+      minimum_guarantee: formData.minimum_guarantee ? parseFloat(formData.minimum_guarantee) : null,
+      minimum_guarantee_start_month: formData.minimum_guarantee_start_month ? parseInt(formData.minimum_guarantee_start_month) : null,
+      royalty_groups: formData.payment_model === 'tiered_royalty' ? royaltyGroups : null,
     };
 
     if (editingAgreement) {
@@ -122,7 +143,12 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
       advance_recoupment_rate: "",
       marketing_attribution_cap_percent: "",
       calculation_basis: "",
+      initiation_fee: "",
+      initiation_fee_due_days: "",
+      minimum_guarantee: "",
+      minimum_guarantee_start_month: "",
     });
+    setRoyaltyGroups([]);
   };
 
   const getStatusColor = (status: string) => {
@@ -152,7 +178,12 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
         advance_recoupment_rate: agreement.advance_recoupment_rate?.toString() || "",
         marketing_attribution_cap_percent: agreement.marketing_attribution_cap_percent?.toString() || "",
         calculation_basis: agreement.calculation_basis || "",
+        initiation_fee: agreement.initiation_fee?.toString() || "",
+        initiation_fee_due_days: agreement.initiation_fee_due_days?.toString() || "",
+        minimum_guarantee: agreement.minimum_guarantee?.toString() || "",
+        minimum_guarantee_start_month: agreement.minimum_guarantee_start_month?.toString() || "",
       });
+      setRoyaltyGroups(agreement.royalty_groups || []);
     } else {
       setEditingAgreement(null);
       resetForm();
@@ -316,6 +347,12 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                     <SelectValue placeholder="Select payment model..." />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="tiered_royalty">
+                      <div className="flex items-center gap-2">
+                        <Layers className="h-4 w-4" />
+                        Tiered Royalty
+                      </div>
+                    </SelectItem>
                     <SelectItem value="royalty_profit">Royalty on Profit</SelectItem>
                     <SelectItem value="royalty_revenue">Royalty on Revenue</SelectItem>
                     <SelectItem value="flat_fee">Flat Fee</SelectItem>
@@ -408,6 +445,85 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                 </Select>
               </div>
             </div>
+
+            {/* Tiered Royalty Section */}
+            {formData.payment_model === 'tiered_royalty' && (
+              <>
+                {/* Initiation Fee */}
+                <div className="border rounded-lg p-4 space-y-3">
+                  <h4 className="font-medium text-sm text-muted-foreground">Initiation / Registration Fee</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
+                      <Label htmlFor="initiation_fee" className="text-sm text-right">Amount (£)</Label>
+                      <Input
+                        id="initiation_fee"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.initiation_fee}
+                        onChange={(e) => setFormData({ ...formData, initiation_fee: e.target.value })}
+                        placeholder="10000.00"
+                      />
+                    </div>
+                    <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
+                      <Label htmlFor="initiation_fee_due_days" className="text-sm text-right">Due (days)</Label>
+                      <Input
+                        id="initiation_fee_due_days"
+                        type="number"
+                        min="0"
+                        value={formData.initiation_fee_due_days}
+                        onChange={(e) => setFormData({ ...formData, initiation_fee_due_days: e.target.value })}
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    One-time fee paid X days after contract signing
+                  </p>
+                </div>
+
+                {/* Minimum Guarantee */}
+                <div className="border rounded-lg p-4 space-y-3">
+                  <h4 className="font-medium text-sm text-muted-foreground">Minimum Royalty Guarantee</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-[100px_1fr] gap-2 items-center">
+                      <Label htmlFor="minimum_guarantee" className="text-sm text-right">Amount (£)</Label>
+                      <Input
+                        id="minimum_guarantee"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.minimum_guarantee}
+                        onChange={(e) => setFormData({ ...formData, minimum_guarantee: e.target.value })}
+                        placeholder="1000.00"
+                      />
+                    </div>
+                    <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
+                      <Label htmlFor="minimum_guarantee_start_month" className="text-sm text-right">Starts Month</Label>
+                      <Input
+                        id="minimum_guarantee_start_month"
+                        type="number"
+                        min="1"
+                        value={formData.minimum_guarantee_start_month}
+                        onChange={(e) => setFormData({ ...formData, minimum_guarantee_start_month: e.target.value })}
+                        placeholder="3"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Partner receives the higher of this amount or calculated royalty (not both). Kicks in from specified month.
+                  </p>
+                </div>
+
+                {/* Royalty Groups */}
+                <div className="border rounded-lg p-4 space-y-3">
+                  <RoyaltyGroupsBuilder 
+                    value={royaltyGroups} 
+                    onChange={setRoyaltyGroups} 
+                  />
+                </div>
+              </>
+            )}
 
             {/* Marketing Attribution Cap */}
             <div className="border rounded-lg p-4 space-y-2">
@@ -561,7 +677,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                 <TableHead>Status</TableHead>
                 <TableHead>Effective Date</TableHead>
                 <TableHead>Rate/Amount</TableHead>
-                <TableHead>Marketing Cap</TableHead>
+                <TableHead>Guarantee/Cap</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -575,8 +691,18 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                   <TableCell className="font-medium capitalize">{agreement.agreement_type}</TableCell>
                   <TableCell className="text-sm">
                     {agreement.payment_model ? (
-                      <Badge variant="outline" className="capitalize">
-                        {agreement.payment_model.replace('_', ' ')}
+                      <Badge 
+                        variant={agreement.payment_model === 'tiered_royalty' ? 'default' : 'outline'} 
+                        className="capitalize"
+                      >
+                        {agreement.payment_model === 'tiered_royalty' ? (
+                          <span className="flex items-center gap-1">
+                            <Layers className="h-3 w-3" />
+                            Tiered
+                          </span>
+                        ) : (
+                          agreement.payment_model.replace('_', ' ')
+                        )}
                       </Badge>
                     ) : '-'}
                   </TableCell>
@@ -587,12 +713,29 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                     {agreement.effective_date ? new Date(agreement.effective_date).toLocaleDateString() : '-'}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {agreement.royalty_rate ? `${agreement.royalty_rate}%` : 
+                    {agreement.payment_model === 'tiered_royalty' && agreement.royalty_groups?.length ? (
+                      <div className="flex flex-col gap-0.5">
+                        {agreement.royalty_groups.slice(0, 2).map((group, i) => (
+                          <span key={i} className="text-xs">
+                            {group.rate}% - {group.name}
+                          </span>
+                        ))}
+                        {agreement.royalty_groups.length > 2 && (
+                          <span className="text-xs text-muted-foreground">
+                            +{agreement.royalty_groups.length - 2} more
+                          </span>
+                        )}
+                      </div>
+                    ) : agreement.royalty_rate ? `${agreement.royalty_rate}%` : 
                      agreement.flat_fee_amount ? `£${agreement.flat_fee_amount.toLocaleString()}` :
                      agreement.advance_amount ? `£${agreement.advance_amount.toLocaleString()} adv` : '-'}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {agreement.marketing_attribution_cap_percent ? `${agreement.marketing_attribution_cap_percent}%` : '-'}
+                    {agreement.payment_model === 'tiered_royalty' && agreement.minimum_guarantee ? (
+                      <span className="text-xs">
+                        £{agreement.minimum_guarantee.toLocaleString()} min
+                      </span>
+                    ) : agreement.marketing_attribution_cap_percent ? `${agreement.marketing_attribution_cap_percent}%` : '-'}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button 

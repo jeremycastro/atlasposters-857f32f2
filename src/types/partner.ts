@@ -59,6 +59,16 @@ export interface Brand {
   }>;
 }
 
+export interface RoyaltyGroup {
+  id: string;
+  name: string;
+  rate: number;
+  calculation_basis: 'revenue' | 'profit';
+  applies_to: 'all' | 'all_other' | 'specific';
+  product_type_ids?: string[];
+  product_ids?: string[];
+}
+
 export interface PartnerAgreement {
   id: string;
   partner_id: string;
@@ -74,14 +84,21 @@ export interface PartnerAgreement {
   created_at: string;
   updated_at: string;
   created_by?: string;
-  // New payment model fields (v0.4.1 - Milestone 1.21a)
-  payment_model?: 'royalty_profit' | 'royalty_revenue' | 'flat_fee' | 'advance';
+  // Payment model fields
+  payment_model?: 'royalty_profit' | 'royalty_revenue' | 'flat_fee' | 'advance' | 'tiered_royalty';
   flat_fee_amount?: number;
   advance_amount?: number;
   advance_balance?: number;
   advance_recoupment_rate?: number;
   marketing_attribution_cap_percent?: number;
   calculation_basis?: string;
+  // Tiered royalty fields (v0.5 - Milestone 1.22)
+  initiation_fee?: number;
+  initiation_fee_due_days?: number;
+  initiation_fee_paid_at?: string;
+  minimum_guarantee?: number;
+  minimum_guarantee_start_month?: number;
+  royalty_groups?: RoyaltyGroup[];
 }
 
 export interface PartnerContact {
