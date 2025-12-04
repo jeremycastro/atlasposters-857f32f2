@@ -85,5 +85,35 @@ export const knowledgeArticles: KnowledgeArticle[] = [
     icon: "BookOpen",
     lastUpdated: "2025-11-12",
     tags: ["Brand", "Story", "Messaging", "Marketing", "Content", "Voice", "Positioning", "Campaigns"]
+  },
+  {
+    id: "prodigi-api",
+    title: "Prodigi API Discovery",
+    description: "Technical documentation for integrating with Prodigi's global print-on-demand fulfillment network including SKU structure, attributes system, and geographic routing",
+    category: "Technical Documentation",
+    route: "/admin/knowledge/prodigi-api",
+    icon: "Globe",
+    lastUpdated: "2025-12-04",
+    tags: ["Prodigi", "API", "Print-on-Demand", "Fulfillment", "Integration", "SKU"]
+  },
+  {
+    id: "product-importing",
+    title: "Product Importing - Shopify/Syncio",
+    description: "Bi-directional product flow documentation covering Syncio sync, partner product mapping, artwork creation, and sales reporting workflows",
+    category: "Workflows & Processes",
+    route: "/admin/knowledge/product-importing",
+    icon: "ArrowRightLeft",
+    lastUpdated: "2025-12-04",
+    tags: ["Shopify", "Syncio", "Import", "Partner Products", "SKU Crosswalk", "Data Flow"]
+  },
+  {
+    id: "readymades-framing",
+    title: "Readymades.co Framing Discovery",
+    description: "Comprehensive framing catalog documentation including frame collections, mount options, glaze types, SKU structure, and price band system",
+    category: "Technical Documentation",
+    route: "/admin/knowledge/readymades-framing",
+    icon: "Frame",
+    lastUpdated: "2025-12-04",
+    tags: ["Readymades", "Framing", "Frames", "Mounts", "Glaze", "Price Bands", "SKU"]
   }
 ];

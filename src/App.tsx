@@ -40,6 +40,9 @@ import BrandTagManagement from "./pages/admin/BrandTagManagement";
 import Payouts from "./pages/admin/Payouts";
 import CustomerDashboard from "./pages/customer/Dashboard";
 import BrandStory from "./pages/admin/knowledge/BrandStory";
+import ProdigiAPI from "./pages/admin/knowledge/ProdigiAPI";
+import ProductImporting from "./pages/admin/knowledge/ProductImporting";
+import ReadymadesFraming from "./pages/admin/knowledge/ReadymadesFraming";
 import BrandStoryDashboard from "./pages/admin/BrandStoryDashboard";
 import BrandTimeline from "./pages/admin/BrandTimeline";
 import TagManagement from "./pages/admin/TagManagement";
@@ -91,6 +94,9 @@ const App = () => (
               <Route path="knowledge/artwork-catalog" element={<ArtworkCatalogKB />} />
               <Route path="knowledge/admin-brand-guide" element={<AdminBrandGuide />} />
               <Route path="knowledge/brand-story" element={<BrandStory />} />
+              <Route path="knowledge/prodigi-api" element={<ProdigiAPI />} />
+              <Route path="knowledge/product-importing" element={<ProductImporting />} />
+              <Route path="knowledge/readymades-framing" element={<ReadymadesFraming />} />
               <Route path="brand-story" element={<BrandStoryDashboard />} />
               <Route path="brand-story/timeline" element={<BrandTimeline />} />
               <Route path="artworks" element={<ArtworkCatalog />} />

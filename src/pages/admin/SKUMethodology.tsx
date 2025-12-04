@@ -495,6 +495,80 @@ $$ LANGUAGE plpgsql IMMUTABLE;
           </div>
         </Card>
 
+        {/* Framing Configuration Architecture */}
+        <Card className="p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Package className="w-6 h-6 text-primary" />
+            <h2 className="text-2xl font-bold">Framing Configuration Architecture</h2>
+            <Badge variant="outline">Proposed</Badge>
+          </div>
+
+          <p className="text-foreground mb-4">
+            Framing products have 6+ configuration dimensions that exceed the standard VAR1-VAR2-VAR3 structure. 
+            Atlas uses a hybrid approach with a separate <strong>Frame Configuration ID</strong>.
+          </p>
+
+          <div className="bg-muted p-4 rounded-lg mb-4">
+            <h3 className="font-semibold mb-2">Framing Dimensions</h3>
+            <div className="grid md:grid-cols-3 gap-2 text-sm">
+              <div>• Frame Style (Strand, Ashby, etc.)</div>
+              <div>• Frame Color (Black, White, Oak)</div>
+              <div>• Mount Type (Single, Double, Float)</div>
+              <div>• Mount Color (White, Off-White, Black)</div>
+              <div>• Glaze Type (Acrylic, Glass, AR)</div>
+              <div>• Size (varies by manufacturer)</div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <Badge className="mb-2">Hybrid SKU Approach</Badge>
+              <div className="bg-muted p-4 rounded-lg">
+                <p className="font-mono text-lg font-semibold text-center mb-2">
+                  <span className="text-primary">{'{ASC}'}</span>-
+                  <span className="text-blue-600">{'{TYPE}'}</span>-
+                  <span className="text-purple-600">{'{VAR1}'}</span>-
+                  <span className="text-orange-600">{'{VAR2}'}</span> + 
+                  <span className="text-green-600 ml-2">Frame Config ID</span>
+                </p>
+                <p className="text-sm text-muted-foreground text-center">
+                  Example: <code>10A001-FPM-02-01</code> + <code>FC042</code> (Gallery Black config)
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <Badge variant="secondary" className="mb-2">Frame Configuration Table</Badge>
+              <p className="text-sm text-muted-foreground mb-2">
+                Stores curated frame packages that map to manufacturer-specific attributes:
+              </p>
+              <div className="bg-slate-900 p-4 rounded-lg overflow-x-auto">
+                <pre className="text-green-400 text-sm">
+{`frame_configurations
+├── id: FC042
+├── config_name: "Gallery Black"
+├── manufacturer_id: (Prodigi/Readymades)
+├── frame_style: "strand"
+├── frame_color: "black"
+├── mount_type: "single"
+├── mount_color: "white"
+├── glaze_type: "acrylic"
+└── price_band: "B"`}
+                </pre>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h4 className="font-semibold text-yellow-900 mb-2">Order Flow</h4>
+              <p className="text-sm text-yellow-800">
+                At checkout, the Atlas SKU + Frame Config ID translates to manufacturer-specific 
+                attributes (e.g., Prodigi's <code>frame_colour</code>, <code>mount_colour</code>) 
+                for fulfillment API calls.
+              </p>
+            </div>
+          </div>
+        </Card>
+
         {/* Key Benefits */}
         <Card className="p-6">
           <h2 className="text-2xl font-bold mb-4">System Benefits</h2>

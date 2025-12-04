@@ -12,6 +12,32 @@ interface ChangelogEntry {
 
 const changelogData: ChangelogEntry[] = [
   {
+    version: "0.5.1",
+    date: "2025-12-04",
+    changes: [
+      {
+        type: "added",
+        description: "Knowledge Base Article: Prodigi API Discovery - Complete documentation of Prodigi print-on-demand API, product SKU structure, geographic routing, attributes system, and Atlas integration strategy",
+      },
+      {
+        type: "added",
+        description: "Knowledge Base Article: Product Importing - Shopify/Syncio workflow documentation covering partner product ingestion, bi-directional data flow, artwork mapping, and proposed database schema for partner_products and sku_crosswalk tables",
+      },
+      {
+        type: "added",
+        description: "Knowledge Base Article: Readymades.co Framing Discovery - Comprehensive framing catalog documentation including frame collections (Classic, Premium, Contemporary), mount options, glaze types, SKU decoding, and A-E price band system",
+      },
+      {
+        type: "changed",
+        description: "SKU Methodology - Added Framing Configuration Architecture section describing hybrid SKU approach with frame configuration IDs for complex product variants exceeding VAR1-VAR2-VAR3 structure",
+      },
+      {
+        type: "added",
+        description: "Tech Stack - Added Prodigi (global print-on-demand fulfillment network) and Readymades.co (premium framing partner via Prodigi) with integration details and purposes",
+      },
+    ],
+  },
+  {
     version: "0.5.0",
     date: "2025-11-14",
     changes: [

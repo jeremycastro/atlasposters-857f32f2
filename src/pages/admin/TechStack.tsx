@@ -138,6 +138,20 @@ const technologies: Technology[] = [
     url: "https://zod.dev",
     purpose: "Type-safe data validation and schema definition",
   },
+  {
+    name: "Prodigi",
+    category: "Print-on-Demand",
+    description: "Global print fulfillment network with 50+ production facilities worldwide",
+    url: "https://www.prodigi.com",
+    purpose: "Print production, framing, and worldwide fulfillment for custom products via API integration",
+  },
+  {
+    name: "Readymades",
+    category: "Manufacturing Partner",
+    description: "Premium custom framing manufacturer with extensive frame collections (acquired by Prodigi)",
+    url: "https://www.readymades.co",
+    purpose: "Frame catalog reference and quality framing options available through Prodigi integration",
+  },
 ];
 
 const categories = Array.from(new Set(technologies.map((t) => t.category)));
