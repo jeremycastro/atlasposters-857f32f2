@@ -61,6 +61,9 @@ export const Navigation = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
+          <Link to="/poster-history" className="text-sm font-medium hover:text-accent transition-colors">
+            Poster History
+          </Link>
           <a href="/#why-atlas" className="text-sm font-medium hover:text-accent transition-colors">
             Why Atlas
           </a>
@@ -131,6 +134,13 @@ export const Navigation = () => {
       {mobileMenuOpen && (
         <div className="md:hidden border-t bg-background">
           <div className="container py-4 flex flex-col space-y-4">
+            <Link
+              to="/poster-history"
+              className="text-sm font-medium hover:text-accent transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Poster History
+            </Link>
             <a
               href="/#why-atlas"
               className="text-sm font-medium hover:text-accent transition-colors"
