@@ -1375,6 +1375,110 @@ export type Database = {
           },
         ]
       }
+      partner_products: {
+        Row: {
+          artwork_code: string | null
+          artwork_id: string | null
+          brand_id: string | null
+          created_at: string | null
+          id: string
+          import_method: string
+          import_status: string
+          imported_at: string | null
+          mapped_at: string | null
+          mapped_by: string | null
+          mapping_notes: string | null
+          original_handle: string | null
+          original_sku: string | null
+          original_title: string
+          partner_id: string
+          product_type: string | null
+          rejection_reason: string | null
+          source_record_id: string
+          source_table: string
+          updated_at: string | null
+          variants: Json | null
+          vendor: string | null
+        }
+        Insert: {
+          artwork_code?: string | null
+          artwork_id?: string | null
+          brand_id?: string | null
+          created_at?: string | null
+          id?: string
+          import_method: string
+          import_status?: string
+          imported_at?: string | null
+          mapped_at?: string | null
+          mapped_by?: string | null
+          mapping_notes?: string | null
+          original_handle?: string | null
+          original_sku?: string | null
+          original_title: string
+          partner_id: string
+          product_type?: string | null
+          rejection_reason?: string | null
+          source_record_id: string
+          source_table: string
+          updated_at?: string | null
+          variants?: Json | null
+          vendor?: string | null
+        }
+        Update: {
+          artwork_code?: string | null
+          artwork_id?: string | null
+          brand_id?: string | null
+          created_at?: string | null
+          id?: string
+          import_method?: string
+          import_status?: string
+          imported_at?: string | null
+          mapped_at?: string | null
+          mapped_by?: string | null
+          mapping_notes?: string | null
+          original_handle?: string | null
+          original_sku?: string | null
+          original_title?: string
+          partner_id?: string
+          product_type?: string | null
+          rejection_reason?: string | null
+          source_record_id?: string
+          source_table?: string
+          updated_at?: string | null
+          variants?: Json | null
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_products_artwork_id_fkey"
+            columns: ["artwork_id"]
+            isOneToOne: false
+            referencedRelation: "artworks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_products_mapped_by_fkey"
+            columns: ["mapped_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_products_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partners: {
         Row: {
           atlas_manager_id: string | null
@@ -2139,6 +2243,54 @@ export type Database = {
             columns: ["variant_id"]
             isOneToOne: false
             referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sku_crosswalk: {
+        Row: {
+          atlas_variant_id: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          partner_product_id: string
+          partner_sku: string
+          partner_variant_id: string | null
+          source_platform: string
+        }
+        Insert: {
+          atlas_variant_id: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          partner_product_id: string
+          partner_sku: string
+          partner_variant_id?: string | null
+          source_platform?: string
+        }
+        Update: {
+          atlas_variant_id?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          partner_product_id?: string
+          partner_sku?: string
+          partner_variant_id?: string | null
+          source_platform?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sku_crosswalk_atlas_variant_id_fkey"
+            columns: ["atlas_variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sku_crosswalk_partner_product_id_fkey"
+            columns: ["partner_product_id"]
+            isOneToOne: false
+            referencedRelation: "partner_products"
             referencedColumns: ["id"]
           },
         ]
