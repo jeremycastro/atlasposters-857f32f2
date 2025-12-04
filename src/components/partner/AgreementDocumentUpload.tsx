@@ -364,7 +364,12 @@ export const AgreementDocumentUpload = ({ agreementId, activeDocumentPath, onSet
                             size="sm"
                             variant="ghost"
                             className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
-                            onClick={() => onSetActive(file.fullPath)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              onSetActive(file.fullPath);
+                            }}
+                            type="button"
                           >
                             <Star className="h-3 w-3 mr-1" />
                             Set Active
