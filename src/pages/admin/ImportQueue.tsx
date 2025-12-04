@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -49,8 +50,11 @@ import {
   Loader2,
   Users,
   Building2,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   pending: { label: "Pending", color: "bg-yellow-500", icon: Clock },
@@ -67,11 +71,13 @@ const ImportQueue = () => {
   const [mapDialogOpen, setMapDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [assignPartnerDialogOpen, setAssignPartnerDialogOpen] = useState(false);
+  const [bulkAssignDialogOpen, setBulkAssignDialogOpen] = useState(false);
   const [selectedArtworkId, setSelectedArtworkId] = useState<string>("");
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>("");
   const [selectedBrandId, setSelectedBrandId] = useState<string>("");
   const [mappingNotes, setMappingNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const { data: products, isLoading } = usePartnerProducts({
     import_status: statusFilter,
@@ -179,6 +185,62 @@ const ImportQueue = () => {
     );
   };
 
+  // Bulk selection helpers
+  const selectableProducts = useMemo(() => {
+    return filteredProducts.filter(p => ["pending", "reviewing"].includes(p.import_status));
+  }, [filteredProducts]);
+
+  const allSelected = selectableProducts.length > 0 && 
+    selectableProducts.every(p => selectedIds.has(p.id));
+  
+  const someSelected = selectableProducts.some(p => selectedIds.has(p.id));
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(selectableProducts.map(p => p.id)));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleBulkAssignPartner = async () => {
+    if (selectedIds.size === 0 || !selectedPartnerId) return;
+    
+    let successCount = 0;
+    const idsArray = Array.from(selectedIds);
+    
+    for (const id of idsArray) {
+      try {
+        await updateMutation.mutateAsync({
+          id,
+          updates: { 
+            partner_id: selectedPartnerId,
+            brand_id: selectedBrandId || null,
+          },
+        });
+        successCount++;
+      } catch (error) {
+        console.error(`Failed to assign partner to product ${id}:`, error);
+      }
+    }
+    
+    toast.success(`Assigned partner to ${successCount} of ${idsArray.length} products`);
+    setBulkAssignDialogOpen(false);
+    setSelectedIds(new Set());
+    setSelectedPartnerId("");
+    setSelectedBrandId("");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8 max-w-7xl">
@@ -249,6 +311,30 @@ const ImportQueue = () => {
               </Select>
             </div>
           </div>
+
+          {/* Bulk Actions */}
+          {selectedIds.size > 0 && (
+            <div className="flex items-center gap-4 mt-4 pt-4 border-t">
+              <span className="text-sm font-medium">
+                {selectedIds.size} selected
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setSelectedIds(new Set())}
+              >
+                Clear Selection
+              </Button>
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => setBulkAssignDialogOpen(true)}
+              >
+                <Users className="w-4 h-4 mr-1" />
+                Assign Partner to Selected
+              </Button>
+            </div>
+          )}
         </Card>
 
         {/* Products Table */}
@@ -268,6 +354,13 @@ const ImportQueue = () => {
               <Table>
                 <TableHeader className="sticky top-0 bg-background">
                   <TableRow>
+                    <TableHead className="w-12">
+                      <Checkbox
+                        checked={allSelected}
+                        onCheckedChange={toggleSelectAll}
+                        aria-label="Select all"
+                      />
+                    </TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Partner</TableHead>
                     <TableHead>Title</TableHead>
@@ -282,8 +375,18 @@ const ImportQueue = () => {
                   {filteredProducts.map((product) => {
                     const status = statusConfig[product.import_status];
                     const StatusIcon = status?.icon || Clock;
+                    const isSelectable = ["pending", "reviewing"].includes(product.import_status);
                     return (
                       <TableRow key={product.id}>
+                        <TableCell>
+                          {isSelectable && (
+                            <Checkbox
+                              checked={selectedIds.has(product.id)}
+                              onCheckedChange={() => toggleSelect(product.id)}
+                              aria-label={`Select ${product.original_title}`}
+                            />
+                          )}
+                        </TableCell>
                         <TableCell>
                           <Badge
                             variant="secondary"
@@ -612,6 +715,80 @@ const ImportQueue = () => {
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 )}
                 Assign Partner
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Bulk Assign Partner Dialog */}
+        <Dialog open={bulkAssignDialogOpen} onOpenChange={setBulkAssignDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-primary" />
+                Bulk Assign Partner
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="p-3 bg-muted rounded-md">
+                <p className="text-sm font-medium">
+                  {selectedIds.size} product{selectedIds.size !== 1 ? "s" : ""} selected
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Partner *</p>
+                <Select value={selectedPartnerId} onValueChange={(val) => {
+                  setSelectedPartnerId(val);
+                  setSelectedBrandId(""); // Reset brand when partner changes
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select partner..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {partners?.map((partner) => (
+                      <SelectItem key={partner.id} value={partner.id}>
+                        {partner.partner_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedPartnerId && filteredBrands.length > 0 && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Brand (optional)</p>
+                  <Select value={selectedBrandId} onValueChange={setSelectedBrandId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select brand..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredBrands.map((brand) => (
+                        <SelectItem key={brand.id} value={brand.id}>
+                          {brand.brand_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => {
+                setBulkAssignDialogOpen(false);
+                setSelectedPartnerId("");
+                setSelectedBrandId("");
+              }}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleBulkAssignPartner}
+                disabled={!selectedPartnerId || updateMutation.isPending}
+              >
+                {updateMutation.isPending && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
+                Assign to {selectedIds.size} Products
               </Button>
             </DialogFooter>
           </DialogContent>
