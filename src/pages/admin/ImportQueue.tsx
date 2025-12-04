@@ -37,6 +37,7 @@ import {
 } from "@/hooks/usePartnerProducts";
 import { useArtworks } from "@/hooks/useArtworks";
 import { usePartners, useBrands } from "@/hooks/usePartnerManagement";
+import { QuickCreateArtworkDialog } from "@/components/artworks/QuickCreateArtworkDialog";
 import {
   Package,
   Search,
@@ -52,6 +53,7 @@ import {
   Building2,
   CheckSquare,
   Square,
+  Plus,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -72,6 +74,7 @@ const ImportQueue = () => {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [assignPartnerDialogOpen, setAssignPartnerDialogOpen] = useState(false);
   const [bulkAssignDialogOpen, setBulkAssignDialogOpen] = useState(false);
+  const [quickCreateDialogOpen, setQuickCreateDialogOpen] = useState(false);
   const [selectedArtworkId, setSelectedArtworkId] = useState<string>("");
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>("");
   const [selectedBrandId, setSelectedBrandId] = useState<string>("");
@@ -556,9 +559,32 @@ const ImportQueue = () => {
                   </div>
                 )}
 
+                {/* Create New Artwork Option */}
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-px bg-border" />
+                  <span className="text-xs text-muted-foreground">or</span>
+                  <div className="flex-1 h-px bg-border" />
+                </div>
+
+                <Button
+                  variant="outline"
+                  className="w-full justify-start gap-2"
+                  onClick={() => setQuickCreateDialogOpen(true)}
+                  disabled={!selectedProduct?.partner_id}
+                >
+                  <Plus className="w-4 h-4" />
+                  Create New Artwork
+                </Button>
+
+                {!selectedProduct?.partner_id && (
+                  <p className="text-xs text-muted-foreground">
+                    Assign a partner to this product first before creating a new artwork
+                  </p>
+                )}
+
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Or select artwork
+                    Or select existing artwork
                   </p>
                   <Select value={selectedArtworkId} onValueChange={setSelectedArtworkId}>
                     <SelectTrigger>
@@ -794,6 +820,22 @@ const ImportQueue = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        {/* Quick Create Artwork Dialog */}
+        {selectedProduct?.partner_id && (
+          <QuickCreateArtworkDialog
+            open={quickCreateDialogOpen}
+            onOpenChange={setQuickCreateDialogOpen}
+            onSuccess={(artworkId, ascCode) => {
+              setSelectedArtworkId(artworkId);
+              setMappingNotes(`Artwork created from import queue (${ascCode})`);
+            }}
+            prefillData={{
+              title: selectedProduct.original_title,
+              brandId: selectedProduct.brand_id || undefined,
+              partnerId: selectedProduct.partner_id,
+            }}
+          />
+        )}
       </main>
     </div>
   );
