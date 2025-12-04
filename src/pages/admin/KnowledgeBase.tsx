@@ -4,10 +4,12 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BookOpen, Search, Filter, Calendar, ArrowRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import * as LucideIcons from "lucide-react";
-import { knowledgeArticles, KnowledgeCategory, KnowledgeArticle } from "@/types/knowledge";
+import { useKnowledgeArticles, useKnowledgeCategories } from "@/hooks/useKnowledgeBase";
 import { changelogData } from "@/pages/admin/Changelog";
+import { format } from "date-fns";
 import {
   Select,
   SelectContent,
@@ -34,41 +36,46 @@ const KnowledgeBase = () => {
   const [sortField, setSortField] = useState<SortField>("lastUpdated");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
-  // Get unique categories
-  const categories = useMemo(() => {
-    const cats = Array.from(new Set(knowledgeArticles.map(a => a.category)));
+  const { data: articles = [], isLoading: articlesLoading } = useKnowledgeArticles();
+  const { data: categories = [], isLoading: categoriesLoading } = useKnowledgeCategories();
+
+  const isLoading = articlesLoading || categoriesLoading;
+
+  // Get unique category display names
+  const categoryOptions = useMemo(() => {
+    const cats = categories.map(c => c.display_name);
     return ["all", ...cats];
-  }, []);
+  }, [categories]);
 
   // Filter and sort articles
   const filteredArticles = useMemo(() => {
-    let articles = knowledgeArticles.filter(article => {
+    let filtered = articles.filter(article => {
       const matchesSearch = 
         article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        article.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        article.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+        (article.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+        (article.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ?? false);
       
       const matchesCategory = 
-        selectedCategory === "all" || article.category === selectedCategory;
+        selectedCategory === "all" || article.category?.display_name === selectedCategory;
       
       return matchesSearch && matchesCategory;
     });
 
     // Sort articles
-    articles.sort((a, b) => {
+    filtered.sort((a, b) => {
       let comparison = 0;
       if (sortField === "title") {
         comparison = a.title.localeCompare(b.title);
       } else if (sortField === "category") {
-        comparison = a.category.localeCompare(b.category);
+        comparison = (a.category?.display_name || "").localeCompare(b.category?.display_name || "");
       } else if (sortField === "lastUpdated") {
-        comparison = new Date(a.lastUpdated).getTime() - new Date(b.lastUpdated).getTime();
+        comparison = new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
       }
       return sortDirection === "asc" ? comparison : -comparison;
     });
 
-    return articles;
-  }, [searchQuery, selectedCategory, sortField, sortDirection]);
+    return filtered;
+  }, [articles, searchQuery, selectedCategory, sortField, sortDirection]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -85,6 +92,38 @@ const KnowledgeBase = () => {
       ? <ArrowUp className="h-4 w-4 ml-1" />
       : <ArrowDown className="h-4 w-4 ml-1" />;
   };
+
+  const handleArticleClick = (slug: string) => {
+    navigate(`/admin/knowledge/article/${slug}`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <main className="container mx-auto px-4 py-8 max-w-[1600px]">
+          <div className="mb-8">
+            <Skeleton className="h-10 w-64 mb-2" />
+            <Skeleton className="h-5 w-96" />
+          </div>
+          <Card className="p-6 mb-6">
+            <Skeleton className="h-10 w-full mb-4" />
+            <div className="flex gap-2">
+              <Skeleton className="h-8 w-24" />
+              <Skeleton className="h-8 w-32" />
+              <Skeleton className="h-8 w-28" />
+            </div>
+          </Card>
+          <Card>
+            <div className="p-4 space-y-4">
+              {[1, 2, 3, 4, 5].map(i => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          </Card>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -128,7 +167,7 @@ const KnowledgeBase = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
-                  {categories.slice(1).map(cat => (
+                  {categoryOptions.slice(1).map(cat => (
                     <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                   ))}
                 </SelectContent>
@@ -145,7 +184,7 @@ const KnowledgeBase = () => {
               >
                 All Categories
               </Button>
-              {categories.slice(1).map(cat => (
+              {categoryOptions.slice(1).map(cat => (
                 <Button
                   key={cat}
                   variant={selectedCategory === cat ? "default" : "outline"}
@@ -203,7 +242,7 @@ const KnowledgeBase = () => {
         {/* Results Summary */}
         <div className="mb-6">
           <p className="text-sm text-muted-foreground">
-            Showing {filteredArticles.length} of {knowledgeArticles.length} articles
+            Showing {filteredArticles.length} of {articles.length} articles
           </p>
         </div>
 
@@ -246,13 +285,13 @@ const KnowledgeBase = () => {
             </TableHeader>
             <TableBody>
               {filteredArticles.map(article => {
-                const IconComponent = (LucideIcons as any)[article.icon] || LucideIcons.BookOpen;
+                const IconComponent = (LucideIcons as any)[article.icon || "BookOpen"] || LucideIcons.BookOpen;
                 
                 return (
                   <TableRow 
                     key={article.id}
                     className="cursor-pointer hover:bg-muted/50 h-16"
-                    onClick={() => navigate(article.route)}
+                    onClick={() => handleArticleClick(article.slug)}
                   >
                     <TableCell className="py-3">
                       <div className="p-2 bg-primary/10 rounded-lg w-fit">
@@ -261,9 +300,14 @@ const KnowledgeBase = () => {
                     </TableCell>
                     <TableCell className="py-3">
                       <span className="font-semibold">{article.title}</span>
+                      {!article.is_published && (
+                        <Badge variant="outline" className="ml-2 text-xs">Draft</Badge>
+                      )}
                     </TableCell>
                     <TableCell className="hidden md:table-cell py-3 whitespace-nowrap">
-                      <Badge variant="outline" className="whitespace-nowrap">{article.category}</Badge>
+                      <Badge variant="outline" className="whitespace-nowrap">
+                        {article.category?.display_name || "Uncategorized"}
+                      </Badge>
                     </TableCell>
                     <TableCell className="hidden lg:table-cell py-3">
                       <p className="text-sm text-muted-foreground line-clamp-1">
@@ -273,7 +317,7 @@ const KnowledgeBase = () => {
                     <TableCell className="py-3">
                       <div className="flex items-center text-xs text-muted-foreground whitespace-nowrap">
                         <Calendar className="h-3 w-3 mr-1" />
-                        {article.lastUpdated}
+                        {format(new Date(article.updated_at), "yyyy-MM-dd")}
                       </div>
                     </TableCell>
                     <TableCell className="py-3">
@@ -287,22 +331,30 @@ const KnowledgeBase = () => {
         </Card>
 
         {/* No Results */}
-        {filteredArticles.length === 0 && (
+        {filteredArticles.length === 0 && !isLoading && (
           <Card className="p-12 text-center">
             <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">No articles found</h3>
             <p className="text-muted-foreground mb-4">
-              Try adjusting your search or filters
+              {articles.length === 0 
+                ? "No articles have been migrated yet. Use Content Migration to add articles."
+                : "Try adjusting your search or filters"}
             </p>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedCategory("all");
-              }}
-            >
-              Clear filters
-            </Button>
+            {articles.length === 0 ? (
+              <Button onClick={() => navigate("/admin/knowledge/migrate")}>
+                Go to Content Migration
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("all");
+                }}
+              >
+                Clear filters
+              </Button>
+            )}
           </Card>
         )}
 
