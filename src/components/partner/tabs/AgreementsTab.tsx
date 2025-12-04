@@ -12,6 +12,7 @@ import { Plus, Trash2, FileText, Info, Layers } from "lucide-react";
 import { useCreateAgreement, useUpdateAgreement, useDeleteAgreement } from "@/hooks/usePartnerMutations";
 import { AgreementDocumentUpload } from "@/components/partner/AgreementDocumentUpload";
 import { RoyaltyGroupsBuilder } from "@/components/partner/RoyaltyGroupsBuilder";
+import { RevenueDefinitionBuilder, defaultRevenueDefinition, type RevenueDefinition } from "@/components/partner/RevenueDefinitionBuilder";
 import { RoyaltyGroup } from "@/types/partner";
 
 interface Agreement {
@@ -37,6 +38,7 @@ interface Agreement {
   minimum_guarantee?: number;
   minimum_guarantee_start_month?: number;
   royalty_groups?: RoyaltyGroup[];
+  revenue_definition?: RevenueDefinition;
 }
 
 interface AgreementsTabProps {
@@ -50,6 +52,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [agreementToDelete, setAgreementToDelete] = useState<Agreement | null>(null);
   const [royaltyGroups, setRoyaltyGroups] = useState<RoyaltyGroup[]>([]);
+  const [revenueDefinition, setRevenueDefinition] = useState<RevenueDefinition>(defaultRevenueDefinition);
   const [formData, setFormData] = useState({
     agreement_type: "",
     effective_date: "",
@@ -82,6 +85,8 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
       return;
     }
     
+    const isTieredRoyalty = formData.payment_model === 'tiered_royalty';
+    
     const agreementData: any = {
       agreement_type: formData.agreement_type,
       status: formData.status,
@@ -94,14 +99,16 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
       flat_fee_amount: formData.flat_fee_amount ? parseFloat(formData.flat_fee_amount) : null,
       advance_amount: formData.advance_amount ? parseFloat(formData.advance_amount) : null,
       advance_recoupment_rate: formData.advance_recoupment_rate ? parseFloat(formData.advance_recoupment_rate) : null,
-      marketing_attribution_cap_percent: formData.marketing_attribution_cap_percent ? parseFloat(formData.marketing_attribution_cap_percent) : null,
+      // Clear marketing cap for tiered royalty
+      marketing_attribution_cap_percent: isTieredRoyalty ? null : (formData.marketing_attribution_cap_percent ? parseFloat(formData.marketing_attribution_cap_percent) : null),
       calculation_basis: formData.calculation_basis || null,
       // Tiered royalty fields
       initiation_fee: formData.initiation_fee ? parseFloat(formData.initiation_fee) : null,
       initiation_fee_due_days: formData.initiation_fee_due_days ? parseInt(formData.initiation_fee_due_days) : null,
       minimum_guarantee: formData.minimum_guarantee ? parseFloat(formData.minimum_guarantee) : null,
       minimum_guarantee_start_month: formData.minimum_guarantee_start_month ? parseInt(formData.minimum_guarantee_start_month) : null,
-      royalty_groups: formData.payment_model === 'tiered_royalty' ? royaltyGroups : null,
+      royalty_groups: isTieredRoyalty ? royaltyGroups : null,
+      revenue_definition: isTieredRoyalty ? revenueDefinition : null,
     };
 
     if (editingAgreement) {
@@ -149,6 +156,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
       minimum_guarantee_start_month: "",
     });
     setRoyaltyGroups([]);
+    setRevenueDefinition(defaultRevenueDefinition);
   };
 
   const getStatusColor = (status: string) => {
@@ -184,6 +192,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
         minimum_guarantee_start_month: agreement.minimum_guarantee_start_month?.toString() || "",
       });
       setRoyaltyGroups(agreement.royalty_groups || []);
+      setRevenueDefinition(agreement.revenue_definition || defaultRevenueDefinition);
     } else {
       setEditingAgreement(null);
       resetForm();
@@ -520,100 +529,110 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                     onChange={setRoyaltyGroups} 
                   />
                 </div>
+
+                {/* Revenue Definition */}
+                <RevenueDefinitionBuilder 
+                  value={revenueDefinition} 
+                  onChange={setRevenueDefinition} 
+                />
               </>
             )}
 
-            {/* Marketing Attribution Cap */}
-            <div className="border rounded-lg p-4 space-y-2">
-              <h4 className="font-medium text-sm text-muted-foreground mb-3">Profit Calculation Settings</h4>
-              <div className="grid grid-cols-[150px_1fr] gap-3 items-center">
-                <Label htmlFor="marketing_attribution_cap_percent" className="text-sm text-right flex items-center gap-1">
-                  Marketing Cap (%)
-                  <Info className="h-3 w-3 text-muted-foreground" />
-                </Label>
-                <div className="space-y-1">
-                  <Input
-                    id="marketing_attribution_cap_percent"
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="100"
-                    value={formData.marketing_attribution_cap_percent}
-                    onChange={(e) => setFormData({ ...formData, marketing_attribution_cap_percent: e.target.value })}
-                    placeholder="25.0"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Max % of net revenue for marketing in profit calculations. Recommended: 15-30%
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-[150px_1fr] gap-3 items-start">
-                <Label htmlFor="calculation_basis" className="text-sm text-right pt-2">Calculation Basis</Label>
-                <Textarea
-                  id="calculation_basis"
-                  value={formData.calculation_basis}
-                  onChange={(e) => setFormData({ ...formData, calculation_basis: e.target.value })}
-                  placeholder="Describe what counts as revenue/profit for this agreement..."
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            {/* Calculation Preview */}
-            {formData.payment_model && formData.marketing_attribution_cap_percent && (
-              <Card className="bg-muted/50">
-                <CardHeader>
-                  <CardTitle className="text-sm">Calculation Preview</CardTitle>
-                  <CardDescription className="text-xs">
-                    Example with £40,000 revenue, £20,000 COGS, £1,600 fees, £8,000 ad spend
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Net Revenue:</span>
-                    <span className="font-medium">£{preview.netRevenue.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Direct Costs:</span>
-                    <span className="font-medium">£{preview.directCosts.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Profit Before Marketing:</span>
-                    <span className="font-medium">£{preview.profitBeforeMarketing.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between border-t pt-2">
-                    <span className="text-muted-foreground">Marketing Cap ({formData.marketing_attribution_cap_percent}%):</span>
-                    <span className="font-medium">£{preview.marketingCap.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Attributed Marketing:</span>
-                    <span className="font-medium">£{preview.attributedMarketing.toLocaleString()}</span>
-                  </div>
-                  {preview.atlasAbsorbs > 0 && (
-                    <div className="flex justify-between text-orange-500">
-                      <span>Atlas Absorbs:</span>
-                      <span className="font-medium">£{preview.atlasAbsorbs.toLocaleString()}</span>
+            {/* Marketing Attribution Cap - hidden for tiered royalty */}
+            {formData.payment_model !== 'tiered_royalty' && (
+              <>
+                <div className="border rounded-lg p-4 space-y-2">
+                  <h4 className="font-medium text-sm text-muted-foreground mb-3">Profit Calculation Settings</h4>
+                  <div className="grid grid-cols-[150px_1fr] gap-3 items-center">
+                    <Label htmlFor="marketing_attribution_cap_percent" className="text-sm text-right flex items-center gap-1">
+                      Marketing Cap (%)
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </Label>
+                    <div className="space-y-1">
+                      <Input
+                        id="marketing_attribution_cap_percent"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="100"
+                        value={formData.marketing_attribution_cap_percent}
+                        onChange={(e) => setFormData({ ...formData, marketing_attribution_cap_percent: e.target.value })}
+                        placeholder="25.0"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Max % of net revenue for marketing in profit calculations. Recommended: 15-30%
+                      </p>
                     </div>
-                  )}
-                  <div className="flex justify-between border-t pt-2 font-semibold">
-                    <span>Final Profit:</span>
-                    <span>£{preview.finalProfit.toLocaleString()}</span>
                   </div>
-                  {formData.payment_model !== 'flat_fee' && (
-                    <>
-                      <div className="flex justify-between text-primary">
-                        <span>Calculated Payment:</span>
-                        <span className="font-medium">£{preview.payment.toLocaleString()}</span>
+
+                  <div className="grid grid-cols-[150px_1fr] gap-3 items-start">
+                    <Label htmlFor="calculation_basis" className="text-sm text-right pt-2">Calculation Basis</Label>
+                    <Textarea
+                      id="calculation_basis"
+                      value={formData.calculation_basis}
+                      onChange={(e) => setFormData({ ...formData, calculation_basis: e.target.value })}
+                      placeholder="Describe what counts as revenue/profit for this agreement..."
+                      rows={3}
+                    />
+                  </div>
+                </div>
+
+                {/* Calculation Preview */}
+                {formData.payment_model && formData.marketing_attribution_cap_percent && (
+                  <Card className="bg-muted/50">
+                    <CardHeader>
+                      <CardTitle className="text-sm">Calculation Preview</CardTitle>
+                      <CardDescription className="text-xs">
+                        Example with £40,000 revenue, £20,000 COGS, £1,600 fees, £8,000 ad spend
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Net Revenue:</span>
+                        <span className="font-medium">£{preview.netRevenue.toLocaleString()}</span>
                       </div>
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Split (50/50):</span>
-                        <span>£{preview.split.toLocaleString()} each</span>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Direct Costs:</span>
+                        <span className="font-medium">£{preview.directCosts.toLocaleString()}</span>
                       </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Profit Before Marketing:</span>
+                        <span className="font-medium">£{preview.profitBeforeMarketing.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between border-t pt-2">
+                        <span className="text-muted-foreground">Marketing Cap ({formData.marketing_attribution_cap_percent}%):</span>
+                        <span className="font-medium">£{preview.marketingCap.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Attributed Marketing:</span>
+                        <span className="font-medium">£{preview.attributedMarketing.toLocaleString()}</span>
+                      </div>
+                      {preview.atlasAbsorbs > 0 && (
+                        <div className="flex justify-between text-orange-500">
+                          <span>Atlas Absorbs:</span>
+                          <span className="font-medium">£{preview.atlasAbsorbs.toLocaleString()}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between border-t pt-2 font-semibold">
+                        <span>Final Profit:</span>
+                        <span>£{preview.finalProfit.toLocaleString()}</span>
+                      </div>
+                      {formData.payment_model !== 'flat_fee' && (
+                        <>
+                          <div className="flex justify-between text-primary">
+                            <span>Calculated Payment:</span>
+                            <span className="font-medium">£{preview.payment.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>Split (50/50):</span>
+                            <span>£{preview.split.toLocaleString()} each</span>
+                          </div>
+                        </>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+              </>
             )}
 
             {/* Agreement Documents */}

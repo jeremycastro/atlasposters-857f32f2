@@ -1164,6 +1164,7 @@ export type Database = {
           partner_id: string
           payment_model: Database["public"]["Enums"]["payment_model"] | null
           payment_period: string | null
+          revenue_definition: Json | null
           royalty_groups: Json | null
           royalty_rate: number | null
           status: string | null
@@ -1193,6 +1194,7 @@ export type Database = {
           partner_id: string
           payment_model?: Database["public"]["Enums"]["payment_model"] | null
           payment_period?: string | null
+          revenue_definition?: Json | null
           royalty_groups?: Json | null
           royalty_rate?: number | null
           status?: string | null
@@ -1222,6 +1224,7 @@ export type Database = {
           partner_id?: string
           payment_model?: Database["public"]["Enums"]["payment_model"] | null
           payment_period?: string | null
+          revenue_definition?: Json | null
           royalty_groups?: Json | null
           royalty_rate?: number | null
           status?: string | null
