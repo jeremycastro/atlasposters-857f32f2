@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
@@ -24,11 +24,42 @@ import { useRestoreVersion } from "@/hooks/useKnowledgeMutations";
 import { ArrowLeft, History, PanelRightOpen } from "lucide-react";
 import { toast } from "sonner";
 
+// Map of slugs to their custom React components (beautifully formatted)
+const staticArticleComponents: Record<string, React.LazyExoticComponent<React.ComponentType>> = {
+  "sku-methodology": lazy(() => import("../SKUMethodology")),
+  "partner-management": lazy(() => import("./PartnerManagement")),
+  "brand-assets": lazy(() => import("./BrandAssets")),
+  "task-management": lazy(() => import("./TaskManagement")),
+  "artwork-catalog": lazy(() => import("./ArtworkCatalog")),
+  "admin-brand-guide": lazy(() => import("./AdminBrandGuide")),
+  "brand-story": lazy(() => import("./BrandStory")),
+  "prodigi-api": lazy(() => import("./ProdigiAPI")),
+  "product-importing": lazy(() => import("./ProductImporting")),
+  "readymades-framing": lazy(() => import("./ReadymadesFraming")),
+};
+
+function ArticleLoadingSkeleton() {
+  return (
+    <div className="min-h-screen bg-background">
+      <main className="container mx-auto px-4 py-8 max-w-5xl">
+        <Skeleton className="h-10 w-32 mb-6" />
+        <Skeleton className="h-10 w-64 mb-4" />
+        <Skeleton className="h-6 w-96 mb-8" />
+        <Skeleton className="h-64 w-full mb-4" />
+        <Skeleton className="h-48 w-full" />
+      </main>
+    </div>
+  );
+}
+
 export default function KnowledgeArticlePage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
-  // Data fetching
+  // Check if this article has a custom React component
+  const StaticComponent = slug ? staticArticleComponents[slug] : null;
+
+  // Data fetching (only needed for markdown articles)
   const { data: article, isLoading: articleLoading } = useKnowledgeArticle(slug);
   const { data: versions = [], isLoading: versionsLoading } = useArticleVersions(article?.id);
 
@@ -64,6 +95,16 @@ export default function KnowledgeArticlePage() {
     toast.info("Editor coming in Phase 5");
   };
 
+  // If there's a static component for this slug, render it with beautiful formatting
+  if (StaticComponent) {
+    return (
+      <Suspense fallback={<ArticleLoadingSkeleton />}>
+        <StaticComponent />
+      </Suspense>
+    );
+  }
+
+  // Fall back to database-driven markdown content
   if (articleLoading) {
     return (
       <div className="p-6 space-y-6">
