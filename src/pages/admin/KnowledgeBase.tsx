@@ -88,7 +88,7 @@ const KnowledgeBase = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
+      <main className="container mx-auto px-4 py-8 max-w-[1600px]">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
@@ -217,7 +217,7 @@ const KnowledgeBase = () => {
                   </div>
                 </TableHead>
                 <TableHead 
-                  className="hidden md:table-cell cursor-pointer select-none"
+                  className="hidden md:table-cell cursor-pointer select-none min-w-[200px] whitespace-nowrap"
                   onClick={() => handleSort("category")}
                 >
                   <div className="flex items-center">
@@ -256,8 +256,8 @@ const KnowledgeBase = () => {
                     <TableCell className="py-3">
                       <span className="font-semibold">{article.title}</span>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell py-3">
-                      <Badge variant="outline">{article.category}</Badge>
+                    <TableCell className="hidden md:table-cell py-3 whitespace-nowrap">
+                      <Badge variant="outline" className="whitespace-nowrap">{article.category}</Badge>
                     </TableCell>
                     <TableCell className="hidden lg:table-cell py-3">
                       <p className="text-sm text-muted-foreground line-clamp-1">
