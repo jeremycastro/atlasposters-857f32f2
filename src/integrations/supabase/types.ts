@@ -1155,10 +1155,16 @@ export type Database = {
           expiration_date: string | null
           flat_fee_amount: number | null
           id: string
+          initiation_fee: number | null
+          initiation_fee_due_days: number | null
+          initiation_fee_paid_at: string | null
           marketing_attribution_cap_percent: number | null
+          minimum_guarantee: number | null
+          minimum_guarantee_start_month: number | null
           partner_id: string
           payment_model: Database["public"]["Enums"]["payment_model"] | null
           payment_period: string | null
+          royalty_groups: Json | null
           royalty_rate: number | null
           status: string | null
           terms: Json | null
@@ -1178,10 +1184,16 @@ export type Database = {
           expiration_date?: string | null
           flat_fee_amount?: number | null
           id?: string
+          initiation_fee?: number | null
+          initiation_fee_due_days?: number | null
+          initiation_fee_paid_at?: string | null
           marketing_attribution_cap_percent?: number | null
+          minimum_guarantee?: number | null
+          minimum_guarantee_start_month?: number | null
           partner_id: string
           payment_model?: Database["public"]["Enums"]["payment_model"] | null
           payment_period?: string | null
+          royalty_groups?: Json | null
           royalty_rate?: number | null
           status?: string | null
           terms?: Json | null
@@ -1201,10 +1213,16 @@ export type Database = {
           expiration_date?: string | null
           flat_fee_amount?: number | null
           id?: string
+          initiation_fee?: number | null
+          initiation_fee_due_days?: number | null
+          initiation_fee_paid_at?: string | null
           marketing_attribution_cap_percent?: number | null
+          minimum_guarantee?: number | null
+          minimum_guarantee_start_month?: number | null
           partner_id?: string
           payment_model?: Database["public"]["Enums"]["payment_model"] | null
           payment_period?: string | null
+          royalty_groups?: Json | null
           royalty_rate?: number | null
           status?: string | null
           terms?: Json | null
@@ -2894,6 +2912,7 @@ export type Database = {
         | "royalty_revenue"
         | "flat_fee"
         | "advance"
+        | "tiered_royalty"
       roadmap_milestone_status:
         | "not_started"
         | "in_progress"
@@ -3092,6 +3111,7 @@ export const Constants = {
         "royalty_revenue",
         "flat_fee",
         "advance",
+        "tiered_royalty",
       ],
       roadmap_milestone_status: [
         "not_started",
