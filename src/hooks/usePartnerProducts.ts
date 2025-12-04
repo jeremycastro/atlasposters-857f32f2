@@ -94,13 +94,28 @@ export const useTranslateShopifyProducts = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (partnerId: string) => {
-      // Fetch the store for this partner
+    mutationFn: async (profileId: string) => {
+      // profileId is actually the user profile ID from shopify_stores.partner_id
+      // We need to find the actual partner_id from partner_contacts
+      const { data: partnerContact, error: contactError } = await supabase
+        .from("partner_contacts")
+        .select("partner_id")
+        .eq("user_id", profileId)
+        .maybeSingle();
+
+      if (contactError) throw contactError;
+      if (!partnerContact) {
+        throw new Error("No partner found for this user. Please link your account to a partner first.");
+      }
+
+      const actualPartnerId = partnerContact.partner_id;
+
+      // Fetch the store for this profile
       const { data: store, error: storeError } = await supabase
         .from("shopify_stores")
         .select("id")
-        .eq("partner_id", partnerId)
-        .single();
+        .eq("partner_id", profileId)
+        .maybeSingle();
 
       if (storeError || !store) {
         throw new Error("No store found for this partner");
@@ -150,7 +165,7 @@ export const useTranslateShopifyProducts = () => {
         const primaryArtworkCode = artworkCodes[0] || null;
 
         return {
-          partner_id: partnerId,
+          partner_id: actualPartnerId,
           source_table: "shopify_products",
           source_record_id: sp.id,
           artwork_code: primaryArtworkCode,
