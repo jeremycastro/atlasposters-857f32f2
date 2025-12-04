@@ -52,6 +52,7 @@ import Pitch01 from "./pages/Pitch01";
 import SyncioImport from "./pages/admin/SyncioImport";
 import ImportQueue from "./pages/admin/ImportQueue";
 import ArchiveManager from "./pages/admin/ArchiveManager";
+import ProductManagement from "./pages/admin/ProductManagement";
 
 const queryClient = new QueryClient();
 
@@ -118,6 +119,7 @@ const App = () => (
               <Route path="tag-management" element={<TagManagement />} />
               <Route path="syncio-import" element={<SyncioImport />} />
               <Route path="import-queue" element={<ImportQueue />} />
+              <Route path="products" element={<ProductManagement />} />
               <Route path="knowledge/archive-manager" element={<ArchiveManager />} />
             </Route>
             
