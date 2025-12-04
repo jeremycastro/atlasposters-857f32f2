@@ -14,6 +14,8 @@ import {
   VersionHistoryPanel,
   VersionPreviewDialog,
   RestoreVersionDialog,
+  StaticArticleVersionDropdown,
+  ArchivedVersionBanner,
 } from "@/components/knowledge";
 import {
   useKnowledgeArticle,
@@ -21,6 +23,12 @@ import {
   KnowledgeArticleVersion,
 } from "@/hooks/useKnowledgeBase";
 import { useRestoreVersion } from "@/hooks/useKnowledgeMutations";
+import { 
+  parseVersionedSlug, 
+  useStaticArticleVersion,
+  useCurrentStaticVersion 
+} from "@/hooks/useStaticArticleVersions";
+import { getArchivedComponent } from "./archive";
 import { ArrowLeft, History, PanelRightOpen } from "lucide-react";
 import { toast } from "sonner";
 
@@ -52,15 +60,69 @@ function ArticleLoadingSkeleton() {
   );
 }
 
+// Wrapper component for static articles that adds version dropdown
+function StaticArticleWrapper({
+  children,
+  slug,
+  currentVersion,
+}: {
+  children: React.ReactNode;
+  slug: string;
+  currentVersion: number | null;
+}) {
+  const { data: versionData } = useStaticArticleVersion(
+    slug,
+    currentVersion || undefined
+  );
+
+  return (
+    <div className="relative">
+      {/* Version dropdown positioned at top */}
+      <div className="absolute top-4 right-4 z-10">
+        <StaticArticleVersionDropdown slug={slug} currentVersion={currentVersion} />
+      </div>
+      
+      {/* Archived version banner if viewing old version */}
+      {currentVersion !== null && versionData && !versionData.is_current && (
+        <div className="container mx-auto px-4 pt-4 max-w-5xl">
+          <ArchivedVersionBanner
+            slug={slug}
+            versionNumber={versionData.version_number}
+            archivedAt={versionData.archived_at}
+            changeSummary={versionData.change_summary}
+          />
+        </div>
+      )}
+      
+      {children}
+    </div>
+  );
+}
+
 export default function KnowledgeArticlePage() {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug: rawSlug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  
+  // Parse versioned slug (e.g., "product-importing-v1" -> { baseSlug: "product-importing", version: 1 })
+  const { baseSlug, version: requestedVersion } = rawSlug 
+    ? parseVersionedSlug(rawSlug) 
+    : { baseSlug: "", version: null };
 
   // Check if this article has a custom React component
-  const StaticComponent = slug ? staticArticleComponents[slug] : null;
+  const StaticComponent = baseSlug ? staticArticleComponents[baseSlug] : null;
+  
+  // For archived versions, check if we have the component
+  const ArchivedComponent = requestedVersion !== null && baseSlug
+    ? getArchivedComponent(baseSlug, requestedVersion)
+    : null;
+
+  // Get current version number for comparison
+  const { data: currentVersionNumber } = useCurrentStaticVersion(baseSlug);
 
   // Data fetching (only needed for markdown articles)
-  const { data: article, isLoading: articleLoading } = useKnowledgeArticle(slug);
+  const { data: article, isLoading: articleLoading } = useKnowledgeArticle(
+    StaticComponent ? undefined : baseSlug
+  );
   const { data: versions = [], isLoading: versionsLoading } = useArticleVersions(article?.id);
 
   // State for dialogs
@@ -95,12 +157,56 @@ export default function KnowledgeArticlePage() {
     toast.info("Editor coming in Phase 5");
   };
 
+  // If requesting a specific archived version that exists
+  if (ArchivedComponent && requestedVersion !== null) {
+    return (
+      <StaticArticleWrapper slug={baseSlug} currentVersion={requestedVersion}>
+        <Suspense fallback={<ArticleLoadingSkeleton />}>
+          <ArchivedComponent />
+        </Suspense>
+      </StaticArticleWrapper>
+    );
+  }
+
+  // If requesting an archived version that doesn't exist yet (no archive file created)
+  if (requestedVersion !== null && StaticComponent && !ArchivedComponent) {
+    // Check if this version is actually the current version
+    if (requestedVersion === currentVersionNumber) {
+      // Redirect to the canonical URL without version suffix
+      return (
+        <StaticArticleWrapper slug={baseSlug} currentVersion={null}>
+          <Suspense fallback={<ArticleLoadingSkeleton />}>
+            <StaticComponent />
+          </Suspense>
+        </StaticArticleWrapper>
+      );
+    }
+    
+    // Version requested but not available
+    return (
+      <div className="p-6">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <h2 className="text-2xl font-bold mb-2">Archived Version Not Found</h2>
+          <p className="text-muted-foreground mb-4">
+            Version {requestedVersion} of "{baseSlug}" hasn't been archived yet, or doesn't exist.
+          </p>
+          <Button onClick={() => navigate(`/admin/knowledge/article/${baseSlug}`)}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            View Current Version
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   // If there's a static component for this slug, render it with beautiful formatting
   if (StaticComponent) {
     return (
-      <Suspense fallback={<ArticleLoadingSkeleton />}>
-        <StaticComponent />
-      </Suspense>
+      <StaticArticleWrapper slug={baseSlug} currentVersion={null}>
+        <Suspense fallback={<ArticleLoadingSkeleton />}>
+          <StaticComponent />
+        </Suspense>
+      </StaticArticleWrapper>
     );
   }
 
@@ -140,7 +246,7 @@ export default function KnowledgeArticlePage() {
     );
   }
 
-  const currentVersionNumber = article.current_version?.version_number || 0;
+  const currentMdVersionNumber = article.current_version?.version_number || 0;
 
   return (
     <div className="flex h-full">
@@ -234,7 +340,7 @@ export default function KnowledgeArticlePage() {
         onOpenChange={(open) => !open && setRestoreVersion(null)}
         version={restoreVersion}
         articleTitle={article.title}
-        currentVersionNumber={currentVersionNumber}
+        currentVersionNumber={currentMdVersionNumber}
         onConfirm={handleConfirmRestore}
         isRestoring={restoreMutation.isPending}
       />
