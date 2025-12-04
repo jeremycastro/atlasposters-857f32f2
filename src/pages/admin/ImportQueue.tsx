@@ -242,10 +242,10 @@ const ImportQueue = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="min-h-screen bg-background flex flex-col">
+      <main className="flex-1 flex flex-col px-6 py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
             <Package className="w-8 h-8 text-primary" />
             <h1 className="text-4xl font-bold text-foreground">Import Queue</h1>
@@ -282,8 +282,9 @@ const ImportQueue = () => {
           </div>
         )}
 
-        {/* Filters */}
+        {/* Filters - Fixed two-row layout */}
         <Card className="p-4 mb-6">
+          {/* Row 1: Search and Status Filter */}
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center gap-2 flex-1 min-w-[200px]">
               <Search className="w-4 h-4 text-muted-foreground" />
@@ -312,33 +313,33 @@ const ImportQueue = () => {
             </div>
           </div>
 
-          {/* Bulk Actions */}
-          {selectedIds.size > 0 && (
-            <div className="flex items-center gap-4 mt-4 pt-4 border-t">
-              <span className="text-sm font-medium">
-                {selectedIds.size} selected
-              </span>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setSelectedIds(new Set())}
-              >
-                Clear Selection
-              </Button>
-              <Button
-                size="sm"
-                variant="default"
-                onClick={() => setBulkAssignDialogOpen(true)}
-              >
-                <Users className="w-4 h-4 mr-1" />
-                Assign Partner to Selected
-              </Button>
-            </div>
-          )}
+          {/* Row 2: Bulk Actions - Always visible */}
+          <div className="flex items-center gap-4 mt-4 pt-4 border-t">
+            <span className="text-sm font-medium text-muted-foreground min-w-[100px]">
+              {selectedIds.size} selected
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setSelectedIds(new Set())}
+              disabled={selectedIds.size === 0}
+            >
+              Clear Selection
+            </Button>
+            <Button
+              size="sm"
+              variant="default"
+              onClick={() => setBulkAssignDialogOpen(true)}
+              disabled={selectedIds.size === 0}
+            >
+              <Users className="w-4 h-4 mr-1" />
+              Assign Partner
+            </Button>
+          </div>
         </Card>
 
-        {/* Products Table */}
-        <Card className="p-6">
+        {/* Products Table - Flex grow to fill remaining space */}
+        <Card className="p-6 flex-1 flex flex-col min-h-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -350,7 +351,7 @@ const ImportQueue = () => {
               <p className="text-sm">Import products from the Syncio Import page first</p>
             </div>
           ) : (
-            <div className="rounded-md border overflow-auto max-h-[600px]">
+            <div className="rounded-md border overflow-auto flex-1">
               <Table>
                 <TableHeader className="sticky top-0 bg-background">
                   <TableRow>
