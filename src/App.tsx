@@ -53,6 +53,8 @@ import SyncioImport from "./pages/admin/SyncioImport";
 import ImportQueue from "./pages/admin/ImportQueue";
 import ArchiveManager from "./pages/admin/ArchiveManager";
 import ProductManagement from "./pages/admin/ProductManagement";
+import ProductTypeDetail from "./pages/admin/ProductTypeDetail";
+import VariantGroupDetail from "./pages/admin/VariantGroupDetail";
 
 const queryClient = new QueryClient();
 
@@ -120,6 +122,8 @@ const App = () => (
               <Route path="syncio-import" element={<SyncioImport />} />
               <Route path="import-queue" element={<ImportQueue />} />
               <Route path="products" element={<ProductManagement />} />
+              <Route path="products/types/:typeId" element={<ProductTypeDetail />} />
+              <Route path="products/groups/:groupId" element={<VariantGroupDetail />} />
               <Route path="knowledge/archive-manager" element={<ArchiveManager />} />
             </Route>
             

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,19 +9,23 @@ import { Package, Layers, Tags, Plus, Upload, Library } from "lucide-react";
 import { useProducts, useProductStats, useProductTypes } from "@/hooks/useProducts";
 import { ProductTableView } from "@/components/products/ProductTableView";
 import { VariantLibraryTab } from "@/components/products/VariantLibraryTab";
-import { ProductTypeSheet } from "@/components/products/ProductTypeSheet";
-import { useNavigate } from "react-router-dom";
+import { CreateProductTypeDialog } from "@/components/products/CreateProductTypeDialog";
 
 export default function ProductManagement() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: stats, isLoading: statsLoading } = useProductStats();
   const { data: productTypes = [], isLoading: typesLoading } = useProductTypes();
 
-  const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null);
   const [isCreateTypeOpen, setIsCreateTypeOpen] = useState(false);
 
-  const selectedType = productTypes.find(t => t.id === selectedTypeId);
+  // Get active tab from URL or default to "products"
+  const activeTab = searchParams.get('tab') || 'products';
+
+  const handleTabChange = (value: string) => {
+    setSearchParams({ tab: value });
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -118,7 +123,7 @@ export default function ProductManagement() {
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="products" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
         <TabsList>
           <TabsTrigger value="products">Products</TabsTrigger>
           <TabsTrigger value="types">Product Types</TabsTrigger>
@@ -166,7 +171,7 @@ export default function ProductManagement() {
                       <TableRow 
                         key={type.id} 
                         className="cursor-pointer hover:bg-muted/50"
-                        onClick={() => setSelectedTypeId(type.id)}
+                        onClick={() => navigate(`/admin/products/types/${type.id}`)}
                       >
                         <TableCell className="font-medium">{type.type_name}</TableCell>
                         <TableCell>
@@ -197,16 +202,8 @@ export default function ProductManagement() {
         </TabsContent>
       </Tabs>
 
-      {/* Edit Product Type Sheet */}
-      <ProductTypeSheet
-        productType={selectedType as any}
-        open={!!selectedTypeId}
-        onOpenChange={(open) => !open && setSelectedTypeId(null)}
-      />
-
-      {/* Create Product Type Sheet */}
-      <ProductTypeSheet
-        productType={undefined}
+      {/* Create Product Type Dialog */}
+      <CreateProductTypeDialog
         open={isCreateTypeOpen}
         onOpenChange={setIsCreateTypeOpen}
       />
