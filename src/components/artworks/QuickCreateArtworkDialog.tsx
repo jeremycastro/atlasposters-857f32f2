@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useArtworkMutations } from "@/hooks/useArtworkMutations";
 import { useBrands } from "@/hooks/usePartnerManagement";
-import { Loader2, Plus, Sparkles } from "lucide-react";
+import { Loader2, Plus, Sparkles, Tag } from "lucide-react";
 
 interface QuickCreateArtworkDialogProps {
   open: boolean;
@@ -28,6 +28,7 @@ interface QuickCreateArtworkDialogProps {
     title: string;
     brandId?: string;
     partnerId: string;
+    artworkCode?: string;
   };
 }
 
@@ -64,6 +65,14 @@ export const QuickCreateArtworkDialog = ({
   const handleCreate = () => {
     if (!title.trim()) return;
 
+    // Build metadata with partner artwork code if available
+    const metadata = prefillData.artworkCode 
+      ? {
+          partner_artwork_codes: [prefillData.artworkCode],
+          import_source: "partner_import_queue",
+        }
+      : undefined;
+
     createArtwork.mutate(
       {
         artwork: {
@@ -73,6 +82,7 @@ export const QuickCreateArtworkDialog = ({
           description: description.trim() || null,
           partner_id: prefillData.partnerId,
           status: "draft",
+          metadata: metadata || null,
         },
         partnerId: prefillData.partnerId,
       },
@@ -103,6 +113,14 @@ export const QuickCreateArtworkDialog = ({
               be automatically generated.
             </p>
           </div>
+
+          {prefillData.artworkCode && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-accent/50 rounded-lg border border-border">
+              <Tag className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Partner Code:</span>
+              <span className="text-sm font-medium">{prefillData.artworkCode}</span>
+            </div>
+          )}
 
           <div>
             <label className="text-sm font-medium mb-2 block">Title *</label>

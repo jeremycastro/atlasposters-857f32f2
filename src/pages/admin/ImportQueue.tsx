@@ -938,6 +938,7 @@ const ImportQueue = () => {
               title: selectedProduct.original_title,
               brandId: selectedProduct.brand_id || undefined,
               partnerId: selectedProduct.partner_id,
+              artworkCode: selectedProduct.artwork_code || undefined,
             }}
           />
         )}
