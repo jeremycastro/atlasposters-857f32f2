@@ -275,9 +275,8 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                 <div className="grid grid-cols-[130px_1fr] gap-2 items-center">
                   <Label htmlFor="status" className="text-sm text-right">Status *</Label>
                   <Select
-                    value={formData.status}
+                    value={formData.status || undefined}
                     onValueChange={(value) => setFormData({ ...formData, status: value })}
-                    required
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select an option" />
@@ -294,9 +293,8 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                 <div className="grid grid-cols-[130px_1fr] gap-2 items-center">
                   <Label htmlFor="agreement_type" className="text-sm text-right">Agreement Type *</Label>
                   <Select
-                    value={formData.agreement_type}
+                    value={formData.agreement_type || undefined}
                     onValueChange={(value) => setFormData({ ...formData, agreement_type: value })}
-                    required
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select an option" />
@@ -340,7 +338,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
                 <Label htmlFor="payment_model" className="text-sm text-right">Payment Model</Label>
                 <Select
-                  value={formData.payment_model}
+                  value={formData.payment_model || undefined}
                   onValueChange={(value) => setFormData({ ...formData, payment_model: value })}
                 >
                   <SelectTrigger>
@@ -430,7 +428,7 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
               <div className="grid grid-cols-[110px_1fr] gap-3 items-center">
                 <Label htmlFor="payment_period" className="text-sm text-right">Payment Period</Label>
                 <Select
-                  value={formData.payment_period}
+                  value={formData.payment_period || undefined}
                   onValueChange={(value) => setFormData({ ...formData, payment_period: value })}
                 >
                   <SelectTrigger>
