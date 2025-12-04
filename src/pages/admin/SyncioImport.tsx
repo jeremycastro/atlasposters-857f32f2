@@ -91,7 +91,7 @@ const SyncioImport = () => {
     return parsedProducts.filter(p => p.productType === typeFilter);
   }, [parsedProducts, typeFilter]);
 
-  // Fetch Atlas store ID, partner ID, and product counts on mount
+  // Fetch Atlas store ID and product counts on mount
   useEffect(() => {
     const fetchStoreData = async () => {
       const { data } = await supabase
@@ -103,13 +103,24 @@ const SyncioImport = () => {
         setStoreId(data.id);
         setPartnerId(data.partner_id);
 
-        // Fetch counts
-        const [shopifyRes, partnerRes] = await Promise.all([
-          supabase.from("shopify_products").select("id", { count: "exact", head: true }).eq("shopify_store_id", data.id),
-          supabase.from("partner_products").select("id", { count: "exact", head: true }).eq("partner_id", data.partner_id),
-        ]);
-        setDbProductCount(shopifyRes.count || 0);
-        setPartnerProductCount(partnerRes.count || 0);
+        // Fetch counts - partner_products count by source_record_id linkage, not partner_id
+        const { data: shopifyProducts } = await supabase
+          .from("shopify_products")
+          .select("id")
+          .eq("shopify_store_id", data.id);
+        
+        const shopifyProductIds = shopifyProducts?.map(p => p.id) || [];
+        setDbProductCount(shopifyProductIds.length);
+
+        if (shopifyProductIds.length > 0) {
+          const { count } = await supabase
+            .from("partner_products")
+            .select("id", { count: "exact", head: true })
+            .in("source_record_id", shopifyProductIds);
+          setPartnerProductCount(count || 0);
+        } else {
+          setPartnerProductCount(0);
+        }
       }
     };
     fetchStoreData();
@@ -356,7 +367,7 @@ const SyncioImport = () => {
   };
 
   const clearImportedData = async () => {
-    if (!storeId || !partnerId) return;
+    if (!storeId) return;
 
     const confirmed = window.confirm(
       "This will delete all imported products from both shopify_products AND partner_products staging tables. Continue?"
@@ -365,14 +376,29 @@ const SyncioImport = () => {
 
     setIsLoading(true);
     try {
-      // Delete from both tables
-      const [shopifyResult, partnerResult] = await Promise.all([
-        supabase.from("shopify_products").delete().eq("shopify_store_id", storeId),
-        supabase.from("partner_products").delete().eq("partner_id", partnerId),
-      ]);
+      // First get all shopify product IDs for this store
+      const { data: shopifyProducts } = await supabase
+        .from("shopify_products")
+        .select("id")
+        .eq("shopify_store_id", storeId);
 
-      if (shopifyResult.error) throw shopifyResult.error;
-      if (partnerResult.error) throw partnerResult.error;
+      const shopifyProductIds = shopifyProducts?.map(p => p.id) || [];
+
+      // Delete partner_products that reference these shopify products
+      if (shopifyProductIds.length > 0) {
+        const { error: partnerError } = await supabase
+          .from("partner_products")
+          .delete()
+          .in("source_record_id", shopifyProductIds);
+        if (partnerError) throw partnerError;
+      }
+
+      // Delete shopify products
+      const { error: shopifyError } = await supabase
+        .from("shopify_products")
+        .delete()
+        .eq("shopify_store_id", storeId);
+      if (shopifyError) throw shopifyError;
 
       toast.success("Cleared all product data from both tables");
       setParsedProducts([]);
@@ -507,8 +533,8 @@ const SyncioImport = () => {
                 </Button>
                 {dbProductCount > partnerProductCount && (
                   <Button
-                    onClick={() => partnerId && translateMutation.mutate(partnerId)}
-                    disabled={!partnerId || translateMutation.isPending}
+                    onClick={() => storeId && translateMutation.mutate(storeId)}
+                    disabled={!storeId || translateMutation.isPending}
                   >
                     {translateMutation.isPending ? (
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />

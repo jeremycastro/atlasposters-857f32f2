@@ -1391,7 +1391,7 @@ export type Database = {
           original_handle: string | null
           original_sku: string | null
           original_title: string
-          partner_id: string
+          partner_id: string | null
           product_type: string | null
           rejection_reason: string | null
           source_record_id: string
@@ -1415,7 +1415,7 @@ export type Database = {
           original_handle?: string | null
           original_sku?: string | null
           original_title: string
-          partner_id: string
+          partner_id?: string | null
           product_type?: string | null
           rejection_reason?: string | null
           source_record_id: string
@@ -1439,7 +1439,7 @@ export type Database = {
           original_handle?: string | null
           original_sku?: string | null
           original_title?: string
-          partner_id?: string
+          partner_id?: string | null
           product_type?: string | null
           rejection_reason?: string | null
           source_record_id?: string
