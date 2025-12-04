@@ -31,6 +31,7 @@ interface Agreement {
   advance_recoupment_rate?: number;
   marketing_attribution_cap_percent?: number;
   calculation_basis?: string;
+  agreement_document_path?: string | null;
   // Tiered royalty fields
   initiation_fee?: number;
   initiation_fee_due_days?: number;
@@ -642,7 +643,20 @@ export function AgreementsTab({ partnerId, agreements }: AgreementsTabProps) {
                   <FileText className="h-4 w-4" />
                   Agreement Documents
                 </h4>
-                <AgreementDocumentUpload agreementId={editingAgreement.id} />
+                <AgreementDocumentUpload 
+                  agreementId={editingAgreement.id}
+                  activeDocumentPath={editingAgreement.agreement_document_path}
+                  onSetActive={(filePath) => {
+                    updateAgreement.mutate(
+                      { id: editingAgreement.id, updates: { agreement_document_path: filePath } },
+                      {
+                        onSuccess: () => {
+                          setEditingAgreement(prev => prev ? { ...prev, agreement_document_path: filePath } : null);
+                        },
+                      }
+                    );
+                  }}
+                />
               </div>
             )}
             {!editingAgreement && (
