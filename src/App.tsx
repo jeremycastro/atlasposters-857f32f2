@@ -48,6 +48,7 @@ import BrandTimeline from "./pages/admin/BrandTimeline";
 import TagManagement from "./pages/admin/TagManagement";
 import Pitch01 from "./pages/Pitch01";
 import SyncioImport from "./pages/admin/SyncioImport";
+import ImportQueue from "./pages/admin/ImportQueue";
 
 const queryClient = new QueryClient();
 
@@ -110,6 +111,7 @@ const App = () => (
               <Route path="payouts" element={<Payouts />} />
               <Route path="tag-management" element={<TagManagement />} />
               <Route path="syncio-import" element={<SyncioImport />} />
+              <Route path="import-queue" element={<ImportQueue />} />
             </Route>
             
             {/* Partner routes */}

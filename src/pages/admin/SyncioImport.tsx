@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { Json } from "@/integrations/supabase/types";
@@ -22,7 +23,8 @@ import { Progress } from "@/components/ui/progress";
 import { useDropzone } from "react-dropzone";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, FileSpreadsheet, Package, Check, AlertTriangle, Trash2, RefreshCw, Filter } from "lucide-react";
+import { Upload, FileSpreadsheet, Package, Check, AlertTriangle, Trash2, RefreshCw, Filter, ArrowRight, Loader2 } from "lucide-react";
+import { useTranslateShopifyProducts } from "@/hooks/usePartnerProducts";
 
 interface ParsedProduct {
   handle: string;
@@ -53,6 +55,7 @@ interface ParsedVariant {
 }
 
 const SyncioImport = () => {
+  const navigate = useNavigate();
   const [parsedProducts, setParsedProducts] = useState<ParsedProduct[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
@@ -65,8 +68,12 @@ const SyncioImport = () => {
   // Filter state
   const [typeFilter, setTypeFilter] = useState<string>("all");
 
-  // Atlas Store ID - will be fetched dynamically
+  // Atlas Store ID and Partner ID - will be fetched dynamically
   const [storeId, setStoreId] = useState<string | null>(null);
+  const [partnerId, setPartnerId] = useState<string | null>(null);
+
+  // Translate mutation
+  const translateMutation = useTranslateShopifyProducts();
 
   // Get unique product types for filter
   const productTypes = useMemo(() => {
@@ -80,15 +87,18 @@ const SyncioImport = () => {
     return parsedProducts.filter(p => p.productType === typeFilter);
   }, [parsedProducts, typeFilter]);
 
-  // Fetch Atlas store ID on mount
+  // Fetch Atlas store ID and partner ID on mount
   useEffect(() => {
     const fetchStoreId = async () => {
       const { data } = await supabase
         .from("shopify_stores")
-        .select("id")
+        .select("id, partner_id")
         .eq("store_domain", "atlas-posters.myshopify.com")
         .single();
-      if (data) setStoreId(data.id);
+      if (data) {
+        setStoreId(data.id);
+        setPartnerId(data.partner_id);
+      }
     };
     fetchStoreId();
   }, []);
@@ -441,6 +451,40 @@ const SyncioImport = () => {
               <p className="text-sm text-muted-foreground">Errors</p>
             </Card>
           </div>
+        )}
+
+        {/* Next Steps - Translate to Partner Products */}
+        {importStats && importStats.imported > 0 && (
+          <Card className="p-6 mb-6 border-primary/20 bg-primary/5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold mb-1">Next Step: Translate to Partner Products</h3>
+                <p className="text-sm text-muted-foreground">
+                  Move imported Shopify products to the staging layer for artwork mapping
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/admin/import-queue")}
+                >
+                  View Import Queue
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+                <Button
+                  onClick={() => partnerId && translateMutation.mutate(partnerId)}
+                  disabled={!partnerId || translateMutation.isPending}
+                >
+                  {translateMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <ArrowRight className="w-4 h-4 mr-2" />
+                  )}
+                  Translate to Partner Products
+                </Button>
+              </div>
+            </div>
+          </Card>
         )}
 
         {/* Parsed Products Preview */}
