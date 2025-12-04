@@ -47,6 +47,7 @@ import {
   Clock,
   Eye,
   Link2,
+  Link2Off,
   AlertTriangle,
   Loader2,
   Users,
@@ -54,7 +55,20 @@ import {
   CheckSquare,
   Square,
   Plus,
+  Trash2,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -75,12 +89,17 @@ const ImportQueue = () => {
   const [assignPartnerDialogOpen, setAssignPartnerDialogOpen] = useState(false);
   const [bulkAssignDialogOpen, setBulkAssignDialogOpen] = useState(false);
   const [quickCreateDialogOpen, setQuickCreateDialogOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
   const [selectedArtworkId, setSelectedArtworkId] = useState<string>("");
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>("");
   const [selectedBrandId, setSelectedBrandId] = useState<string>("");
   const [mappingNotes, setMappingNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  const queryClient = useQueryClient();
 
   const { data: products, isLoading } = usePartnerProducts({
     import_status: statusFilter,
@@ -244,6 +263,58 @@ const ImportQueue = () => {
     setSelectedBrandId("");
   };
 
+  const handleDeleteProduct = async () => {
+    if (!selectedProduct) return;
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("partner_products")
+        .delete()
+        .eq("id", selectedProduct.id);
+      
+      if (error) throw error;
+      
+      toast.success("Product removed from import queue");
+      queryClient.invalidateQueries({ queryKey: ["partner-products"] });
+      queryClient.invalidateQueries({ queryKey: ["partner-product-stats"] });
+    } catch (error) {
+      console.error("Failed to delete product:", error);
+      toast.error("Failed to delete product");
+    } finally {
+      setIsDeleting(false);
+      setDeleteConfirmOpen(false);
+      setSelectedProduct(null);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    setIsDeleting(true);
+    
+    let successCount = 0;
+    const idsArray = Array.from(selectedIds);
+    
+    for (const id of idsArray) {
+      try {
+        const { error } = await supabase
+          .from("partner_products")
+          .delete()
+          .eq("id", id);
+        
+        if (!error) successCount++;
+      } catch (error) {
+        console.error(`Failed to delete product ${id}:`, error);
+      }
+    }
+    
+    toast.success(`Deleted ${successCount} of ${idsArray.length} products`);
+    queryClient.invalidateQueries({ queryKey: ["partner-products"] });
+    queryClient.invalidateQueries({ queryKey: ["partner-product-stats"] });
+    setBulkDeleteConfirmOpen(false);
+    setSelectedIds(new Set());
+    setIsDeleting(false);
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <main className="flex-1 flex flex-col px-6 py-8">
@@ -337,6 +408,16 @@ const ImportQueue = () => {
             >
               <Users className="w-4 h-4 mr-1" />
               Assign Partner
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setBulkDeleteConfirmOpen(true)}
+              disabled={selectedIds.size === 0}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              Delete Selected
             </Button>
           </div>
         </Card>
@@ -464,26 +545,35 @@ const ImportQueue = () => {
                                 )}
                                 <Button
                                   size="sm"
-                                  variant="default"
+                                  variant="outline"
+                                  className={product.artwork_id 
+                                    ? "border-green-500 text-green-600 hover:bg-green-50" 
+                                    : "border-yellow-500 text-yellow-600 hover:bg-yellow-50"}
                                   onClick={() => {
                                     setSelectedProduct(product);
                                     setMapDialogOpen(true);
                                   }}
                                   disabled={!product.partner_id}
-                                  title={!product.partner_id ? "Assign partner first" : ""}
+                                  title={!product.partner_id ? "Assign partner first" : product.artwork_id ? "Mapped - click to change" : "Map to artwork"}
                                 >
-                                  <Link2 className="w-4 h-4 mr-1" />
-                                  Map
+                                  {product.artwork_id ? (
+                                    <Link2 className="w-4 h-4 mr-1" />
+                                  ) : (
+                                    <Link2Off className="w-4 h-4 mr-1" />
+                                  )}
+                                  {product.artwork_id ? "Mapped" : "Map"}
                                 </Button>
                                 <Button
                                   size="sm"
-                                  variant="destructive"
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0"
                                   onClick={() => {
                                     setSelectedProduct(product);
-                                    setRejectDialogOpen(true);
+                                    setDeleteConfirmOpen(true);
                                   }}
+                                  title="Remove from queue"
                                 >
-                                  <XCircle className="w-4 h-4" />
+                                  <XCircle className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                                 </Button>
                               </>
                             )}
@@ -836,6 +926,52 @@ const ImportQueue = () => {
             }}
           />
         )}
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove from Import Queue?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently remove "{selectedProduct?.original_title}" from the import queue. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteProduct}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Remove
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Bulk Delete Confirmation Dialog */}
+        <AlertDialog open={bulkDeleteConfirmOpen} onOpenChange={setBulkDeleteConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete {selectedIds.size} products?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently remove {selectedIds.size} products from the import queue. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleBulkDelete}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Delete {selectedIds.size} Products
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </div>
   );
