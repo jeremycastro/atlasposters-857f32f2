@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
-import { Upload, X, Loader2, Download, ExternalLink, FileText } from "lucide-react";
+import { Upload, X, Loader2, Download, ExternalLink, FileText, Check, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -11,9 +12,11 @@ import { FilePreviewDialog } from "./FilePreviewDialog";
 
 interface AgreementDocumentUploadProps {
   agreementId: string;
+  activeDocumentPath?: string | null;
+  onSetActive?: (filePath: string) => void;
 }
 
-export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUploadProps) => {
+export const AgreementDocumentUpload = ({ agreementId, activeDocumentPath, onSetActive }: AgreementDocumentUploadProps) => {
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
   const [previewFile, setPreviewFile] = useState<any | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -321,15 +324,17 @@ export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUpload
                   <TableHead className="w-[50px]">Type</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead className="w-[100px]">Size</TableHead>
+                  <TableHead className="w-[100px]">Status</TableHead>
                   <TableHead className="w-[150px] text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {uploadedFiles.map((file) => {
                   const displayName = file.name.replace(/^\d+-/, ''); // Remove timestamp prefix
+                  const isActive = activeDocumentPath === file.fullPath;
                   
                   return (
-                    <TableRow key={file.name}>
+                    <TableRow key={file.name} className={cn(isActive && "bg-primary/5")}>
                       <TableCell>
                         <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
                           <FileText className="h-5 w-5 text-muted-foreground" />
@@ -347,6 +352,24 @@ export const AgreementDocumentUpload = ({ agreementId }: AgreementDocumentUpload
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {formatFileSize(file.metadata?.size || 0)}
+                      </TableCell>
+                      <TableCell>
+                        {isActive ? (
+                          <Badge variant="default" className="bg-green-600 hover:bg-green-600 text-white">
+                            <Check className="h-3 w-3 mr-1" />
+                            Active
+                          </Badge>
+                        ) : onSetActive ? (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                            onClick={() => onSetActive(file.fullPath)}
+                          >
+                            <Star className="h-3 w-3 mr-1" />
+                            Set Active
+                          </Button>
+                        ) : null}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center justify-end gap-1">
