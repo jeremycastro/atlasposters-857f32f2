@@ -1667,6 +1667,51 @@ export type Database = {
           },
         ]
       }
+      product_type_variant_groups: {
+        Row: {
+          allow_multiple: boolean | null
+          created_at: string | null
+          id: string
+          is_required: boolean | null
+          product_type_id: string
+          sort_order: number
+          variant_group_id: string
+        }
+        Insert: {
+          allow_multiple?: boolean | null
+          created_at?: string | null
+          id?: string
+          is_required?: boolean | null
+          product_type_id: string
+          sort_order?: number
+          variant_group_id: string
+        }
+        Update: {
+          allow_multiple?: boolean | null
+          created_at?: string | null
+          id?: string
+          is_required?: boolean | null
+          product_type_id?: string
+          sort_order?: number
+          variant_group_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_type_variant_groups_product_type_id_fkey"
+            columns: ["product_type_id"]
+            isOneToOne: false
+            referencedRelation: "product_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_type_variant_groups_variant_group_id_fkey"
+            columns: ["variant_group_id"]
+            isOneToOne: false
+            referencedRelation: "variant_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_types: {
         Row: {
           created_at: string | null
@@ -3076,50 +3121,30 @@ export type Database = {
       }
       variant_groups: {
         Row: {
-          allow_multiple: boolean | null
           created_at: string | null
           description: string | null
           group_name: string
           id: string
           is_active: boolean | null
-          is_required: boolean | null
-          product_type_id: string
-          sort_order: number
           updated_at: string | null
         }
         Insert: {
-          allow_multiple?: boolean | null
           created_at?: string | null
           description?: string | null
           group_name: string
           id?: string
           is_active?: boolean | null
-          is_required?: boolean | null
-          product_type_id: string
-          sort_order?: number
           updated_at?: string | null
         }
         Update: {
-          allow_multiple?: boolean | null
           created_at?: string | null
           description?: string | null
           group_name?: string
           id?: string
           is_active?: boolean | null
-          is_required?: boolean | null
-          product_type_id?: string
-          sort_order?: number
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "variant_groups_product_type_id_fkey"
-            columns: ["product_type_id"]
-            isOneToOne: false
-            referencedRelation: "product_types"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
