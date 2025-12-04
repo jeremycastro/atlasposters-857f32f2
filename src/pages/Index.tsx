@@ -294,6 +294,9 @@ const Index = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-sm text-muted-foreground">© 2025 Atlas Posters. Coming Soon.</p>
             <div className="flex gap-8 text-sm">
+              <Link to="/poster-history" className="text-muted-foreground hover:text-atlas-gold transition-colors font-medium">
+                Poster History
+              </Link>
               <Link to="/about" className="text-muted-foreground hover:text-atlas-ocean transition-colors font-medium">
                 About
               </Link>
