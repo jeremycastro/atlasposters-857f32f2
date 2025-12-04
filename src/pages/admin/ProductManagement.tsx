@@ -1,11 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Package, Layers, Tags, Plus, Upload } from "lucide-react";
 import { useProducts, useProductStats, useProductTypes } from "@/hooks/useProducts";
 import { ProductTableView } from "@/components/products/ProductTableView";
 import { useNavigate } from "react-router-dom";
-
+import { useState } from "react";
 export default function ProductManagement() {
   const navigate = useNavigate();
   const { data: products = [], isLoading: productsLoading } = useProducts();
@@ -121,10 +123,14 @@ export default function ProductManagement() {
 
         <TabsContent value="types" className="space-y-4">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Product Types</CardTitle>
+              <Button size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Type
+              </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               {typesLoading ? (
                 <div className="h-32 flex items-center justify-center text-muted-foreground">
                   Loading...
@@ -134,25 +140,42 @@ export default function ProductManagement() {
                   No product types configured
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {productTypes.map((type) => (
-                    <div 
-                      key={type.id} 
-                      className="flex items-center justify-between p-3 border rounded-lg"
-                    >
-                      <div>
-                        <div className="font-medium">{type.type_name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          Code: {type.type_code}
-                          {type.description && ` • ${type.description}`}
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        Configure
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Type Name</TableHead>
+                      <TableHead>Code</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Sort Order</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {productTypes.map((type) => (
+                      <TableRow 
+                        key={type.id} 
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => console.log('Edit type:', type.id)}
+                      >
+                        <TableCell className="font-medium">{type.type_name}</TableCell>
+                        <TableCell>
+                          <code className="text-xs bg-muted px-1.5 py-0.5 rounded">
+                            {type.type_code}
+                          </code>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground max-w-xs truncate">
+                          {type.description || "—"}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={type.is_active ? "default" : "secondary"}>
+                            {type.is_active ? "Active" : "Inactive"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">{type.sort_order}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               )}
             </CardContent>
           </Card>
