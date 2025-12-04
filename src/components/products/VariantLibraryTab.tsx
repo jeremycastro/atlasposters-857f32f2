@@ -1,18 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, ChevronRight } from "lucide-react";
 import { useVariantGroups } from "@/hooks/useVariantGroups";
-import { VariantGroupSheet } from "./VariantGroupSheet";
+import { CreateVariantGroupDialog } from "./CreateVariantGroupDialog";
 
 export function VariantLibraryTab() {
+  const navigate = useNavigate();
   const { variantGroups, isLoading, getCodesForGroup } = useVariantGroups();
-  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-
-  const selectedGroup = variantGroups.find(g => g.id === selectedGroupId);
 
   if (isLoading) {
     return (
@@ -57,7 +56,7 @@ export function VariantLibraryTab() {
                     <TableRow
                       key={group.id}
                       className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => setSelectedGroupId(group.id)}
+                      onClick={() => navigate(`/admin/products/groups/${group.id}`)}
                     >
                       <TableCell className="font-medium">{group.group_name}</TableCell>
                       <TableCell className="text-muted-foreground max-w-xs truncate">
@@ -83,16 +82,8 @@ export function VariantLibraryTab() {
         </CardContent>
       </Card>
 
-      {/* Edit existing group */}
-      <VariantGroupSheet
-        group={selectedGroup}
-        open={!!selectedGroupId}
-        onOpenChange={(open) => !open && setSelectedGroupId(null)}
-      />
-
       {/* Create new group */}
-      <VariantGroupSheet
-        group={undefined}
+      <CreateVariantGroupDialog
         open={isCreateOpen}
         onOpenChange={setIsCreateOpen}
       />
