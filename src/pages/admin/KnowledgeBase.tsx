@@ -61,8 +61,8 @@ const KnowledgeBase = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [sortField, setSortField] = useState<SortField>("lastUpdated");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [sortField, setSortField] = useState<SortField>("title");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const { data: dbArticles = [], isLoading: articlesLoading } = useKnowledgeArticles();
   const { data: categories = [], isLoading: categoriesLoading } = useKnowledgeCategories();
