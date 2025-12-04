@@ -58,13 +58,13 @@ const SyncioImport = () => {
   // SNB Store ID - will be fetched dynamically
   const [storeId, setStoreId] = useState<string | null>(null);
 
-  // Fetch store ID on mount
+  // Fetch Atlas store ID on mount
   useEffect(() => {
     const fetchStoreId = async () => {
       const { data } = await supabase
         .from("shopify_stores")
         .select("id")
-        .eq("store_domain", "sticknobills.myshopify.com")
+        .eq("store_domain", "atlas-posters.myshopify.com")
         .single();
       if (data) setStoreId(data.id);
     };
@@ -327,8 +327,8 @@ const SyncioImport = () => {
             <div className="flex items-center gap-3">
               <Package className="w-5 h-5 text-primary" />
               <div>
-                <p className="font-semibold">Partner Store: Stick No Bills</p>
-                <p className="text-sm text-muted-foreground">sticknobills.myshopify.com</p>
+                <p className="font-semibold">Target Store: Atlas Posters</p>
+                <p className="text-sm text-muted-foreground">atlas-posters.myshopify.com</p>
               </div>
             </div>
             {storeId ? (
