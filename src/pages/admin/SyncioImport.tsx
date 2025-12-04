@@ -72,11 +72,12 @@ const SyncioImport = () => {
   }, []);
 
   const parseCSV = (content: string): ParsedProduct[] => {
-    const lines = content.split("\n");
-    if (lines.length < 2) return [];
+    // Parse CSV handling multi-line quoted fields
+    const rows = parseCSVRows(content);
+    if (rows.length < 2) return [];
 
     // Parse header
-    const header = parseCSVLine(lines[0]);
+    const header = rows[0];
     const columnIndex: Record<string, number> = {};
     header.forEach((col, idx) => {
       columnIndex[col.trim()] = idx;
@@ -84,11 +85,8 @@ const SyncioImport = () => {
 
     const products: Map<string, ParsedProduct> = new Map();
 
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
-
-      const values = parseCSVLine(line);
+    for (let i = 1; i < rows.length; i++) {
+      const values = rows[i];
       const handle = values[columnIndex["Handle"]]?.trim();
       if (!handle) continue;
 
@@ -147,29 +145,62 @@ const SyncioImport = () => {
     return Array.from(products.values());
   };
 
-  const parseCSVLine = (line: string): string[] => {
-    const result: string[] = [];
-    let current = "";
+  // Parse CSV into rows, handling multi-line quoted fields
+  const parseCSVRows = (content: string): string[][] => {
+    const rows: string[][] = [];
+    let currentRow: string[] = [];
+    let currentField = "";
     let inQuotes = false;
-
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-      if (char === '"') {
-        if (inQuotes && line[i + 1] === '"') {
-          current += '"';
-          i++;
+    
+    for (let i = 0; i < content.length; i++) {
+      const char = content[i];
+      const nextChar = content[i + 1];
+      
+      if (inQuotes) {
+        if (char === '"') {
+          if (nextChar === '"') {
+            // Escaped quote
+            currentField += '"';
+            i++;
+          } else {
+            // End of quoted field
+            inQuotes = false;
+          }
         } else {
-          inQuotes = !inQuotes;
+          currentField += char;
         }
-      } else if (char === "," && !inQuotes) {
-        result.push(current);
-        current = "";
       } else {
-        current += char;
+        if (char === '"') {
+          inQuotes = true;
+        } else if (char === ',') {
+          currentRow.push(currentField);
+          currentField = "";
+        } else if (char === '\r' && nextChar === '\n') {
+          // Windows line ending
+          currentRow.push(currentField);
+          currentField = "";
+          if (currentRow.length > 0) rows.push(currentRow);
+          currentRow = [];
+          i++; // Skip \n
+        } else if (char === '\n') {
+          // Unix line ending
+          currentRow.push(currentField);
+          currentField = "";
+          if (currentRow.length > 0) rows.push(currentRow);
+          currentRow = [];
+        } else {
+          currentField += char;
+        }
       }
     }
-    result.push(current);
-    return result;
+    
+    // Don't forget the last field and row
+    if (currentField || currentRow.length > 0) {
+      currentRow.push(currentField);
+      if (currentRow.length > 0) rows.push(currentRow);
+    }
+    
+    return rows;
   };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
