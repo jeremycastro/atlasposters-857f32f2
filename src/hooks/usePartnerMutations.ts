@@ -2,25 +2,52 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Partner, Brand } from "@/types/partner";
+import {
+  partnerCreateSchema,
+  partnerUpdateSchema,
+  brandCreateSchema,
+  brandUpdateSchema,
+  contactCreateSchema,
+  contactUpdateSchema,
+  addressCreateSchema,
+  addressUpdateSchema,
+  agreementCreateSchema,
+  agreementUpdateSchema,
+  type PartnerCreate,
+  type PartnerUpdate,
+  type BrandCreate,
+  type BrandUpdate,
+  type ContactCreate,
+  type ContactUpdate,
+  type AddressCreate,
+  type AddressUpdate,
+  type AgreementCreate,
+  type AgreementUpdate,
+} from "@/lib/validations/partnerSchemas";
 
 export const useCreatePartner = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      partner_name: string;
-      website_url?: string;
-      status: string;
-      atlas_manager_id?: string;
-      notes?: string;
-    }) => {
+    mutationFn: async (data: PartnerCreate) => {
+      // Validate input
+      const validated = partnerCreateSchema.parse(data);
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
+
+      // Clean empty strings to null for optional fields
+      const cleanedData = {
+        ...validated,
+        website_url: validated.website_url || null,
+        atlas_manager_id: validated.atlas_manager_id || null,
+        notes: validated.notes || null,
+      };
 
       const { data: partner, error } = await (supabase as any)
         .from("partners")
         .insert({
-          ...data,
+          ...cleanedData,
           created_by: user.id,
         })
         .select()
@@ -44,10 +71,18 @@ export const useUpdatePartner = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: PartnerUpdate }) => {
+      // Validate input
+      const validated = partnerUpdateSchema.parse(updates);
+      
+      // Clean empty strings to null for optional fields
+      const cleanedUpdates: Record<string, unknown> = { ...validated };
+      if (cleanedUpdates.website_url === "") cleanedUpdates.website_url = null;
+      if (cleanedUpdates.atlas_manager_id === "") cleanedUpdates.atlas_manager_id = null;
+      
       const { data, error } = await (supabase as any)
         .from("partners")
-        .update(updates)
+        .update(cleanedUpdates)
         .eq("id", id)
         .select()
         .single();
@@ -71,14 +106,24 @@ export const useCreateBrand = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      partner_id: string;
-      brand_name: string;
-      description?: string;
-    }) => {
+    mutationFn: async (data: BrandCreate) => {
+      // Validate input
+      const validated = brandCreateSchema.parse(data);
+      
+      // Clean empty strings to null
+      const cleanedData = {
+        ...validated,
+        description: validated.description || null,
+        tagline: validated.tagline || null,
+        website_url: validated.website_url || null,
+        primary_color: validated.primary_color || null,
+        secondary_color: validated.secondary_color || null,
+        accent_color: validated.accent_color || null,
+      };
+
       const { data: brand, error } = await (supabase as any)
         .from("brands")
-        .insert(data)
+        .insert(cleanedData)
         .select()
         .single();
 
@@ -101,10 +146,20 @@ export const useUpdateBrand = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: BrandUpdate }) => {
+      // Validate input
+      const validated = brandUpdateSchema.parse(updates);
+      
+      // Clean empty strings to null
+      const cleanedUpdates: Record<string, unknown> = { ...validated };
+      if (cleanedUpdates.website_url === "") cleanedUpdates.website_url = null;
+      if (cleanedUpdates.primary_color === "") cleanedUpdates.primary_color = null;
+      if (cleanedUpdates.secondary_color === "") cleanedUpdates.secondary_color = null;
+      if (cleanedUpdates.accent_color === "") cleanedUpdates.accent_color = null;
+
       const { data, error } = await (supabase as any)
         .from("brands")
-        .update(updates)
+        .update(cleanedUpdates)
         .eq("id", id)
         .select()
         .single();
@@ -113,7 +168,6 @@ export const useUpdateBrand = () => {
       return data as Brand;
     },
     onSuccess: async () => {
-      // Wait for the refetch to complete before showing success
       await queryClient.invalidateQueries({ queryKey: ["brands"] });
       await queryClient.invalidateQueries({ queryKey: ["partner"] });
       toast.success("Brand updated successfully");
@@ -128,14 +182,17 @@ export const useCreateAgreement = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: AgreementCreate) => {
+      // Validate input
+      const validated = agreementCreateSchema.parse(data);
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
       const { data: agreement, error } = await (supabase as any)
         .from("partner_agreements")
         .insert({
-          ...data,
+          ...validated,
           created_by: user.id,
         })
         .select()
@@ -159,10 +216,22 @@ export const useCreateContact = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: ContactCreate) => {
+      // Validate input
+      const validated = contactCreateSchema.parse(data);
+      
+      // Clean empty strings to null
+      const cleanedData = {
+        ...validated,
+        last_name: validated.last_name || null,
+        designation: validated.designation || null,
+        mobile_phone: validated.mobile_phone || null,
+        notes: validated.notes || null,
+      };
+
       const { data: contact, error } = await (supabase as any)
         .from("partner_contacts")
-        .insert(data)
+        .insert(cleanedData)
         .select()
         .single();
 
@@ -183,10 +252,22 @@ export const useCreateAddress = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: AddressCreate) => {
+      // Validate input
+      const validated = addressCreateSchema.parse(data);
+      
+      // Clean empty strings to null
+      const cleanedData = {
+        ...validated,
+        address_line2: validated.address_line2 || null,
+        state: validated.state || null,
+        contact_id: validated.contact_id || null,
+        contact_name: validated.contact_name || null,
+      };
+
       const { data: address, error } = await (supabase as any)
         .from("partner_addresses")
-        .insert(data)
+        .insert(cleanedData)
         .select()
         .single();
 
@@ -207,10 +288,13 @@ export const useUpdateAgreement = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: AgreementUpdate }) => {
+      // Validate input
+      const validated = agreementUpdateSchema.parse(updates);
+      
       const { data, error } = await (supabase as any)
         .from("partner_agreements")
-        .update(updates)
+        .update(validated)
         .eq("id", id)
         .select()
         .single();
@@ -233,10 +317,13 @@ export const useUpdateContact = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: ContactUpdate }) => {
+      // Validate input
+      const validated = contactUpdateSchema.parse(updates);
+      
       const { data, error } = await (supabase as any)
         .from("partner_contacts")
-        .update(updates)
+        .update(validated)
         .eq("id", id)
         .select()
         .single();
@@ -258,10 +345,13 @@ export const useUpdateAddress = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: AddressUpdate }) => {
+      // Validate input
+      const validated = addressUpdateSchema.parse(updates);
+      
       const { data, error } = await (supabase as any)
         .from("partner_addresses")
-        .update(updates)
+        .update(validated)
         .eq("id", id)
         .select()
         .single();
