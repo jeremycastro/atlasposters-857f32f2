@@ -17,7 +17,13 @@ export const CreatePartnerDialog = ({ open, onOpenChange }: CreatePartnerDialogP
   const createPartner = useCreatePartner();
   const { data: profiles } = useProfiles();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    partner_name: string;
+    website_url: string;
+    status: "pending" | "active" | "inactive" | "suspended";
+    atlas_manager_id: string;
+    notes: string;
+  }>({
     partner_name: "",
     website_url: "",
     status: "pending",
@@ -77,7 +83,7 @@ export const CreatePartnerDialog = ({ open, onOpenChange }: CreatePartnerDialogP
 
           <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
-            <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+            <Select value={formData.status} onValueChange={(value: "pending" | "active" | "inactive" | "suspended") => setFormData({ ...formData, status: value })}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
