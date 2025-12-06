@@ -736,22 +736,28 @@ export type Database = {
           created_at: string | null
           email: string
           id: string
+          ip_hash: string | null
           name: string | null
           source: string | null
+          submitted_at: string | null
         }
         Insert: {
           created_at?: string | null
           email: string
           id?: string
+          ip_hash?: string | null
           name?: string | null
           source?: string | null
+          submitted_at?: string | null
         }
         Update: {
           created_at?: string | null
           email?: string
           id?: string
+          ip_hash?: string | null
           name?: string | null
           source?: string | null
+          submitted_at?: string | null
         }
         Relationships: []
       }
@@ -3158,6 +3164,10 @@ export type Database = {
           p_variant_code: string
         }
         Returns: string
+      }
+      check_email_signup_rate_limit: {
+        Args: { p_email: string }
+        Returns: boolean
       }
       create_article_version: {
         Args: {

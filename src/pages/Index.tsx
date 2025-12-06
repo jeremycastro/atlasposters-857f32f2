@@ -19,20 +19,23 @@ const signupSchema = z.object({
     .trim()
     .max(100, { message: "Name must be less than 100 characters" })
     .optional()
-    .or(z.literal(''))
+    .or(z.literal('')),
+  // Honeypot field - should always be empty for real users
+  website: z.string().max(0, { message: "Invalid submission" }).optional().or(z.literal(''))
 });
 
 const Index = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [honeypot, setHoneypot] = useState(""); // Hidden field for bot detection
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate inputs with Zod
-    const validation = signupSchema.safeParse({ email, name });
+    // Validate inputs with Zod (honeypot must be empty)
+    const validation = signupSchema.safeParse({ email, name, website: honeypot });
     if (!validation.success) {
       toast({
         title: "Invalid input",
@@ -134,6 +137,17 @@ const Index = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="h-12"
+                  />
+                  {/* Honeypot field - hidden from real users, bots will fill it */}
+                  <input
+                    type="text"
+                    name="website"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                    style={{ position: 'absolute', left: '-9999px', opacity: 0 }}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
                   />
                 </div>
 
