@@ -44,6 +44,8 @@ const staticArticleComponents: Record<string, React.LazyExoticComponent<React.Co
   "prodigi-api": lazy(() => import("./ProdigiAPI")),
   "product-importing": lazy(() => import("./ProductImporting")),
   "readymades-framing": lazy(() => import("./ReadymadesFraming")),
+  "brand-story-exhibition-guide": lazy(() => import("./BrandStoryExhibitionGuide")),
+  "knowledge-base-architecture": lazy(() => import("./KnowledgeBaseArchitecture")),
 };
 
 function ArticleLoadingSkeleton() {
