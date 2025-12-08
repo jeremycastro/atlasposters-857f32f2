@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
-import { ExternalLink, Eye, Layout, Palette, Type } from "lucide-react";
+import { ExternalLink, Eye, Layout, Palette, Type, Users, Search, CheckCircle, AlertCircle, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Progress } from "@/components/ui/progress";
 
 const wireframeVersions = [
   {
@@ -22,6 +24,40 @@ const wireframeVersions = [
       { name: "Product", path: "/wireframes-01/product" },
       { name: "Collection", path: "/wireframes-01/collection" },
     ],
+    analysis: {
+      uxStrengths: [
+        "Clear visual hierarchy with editorial typography creates sophisticated feel",
+        "Well-organized category grid enables easy navigation and discovery",
+        "Trust bar with shipping/quality messaging builds customer confidence",
+        "Consistent product card design with clear pricing reduces cognitive load",
+      ],
+      uxWeaknesses: [
+        "Dense 6-column product grid may overwhelm users on mobile devices",
+        "No visible search functionality in header limits discoverability",
+        "Newsletter section lacks clear value proposition differentiator",
+        "Limited filtering options visible on collection pages",
+      ],
+      seoStrengths: [
+        "Semantic heading structure (H1, H2) used appropriately throughout",
+        "Descriptive link text with 'View All' patterns aids crawlability",
+        "Good use of alt text patterns for product images",
+        "Clear category taxonomy supports topical authority",
+      ],
+      seoWeaknesses: [
+        "Missing breadcrumb navigation for deeper category/product pages",
+        "No structured data / schema markup visible for products",
+        "Category pages lack meta description guidance in templates",
+        "Image-heavy sections lack supporting text content",
+      ],
+      recommendations: [
+        "Add prominent search bar in navigation for improved discoverability",
+        "Implement breadcrumbs for collection/product pages to improve navigation and SEO",
+        "Add lazy-loading for product grid images to improve Core Web Vitals",
+        "Include FAQ or content sections on category pages for long-tail SEO",
+        "Implement Product schema markup for rich snippets in search results",
+      ],
+      overallScore: { ux: 7, seo: 6 },
+    },
   },
   {
     version: "02",
@@ -40,8 +76,93 @@ const wireframeVersions = [
       { name: "Product", path: "/wireframes-02/product" },
       { name: "Collection", path: "/wireframes-02/collection" },
     ],
+    analysis: {
+      uxStrengths: [
+        "Dramatic full-bleed hero creates strong first impression and brand recall",
+        "Clean, minimal navigation reduces cognitive load and decision fatigue",
+        "Featured artists section builds trust and adds personality",
+        "Consistent dark theme creates premium, gallery-like aesthetic",
+      ],
+      uxWeaknesses: [
+        "Dark navigation on dark background may have accessibility contrast issues",
+        "Icon-only navigation buttons lack discoverability for new users",
+        "Long-scroll layout may hide important conversion CTAs below fold",
+        "Limited product information visible without interaction",
+      ],
+      seoStrengths: [
+        "Clear H1 with brand messaging establishes page topic",
+        "Artist attribution improves content relevance and uniqueness",
+        "Good semantic section structure aids content understanding",
+        "Clean URL structure visible in navigation patterns",
+      ],
+      seoWeaknesses: [
+        "Very image-heavy with minimal text content reduces crawlable content",
+        "Navigation links use generic text ('Art Prints') vs descriptive phrases",
+        "Missing H2 semantic structure in some content sections",
+        "No visible internal linking strategy beyond main navigation",
+      ],
+      recommendations: [
+        "Increase text content in category sections for improved SEO signals",
+        "Add sticky 'Add to Cart' or CTA on scroll to improve conversions",
+        "Implement ARIA labels for icon-only buttons to improve accessibility",
+        "Add product collection descriptions for topical relevance",
+        "Consider adding a blog or editorial section for content marketing",
+      ],
+      overallScore: { ux: 8, seo: 5 },
+    },
   },
 ];
+
+const ScoreIndicator = ({ label, score }: { label: string; score: number }) => {
+  const getScoreColor = (score: number) => {
+    if (score >= 8) return "text-green-600";
+    if (score >= 6) return "text-amber-600";
+    return "text-red-600";
+  };
+
+  const getProgressColor = (score: number) => {
+    if (score >= 8) return "bg-green-500";
+    if (score >= 6) return "bg-amber-500";
+    return "bg-red-500";
+  };
+
+  return (
+    <div className="flex-1">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs font-medium text-muted-foreground">{label}</span>
+        <span className={`text-sm font-bold ${getScoreColor(score)}`}>{score}/10</span>
+      </div>
+      <div className="h-2 bg-muted rounded-full overflow-hidden">
+        <div 
+          className={`h-full rounded-full transition-all ${getProgressColor(score)}`}
+          style={{ width: `${score * 10}%` }}
+        />
+      </div>
+    </div>
+  );
+};
+
+const AnalysisSection = ({ 
+  items, 
+  type 
+}: { 
+  items: string[]; 
+  type: "strength" | "weakness" 
+}) => {
+  const Icon = type === "strength" ? CheckCircle : AlertCircle;
+  const iconColor = type === "strength" ? "text-green-600" : "text-amber-600";
+  
+  return (
+    <ul className="space-y-2">
+      {items.map((item, index) => (
+        <li key={index} className="flex items-start gap-2 text-sm">
+          <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${iconColor}`} />
+          <span className="text-muted-foreground">{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+};
 
 const Wireframes = () => {
   return (
@@ -71,16 +192,16 @@ const Wireframes = () => {
           </h1>
           <p className="text-lg text-muted-foreground">
             Explore our design explorations for the Atlas storefront. Each version represents
-            a different aesthetic direction inspired by leading art retailers.
+            a different aesthetic direction inspired by leading art retailers, with detailed UX and SEO analysis.
           </p>
         </div>
       </section>
 
       {/* Wireframe Versions */}
       <section className="container mx-auto px-4 pb-16">
-        <div className="grid gap-8 md:grid-cols-2">
+        <div className="grid gap-8 lg:grid-cols-2">
           {wireframeVersions.map((wireframe) => (
-            <Card key={wireframe.version} className="overflow-hidden">
+            <Card key={wireframe.version} className="overflow-hidden flex flex-col">
               <CardHeader>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded">
@@ -93,7 +214,7 @@ const Wireframes = () => {
                   {wireframe.description}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 flex-1 flex flex-col">
                 {/* Design Notes */}
                 <div className="grid grid-cols-3 gap-3">
                   {wireframe.designNotes.map((note) => (
@@ -122,8 +243,80 @@ const Wireframes = () => {
                   </a>
                 </div>
 
+                {/* Overall Scores */}
+                <div className="flex gap-6 p-4 bg-muted/30 rounded-lg">
+                  <ScoreIndicator label="UX Score" score={wireframe.analysis.overallScore.ux} />
+                  <ScoreIndicator label="SEO Score" score={wireframe.analysis.overallScore.seo} />
+                </div>
+
+                {/* Analysis Accordion */}
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="ux-analysis" className="border-none">
+                    <AccordionTrigger className="text-sm font-medium hover:no-underline py-3 px-4 bg-muted/30 rounded-lg data-[state=open]:rounded-b-none">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-primary" />
+                        UX Analysis
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4 pt-3 bg-muted/10 rounded-b-lg">
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="text-xs font-semibold uppercase tracking-wider text-green-600 mb-2">Strengths</h4>
+                          <AnalysisSection items={wireframe.analysis.uxStrengths} type="strength" />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-2">Areas for Improvement</h4>
+                          <AnalysisSection items={wireframe.analysis.uxWeaknesses} type="weakness" />
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="seo-analysis" className="border-none mt-2">
+                    <AccordionTrigger className="text-sm font-medium hover:no-underline py-3 px-4 bg-muted/30 rounded-lg data-[state=open]:rounded-b-none">
+                      <div className="flex items-center gap-2">
+                        <Search className="h-4 w-4 text-primary" />
+                        SEO Analysis
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4 pt-3 bg-muted/10 rounded-b-lg">
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="text-xs font-semibold uppercase tracking-wider text-green-600 mb-2">Strengths</h4>
+                          <AnalysisSection items={wireframe.analysis.seoStrengths} type="strength" />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-2">Areas for Improvement</h4>
+                          <AnalysisSection items={wireframe.analysis.seoWeaknesses} type="weakness" />
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="recommendations" className="border-none mt-2">
+                    <AccordionTrigger className="text-sm font-medium hover:no-underline py-3 px-4 bg-muted/30 rounded-lg data-[state=open]:rounded-b-none">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-primary" />
+                        Recommendations
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4 pt-3 bg-muted/10 rounded-b-lg">
+                      <ul className="space-y-2">
+                        {wireframe.analysis.recommendations.map((rec, index) => (
+                          <li key={index} className="flex items-start gap-2 text-sm">
+                            <span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-primary/10 text-primary text-xs font-medium shrink-0">
+                              {index + 1}
+                            </span>
+                            <span className="text-muted-foreground">{rec}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+
                 {/* Page Links */}
-                <div className="space-y-3">
+                <div className="space-y-3 mt-auto">
                   <p className="text-sm font-medium">Pages</p>
                   <div className="flex flex-wrap gap-2">
                     {wireframe.pages.map((page) => (
