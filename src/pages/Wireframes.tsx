@@ -139,7 +139,7 @@ const Wireframes = () => {
 
                 {/* View Full Set */}
                 <Button asChild className="w-full">
-                  <Link to={`/wireframes-0${wireframe.version}`}>
+                  <Link to={`/wireframes-${wireframe.version}`}>
                     View Full Wireframe Set
                   </Link>
                 </Button>
