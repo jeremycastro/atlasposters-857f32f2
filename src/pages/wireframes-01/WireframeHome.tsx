@@ -195,7 +195,7 @@ export default function WireframeHome() {
         </div>
       </section>
 
-      <WireframeFooter />
+      
     </div>
   );
 }

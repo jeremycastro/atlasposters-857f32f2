@@ -218,51 +218,6 @@ export function WireframeHome() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 bg-[#1a1a1a] text-white/60">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            <div>
-              <h4 className="text-white font-medium mb-4">Shop</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Art Prints</a></li>
-                <li><a href="#" className="hover:text-white">Frames</a></li>
-                <li><a href="#" className="hover:text-white">New Arrivals</a></li>
-                <li><a href="#" className="hover:text-white">Best Sellers</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-medium mb-4">About</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Our Story</a></li>
-                <li><a href="#" className="hover:text-white">Artists</a></li>
-                <li><a href="#" className="hover:text-white">Sustainability</a></li>
-                <li><a href="#" className="hover:text-white">Press</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-medium mb-4">Help</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">FAQ</a></li>
-                <li><a href="#" className="hover:text-white">Shipping</a></li>
-                <li><a href="#" className="hover:text-white">Returns</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-medium mb-4">Follow</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Instagram</a></li>
-                <li><a href="#" className="hover:text-white">Pinterest</a></li>
-                <li><a href="#" className="hover:text-white">Facebook</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-white/10 pt-8 text-center text-sm">
-            <p>© 2024 Atlas Studio. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
