@@ -13,10 +13,10 @@ export function WireframeLayout() {
       <div className="sticky top-0 z-50 bg-muted border-b border-border">
         <div className="container mx-auto px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link to="/wireframes-01">
+            <Link to={isIndex ? "/" : "/wireframes-01"}>
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
-                {isIndex ? "Back to Admin" : "Wireframe Index"}
+                {isIndex ? "Back to Home" : "Wireframe Index"}
               </Button>
             </Link>
             <Badge variant="outline" className="text-xs">
