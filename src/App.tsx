@@ -62,6 +62,11 @@ import WireframeHome01 from "./pages/wireframes-01/WireframeHome";
 import WireframeProduct01 from "./pages/wireframes-01/WireframeProduct";
 import WireframeCollection01 from "./pages/wireframes-01/WireframeCollection";
 import { WireframeLayout as WireframeLayout01 } from "./pages/wireframes-01/WireframeLayout";
+import { WireframeIndex as WireframeIndex02 } from "./pages/wireframes-02/index";
+import { WireframeHome as WireframeHome02 } from "./pages/wireframes-02/WireframeHome";
+import { WireframeProduct as WireframeProduct02 } from "./pages/wireframes-02/WireframeProduct";
+import { WireframeCollection as WireframeCollection02 } from "./pages/wireframes-02/WireframeCollection";
+import { WireframeLayout as WireframeLayout02 } from "./pages/wireframes-02/WireframeLayout";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +93,14 @@ const App = () => (
               <Route path="home" element={<WireframeHome01 />} />
               <Route path="product" element={<WireframeProduct01 />} />
               <Route path="collection" element={<WireframeCollection01 />} />
+            </Route>
+            
+            {/* Wireframe Routes - Version 02 (The Poster Club) */}
+            <Route path="/wireframes-02" element={<WireframeLayout02 />}>
+              <Route index element={<WireframeIndex02 />} />
+              <Route path="home" element={<WireframeHome02 />} />
+              <Route path="product" element={<WireframeProduct02 />} />
+              <Route path="collection" element={<WireframeCollection02 />} />
             </Route>
             
             {/* Auth routes */}
