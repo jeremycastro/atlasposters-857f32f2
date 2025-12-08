@@ -82,6 +82,14 @@ const App = () => (
             <Route path="/collections/:handle" element={<Collection />} />
             <Route path="/about" element={<About />} />
             
+            {/* Wireframe Routes - Version 01 */}
+            <Route path="/wireframes-01" element={<WireframeLayout01 />}>
+              <Route index element={<WireframeIndex01 />} />
+              <Route path="home" element={<WireframeHome01 />} />
+              <Route path="product" element={<WireframeProduct01 />} />
+              <Route path="collection" element={<WireframeCollection01 />} />
+            </Route>
+            
             {/* Auth routes */}
             <Route path="/auth" element={<Auth />} />
             <Route path="/partner/auth" element={<PartnerAuth />} />
