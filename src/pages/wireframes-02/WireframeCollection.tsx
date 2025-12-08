@@ -165,12 +165,7 @@ export function WireframeCollection() {
               to="/wireframes-02/product"
               className="group"
             >
-              <div 
-                className="overflow-hidden bg-[#f5f3f0] mb-4"
-                style={{ 
-                  aspectRatio: index % 3 === 1 ? "4/6" : index % 3 === 2 ? "4/4.5" : "4/5"
-                }}
-              >
+              <div className="aspect-[3/4] overflow-hidden bg-[#f5f3f0] mb-4">
                 <img
                   src={product.image}
                   alt={product.title}
