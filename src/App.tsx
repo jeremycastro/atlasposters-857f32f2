@@ -57,6 +57,8 @@ import ArchiveManager from "./pages/admin/ArchiveManager";
 import ProductManagement from "./pages/admin/ProductManagement";
 import ProductTypeDetail from "./pages/admin/ProductTypeDetail";
 import VariantGroupDetail from "./pages/admin/VariantGroupDetail";
+import WireframeDashboard from "./pages/admin/WireframeDashboard";
+import Wireframes from "./pages/Wireframes";
 import WireframeIndex01 from "./pages/wireframes-01/index";
 import WireframeHome01 from "./pages/wireframes-01/WireframeHome";
 import WireframeProduct01 from "./pages/wireframes-01/WireframeProduct";
@@ -86,6 +88,7 @@ const App = () => (
             <Route path="/product/:handle" element={<ProductDetail />} />
             <Route path="/collections/:handle" element={<Collection />} />
             <Route path="/about" element={<About />} />
+            <Route path="/wireframes" element={<Wireframes />} />
             
             {/* Wireframe Routes - Version 01 */}
             <Route path="/wireframes-01" element={<WireframeLayout01 />}>
@@ -155,6 +158,7 @@ const App = () => (
               <Route path="products/types/:typeId" element={<ProductTypeDetail />} />
               <Route path="products/groups/:groupId" element={<VariantGroupDetail />} />
               <Route path="knowledge/archive-manager" element={<ArchiveManager />} />
+              <Route path="wireframes" element={<WireframeDashboard />} />
             </Route>
             
             {/* Partner routes */}
