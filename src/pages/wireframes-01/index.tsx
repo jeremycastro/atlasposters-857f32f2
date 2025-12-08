@@ -135,16 +135,6 @@ export default function WireframeIndex() {
                   adapted for Atlas Posters' adventure and travel focus.
                 </p>
               </div>
-              <a
-                href="https://www.kingandmcgaw.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button variant="outline">
-                  Visit King & McGaw
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
             </div>
           </CardContent>
         </Card>
