@@ -38,13 +38,15 @@ export function WireframeProduct() {
 
   return (
     <div className="min-h-screen bg-white text-[#2a2a2a]">
-      {/* Announcement Bar */}
-      <div className="bg-[#2a2a2a] text-white text-center py-2 text-sm">
-        <span className="text-white/80">Free shipping on orders over €100</span>
-      </div>
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-50 bg-white">
+        {/* Announcement Bar */}
+        <div className="bg-[#2a2a2a] text-white text-center py-2 text-sm">
+          <span className="text-white/80">Free shipping on orders over €100</span>
+        </div>
 
-      {/* Navigation */}
-      <nav className="border-b border-[#e5e5e5]">
+        {/* Navigation */}
+        <nav className="border-b border-[#e5e5e5]">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/wireframes-02/collection" className="text-sm uppercase tracking-wider text-[#666] hover:text-[#2a2a2a]">
@@ -75,6 +77,7 @@ export function WireframeProduct() {
           </div>
         </div>
       </nav>
+      </header>
 
       {/* Breadcrumb */}
       <div className="container mx-auto px-6 py-4">

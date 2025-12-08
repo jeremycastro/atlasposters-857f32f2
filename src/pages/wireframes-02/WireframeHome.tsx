@@ -25,13 +25,15 @@ const newArrivals = [
 export function WireframeHome() {
   return (
     <div className="min-h-screen bg-[#2a2a2a] text-white">
-      {/* Announcement Bar */}
-      <div className="bg-[#1a1a1a] text-center py-2 text-sm">
-        <span className="text-white/80">Free shipping on orders over €100</span>
-      </div>
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-50 bg-[#2a2a2a]">
+        {/* Announcement Bar */}
+        <div className="bg-[#1a1a1a] text-center py-2 text-sm">
+          <span className="text-white/80">Free shipping on orders over €100</span>
+        </div>
 
-      {/* Navigation */}
-      <nav className="border-b border-white/10">
+        {/* Navigation */}
+        <nav className="border-b border-white/10">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/wireframes-02/collection" className="text-sm uppercase tracking-wider hover:text-white/70">
@@ -65,6 +67,7 @@ export function WireframeHome() {
           </div>
         </div>
       </nav>
+      </header>
 
       {/* Hero Section - Full Bleed */}
       <section className="relative h-[90vh] overflow-hidden">
