@@ -57,6 +57,11 @@ import ArchiveManager from "./pages/admin/ArchiveManager";
 import ProductManagement from "./pages/admin/ProductManagement";
 import ProductTypeDetail from "./pages/admin/ProductTypeDetail";
 import VariantGroupDetail from "./pages/admin/VariantGroupDetail";
+import WireframeIndex01 from "./pages/wireframes-01/index";
+import WireframeHome01 from "./pages/wireframes-01/WireframeHome";
+import WireframeProduct01 from "./pages/wireframes-01/WireframeProduct";
+import WireframeCollection01 from "./pages/wireframes-01/WireframeCollection";
+import { WireframeLayout as WireframeLayout01 } from "./pages/wireframes-01/WireframeLayout";
 
 const queryClient = new QueryClient();
 
