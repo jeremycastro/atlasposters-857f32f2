@@ -95,8 +95,8 @@ export default function WireframeHome05() {
         </div>
       </div>
 
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#faf9f7]/95 backdrop-blur-sm border-b border-neutral-200">
+      {/* Header - Sticky */}
+      <header className="sticky top-0 z-50 bg-[#faf9f7] border-b border-neutral-200 shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -172,9 +172,9 @@ export default function WireframeHome05() {
       <section className="relative bg-[#1c1c1c] text-white overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1920&h=900&fit=crop"
-            alt="Hero background"
-            className="w-full h-full object-cover opacity-40"
+            src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1920&h=900&fit=crop"
+            alt="Framed travel poster in stylish living room"
+            className="w-full h-full object-cover opacity-50"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#1c1c1c] via-[#1c1c1c]/80 to-transparent" />
         </div>
