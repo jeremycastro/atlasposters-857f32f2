@@ -69,6 +69,11 @@ import { WireframeHome as WireframeHome02 } from "./pages/wireframes-02/Wirefram
 import { WireframeProduct as WireframeProduct02 } from "./pages/wireframes-02/WireframeProduct";
 import { WireframeCollection as WireframeCollection02 } from "./pages/wireframes-02/WireframeCollection";
 import { WireframeLayout as WireframeLayout02 } from "./pages/wireframes-02/WireframeLayout";
+import { WireframeIndex as WireframeIndex03 } from "./pages/wireframes-03/index";
+import { WireframeHome as WireframeHome03 } from "./pages/wireframes-03/WireframeHome";
+import { WireframeProduct as WireframeProduct03 } from "./pages/wireframes-03/WireframeProduct";
+import { WireframeCollection as WireframeCollection03 } from "./pages/wireframes-03/WireframeCollection";
+import { WireframeLayout as WireframeLayout03 } from "./pages/wireframes-03/WireframeLayout";
 
 const queryClient = new QueryClient();
 
@@ -104,6 +109,14 @@ const App = () => (
               <Route path="home" element={<WireframeHome02 />} />
               <Route path="product" element={<WireframeProduct02 />} />
               <Route path="collection" element={<WireframeCollection02 />} />
+            </Route>
+            
+            {/* Wireframe Routes - Version 03 (Desenio) */}
+            <Route path="/wireframes-03" element={<WireframeLayout03 />}>
+              <Route index element={<WireframeIndex03 />} />
+              <Route path="home" element={<WireframeHome03 />} />
+              <Route path="product" element={<WireframeProduct03 />} />
+              <Route path="collection" element={<WireframeCollection03 />} />
             </Route>
             
             {/* Auth routes */}
