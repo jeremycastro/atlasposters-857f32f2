@@ -8,7 +8,7 @@ export function WireframeLayout() {
         version="05"
         title="Best Practices Synthesis"
         accentColor="bg-amber-500"
-        bgColor="bg-[#1c1c1c]"
+        variant="dark"
       />
       <div className="flex-1">
         <Outlet />

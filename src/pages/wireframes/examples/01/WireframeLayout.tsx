@@ -10,7 +10,7 @@ export function WireframeLayout() {
         referenceUrl="https://www.kingandmcgaw.com"
         referenceName="King & McGaw"
         accentColor="bg-amber-500"
-        bgColor="bg-muted"
+        variant="light"
       />
       <div className="flex-1">
         <Outlet />
