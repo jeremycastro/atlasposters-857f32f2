@@ -393,115 +393,171 @@ const Wireframes = () => {
 
       {/* Wireframe Versions */}
       <section className="container mx-auto px-4 pb-16">
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {wireframeVersions.map((wireframe) => (
             <Card key={wireframe.version} className="overflow-hidden flex flex-col">
-              <CardHeader>
-                <div className="flex items-center gap-2 mb-2">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                    VERSION {wireframe.version}
+                    V{wireframe.version}
                   </span>
-                  <Badge variant="secondary">{wireframe.status}</Badge>
+                  <Badge variant="secondary" className="text-xs">{wireframe.status}</Badge>
                 </div>
-                <CardTitle className="text-2xl">{wireframe.title}</CardTitle>
-                <CardDescription className="text-base">
+                <CardTitle className="text-lg leading-tight">{wireframe.title}</CardTitle>
+                <CardDescription className="text-sm line-clamp-2">
                   {wireframe.description}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6 flex-1 flex flex-col">
-                {/* Design Notes */}
-                <div className="grid grid-cols-3 gap-3">
+              <CardContent className="space-y-4 flex-1 flex flex-col pt-0">
+                {/* Design Notes - Vertical Stack */}
+                <div className="space-y-2">
                   {wireframe.designNotes.map((note) => (
                     <div
                       key={note.label}
-                      className="rounded-lg bg-muted/50 p-4 text-center"
+                      className="flex items-center gap-2 text-xs"
                     >
-                      <note.icon className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-sm font-medium">{note.label}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{note.value}</p>
+                      <note.icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <span className="font-medium">{note.label}:</span>
+                      <span className="text-muted-foreground truncate">{note.value}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Reference */}
-                <div className="flex items-center justify-between py-3 border-y">
-                  <span className="text-sm text-muted-foreground">Design Reference:</span>
-                  <a
-                    href={wireframe.referenceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline flex items-center gap-1"
-                  >
-                    {wireframe.reference}
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
+                {wireframe.reference && (
+                  <div className="flex items-center justify-between py-2 border-y text-xs">
+                    <span className="text-muted-foreground">Reference:</span>
+                    <a
+                      href={wireframe.referenceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline flex items-center gap-1"
+                    >
+                      {wireframe.reference}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                )}
+
+                {/* Overall Scores - Inline */}
+                <div className="flex gap-4 p-3 bg-muted/30 rounded-lg">
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">UX</span>
+                      <span className={`text-xs font-bold ${wireframe.analysis.overallScore.ux >= 8 ? 'text-green-600' : wireframe.analysis.overallScore.ux >= 6 ? 'text-amber-600' : 'text-red-600'}`}>
+                        {wireframe.analysis.overallScore.ux}/10
+                      </span>
+                    </div>
+                    <div className="h-1.5 bg-muted rounded-full overflow-hidden mt-1">
+                      <div 
+                        className={`h-full rounded-full ${wireframe.analysis.overallScore.ux >= 8 ? 'bg-green-500' : wireframe.analysis.overallScore.ux >= 6 ? 'bg-amber-500' : 'bg-red-500'}`}
+                        style={{ width: `${wireframe.analysis.overallScore.ux * 10}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">SEO</span>
+                      <span className={`text-xs font-bold ${wireframe.analysis.overallScore.seo >= 8 ? 'text-green-600' : wireframe.analysis.overallScore.seo >= 6 ? 'text-amber-600' : 'text-red-600'}`}>
+                        {wireframe.analysis.overallScore.seo}/10
+                      </span>
+                    </div>
+                    <div className="h-1.5 bg-muted rounded-full overflow-hidden mt-1">
+                      <div 
+                        className={`h-full rounded-full ${wireframe.analysis.overallScore.seo >= 8 ? 'bg-green-500' : wireframe.analysis.overallScore.seo >= 6 ? 'bg-amber-500' : 'bg-red-500'}`}
+                        style={{ width: `${wireframe.analysis.overallScore.seo * 10}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {/* Overall Scores */}
-                <div className="flex gap-6 p-4 bg-muted/30 rounded-lg">
-                  <ScoreIndicator label="UX Score" score={wireframe.analysis.overallScore.ux} />
-                  <ScoreIndicator label="SEO Score" score={wireframe.analysis.overallScore.seo} />
-                </div>
-
-                {/* Analysis Accordion */}
+                {/* Analysis Accordion - Compact */}
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="ux-analysis" className="border-none">
-                    <AccordionTrigger className="text-sm font-medium hover:no-underline py-3 px-4 bg-muted/30 rounded-lg data-[state=open]:rounded-b-none">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-primary" />
+                    <AccordionTrigger className="text-xs font-medium hover:no-underline py-2 px-3 bg-muted/30 rounded-lg data-[state=open]:rounded-b-none">
+                      <div className="flex items-center gap-1.5">
+                        <Users className="h-3.5 w-3.5 text-primary" />
                         UX Analysis
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 pb-4 pt-3 bg-muted/10 rounded-b-lg">
-                      <div className="space-y-4">
+                    <AccordionContent className="px-3 pb-3 pt-2 bg-muted/10 rounded-b-lg text-xs">
+                      <div className="space-y-3">
                         <div>
-                          <h4 className="text-xs font-semibold uppercase tracking-wider text-green-600 mb-2">Strengths</h4>
-                          <AnalysisSection items={wireframe.analysis.uxStrengths} type="strength" />
+                          <h4 className="text-[10px] font-semibold uppercase tracking-wider text-green-600 mb-1.5">Strengths</h4>
+                          <ul className="space-y-1">
+                            {wireframe.analysis.uxStrengths.slice(0, 2).map((item, index) => (
+                              <li key={index} className="flex items-start gap-1.5">
+                                <CheckCircle className="h-3 w-3 mt-0.5 shrink-0 text-green-600" />
+                                <span className="text-muted-foreground line-clamp-2">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                         <div>
-                          <h4 className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-2">Areas for Improvement</h4>
-                          <AnalysisSection items={wireframe.analysis.uxWeaknesses} type="weakness" />
+                          <h4 className="text-[10px] font-semibold uppercase tracking-wider text-amber-600 mb-1.5">Improvements</h4>
+                          <ul className="space-y-1">
+                            {wireframe.analysis.uxWeaknesses.slice(0, 2).map((item, index) => (
+                              <li key={index} className="flex items-start gap-1.5">
+                                <AlertCircle className="h-3 w-3 mt-0.5 shrink-0 text-amber-600" />
+                                <span className="text-muted-foreground line-clamp-2">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
 
-                  <AccordionItem value="seo-analysis" className="border-none mt-2">
-                    <AccordionTrigger className="text-sm font-medium hover:no-underline py-3 px-4 bg-muted/30 rounded-lg data-[state=open]:rounded-b-none">
-                      <div className="flex items-center gap-2">
-                        <Search className="h-4 w-4 text-primary" />
+                  <AccordionItem value="seo-analysis" className="border-none mt-1.5">
+                    <AccordionTrigger className="text-xs font-medium hover:no-underline py-2 px-3 bg-muted/30 rounded-lg data-[state=open]:rounded-b-none">
+                      <div className="flex items-center gap-1.5">
+                        <Search className="h-3.5 w-3.5 text-primary" />
                         SEO Analysis
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 pb-4 pt-3 bg-muted/10 rounded-b-lg">
-                      <div className="space-y-4">
+                    <AccordionContent className="px-3 pb-3 pt-2 bg-muted/10 rounded-b-lg text-xs">
+                      <div className="space-y-3">
                         <div>
-                          <h4 className="text-xs font-semibold uppercase tracking-wider text-green-600 mb-2">Strengths</h4>
-                          <AnalysisSection items={wireframe.analysis.seoStrengths} type="strength" />
+                          <h4 className="text-[10px] font-semibold uppercase tracking-wider text-green-600 mb-1.5">Strengths</h4>
+                          <ul className="space-y-1">
+                            {wireframe.analysis.seoStrengths.slice(0, 2).map((item, index) => (
+                              <li key={index} className="flex items-start gap-1.5">
+                                <CheckCircle className="h-3 w-3 mt-0.5 shrink-0 text-green-600" />
+                                <span className="text-muted-foreground line-clamp-2">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                         <div>
-                          <h4 className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-2">Areas for Improvement</h4>
-                          <AnalysisSection items={wireframe.analysis.seoWeaknesses} type="weakness" />
+                          <h4 className="text-[10px] font-semibold uppercase tracking-wider text-amber-600 mb-1.5">Improvements</h4>
+                          <ul className="space-y-1">
+                            {wireframe.analysis.seoWeaknesses.slice(0, 2).map((item, index) => (
+                              <li key={index} className="flex items-start gap-1.5">
+                                <AlertCircle className="h-3 w-3 mt-0.5 shrink-0 text-amber-600" />
+                                <span className="text-muted-foreground line-clamp-2">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
 
-                  <AccordionItem value="recommendations" className="border-none mt-2">
-                    <AccordionTrigger className="text-sm font-medium hover:no-underline py-3 px-4 bg-muted/30 rounded-lg data-[state=open]:rounded-b-none">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-primary" />
+                  <AccordionItem value="recommendations" className="border-none mt-1.5">
+                    <AccordionTrigger className="text-xs font-medium hover:no-underline py-2 px-3 bg-muted/30 rounded-lg data-[state=open]:rounded-b-none">
+                      <div className="flex items-center gap-1.5">
+                        <TrendingUp className="h-3.5 w-3.5 text-primary" />
                         Recommendations
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 pb-4 pt-3 bg-muted/10 rounded-b-lg">
-                      <ul className="space-y-2">
-                        {wireframe.analysis.recommendations.map((rec, index) => (
-                          <li key={index} className="flex items-start gap-2 text-sm">
-                            <span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-primary/10 text-primary text-xs font-medium shrink-0">
+                    <AccordionContent className="px-3 pb-3 pt-2 bg-muted/10 rounded-b-lg text-xs">
+                      <ul className="space-y-1.5">
+                        {wireframe.analysis.recommendations.slice(0, 3).map((rec, index) => (
+                          <li key={index} className="flex items-start gap-1.5">
+                            <span className="inline-flex items-center justify-center h-4 w-4 rounded-full bg-primary/10 text-primary text-[10px] font-medium shrink-0">
                               {index + 1}
                             </span>
-                            <span className="text-muted-foreground">{rec}</span>
+                            <span className="text-muted-foreground line-clamp-2">{rec}</span>
                           </li>
                         ))}
                       </ul>
@@ -509,14 +565,14 @@ const Wireframes = () => {
                   </AccordionItem>
                 </Accordion>
 
-                {/* Page Links */}
-                <div className="space-y-3 mt-auto">
-                  <p className="text-sm font-medium">Pages</p>
-                  <div className="flex flex-wrap gap-2">
+                {/* Page Links - Compact */}
+                <div className="space-y-2 mt-auto">
+                  <p className="text-xs font-medium">Pages</p>
+                  <div className="flex flex-wrap gap-1.5">
                     {wireframe.pages.map((page) => (
-                      <Button key={page.path} asChild variant="outline" size="sm">
+                      <Button key={page.path} asChild variant="outline" size="sm" className="h-7 text-xs px-2">
                         <Link to={page.path}>
-                          <Eye className="h-3 w-3 mr-1.5" />
+                          <Eye className="h-3 w-3 mr-1" />
                           {page.name}
                         </Link>
                       </Button>
@@ -525,9 +581,9 @@ const Wireframes = () => {
                 </div>
 
                 {/* View Full Set */}
-                <Button asChild className="w-full">
+                <Button asChild size="sm" className="w-full">
                   <Link to={`/wireframes/examples/${wireframe.version}`}>
-                    View Full Wireframe Set
+                    View Full Wireframe
                   </Link>
                 </Button>
               </CardContent>
