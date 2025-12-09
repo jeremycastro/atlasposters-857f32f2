@@ -408,7 +408,7 @@ const Wireframes = () => {
                   {wireframe.description}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4 flex-1 flex flex-col pt-0">
+              <CardContent className="space-y-4 flex-1 pt-0">
                 {/* Design Notes - Vertical Stack */}
                 <div className="space-y-2">
                   {wireframe.designNotes.map((note) => (
@@ -566,7 +566,7 @@ const Wireframes = () => {
                 </Accordion>
 
                 {/* Page Links - Compact */}
-                <div className="space-y-2 mt-auto">
+                <div className="space-y-2">
                   <p className="text-xs font-medium">Pages</p>
                   <div className="flex flex-wrap gap-1.5">
                     {wireframe.pages.map((page) => (
@@ -579,14 +579,16 @@ const Wireframes = () => {
                     ))}
                   </div>
                 </div>
+              </CardContent>
 
-                {/* View Full Set */}
+              {/* View Full Set - Always at bottom */}
+              <div className="p-4 pt-0 mt-auto">
                 <Button asChild size="sm" className="w-full">
                   <Link to={`/wireframes/examples/${wireframe.version}`}>
                     View Full Wireframe
                   </Link>
                 </Button>
-              </CardContent>
+              </div>
             </Card>
           ))}
         </div>
