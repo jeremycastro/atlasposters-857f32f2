@@ -24,7 +24,7 @@ export function WireframeLayout() {
                 All Wireframes
               </Button>
             </Link>
-            <span className="text-sm text-white/50">Version 04 — Stick No Bills Style</span>
+            <span className="text-sm text-white/50">Version 04 — Travel Premium Style</span>
           </div>
           
           <div className="flex items-center gap-2">

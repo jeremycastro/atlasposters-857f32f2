@@ -65,7 +65,7 @@ export function WireframeCollection() {
                 <Menu className="h-5 w-5" />
               </Button>
               <Link to="/wireframes-04" className="text-2xl font-serif text-white tracking-wide">
-                STICK NO BILLS®
+                ATLAS POSTERS
               </Link>
             </div>
 
@@ -234,7 +234,7 @@ export function WireframeCollection() {
       {/* Footer */}
       <footer className="bg-[#1a2332] text-white py-12 border-t border-white/10">
         <div className="container mx-auto px-4 text-center text-sm text-white/40">
-          © 2024 Atlas Posters. Wireframe concept inspired by Stick No Bills.
+          © 2024 Atlas Posters. All rights reserved.
         </div>
       </footer>
     </div>

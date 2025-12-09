@@ -63,8 +63,8 @@ export function WireframeIndex() {
           </div>
           <h1 className="text-4xl font-serif text-white mb-4">Wireframe Gallery</h1>
           <p className="text-lg text-white/70 max-w-2xl">
-            Design direction inspired by Stick No Bills — vintage travel poster aesthetic 
-            with destination-focused navigation, curated collections, and premium presentation.
+            Vintage travel poster aesthetic with destination-focused navigation, 
+            curated collections, and premium presentation.
           </p>
         </div>
       </div>
@@ -126,21 +126,6 @@ export function WireframeIndex() {
         </div>
       </div>
 
-      {/* Reference Link */}
-      <div className="border-t border-white/10">
-        <div className="container mx-auto px-4 py-8 text-center">
-          <p className="text-white/50 mb-4">Design reference</p>
-          <a
-            href="https://sticknobillsonline.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-white hover:text-amber-500 transition-colors font-medium"
-          >
-            Stick No Bills
-            <ArrowRight className="h-4 w-4" />
-          </a>
-        </div>
-      </div>
     </div>
   );
 }
