@@ -9,7 +9,7 @@ interface WireframeExampleNavProps {
   referenceUrl?: string;
   referenceName?: string;
   accentColor?: string;
-  bgColor?: string;
+  variant?: "light" | "dark";
 }
 
 const pages = ["Index", "Home", "Product", "Collection"] as const;
@@ -20,7 +20,7 @@ export function WireframeExampleNav({
   referenceUrl,
   referenceName,
   accentColor = "bg-amber-500",
-  bgColor = "bg-[#1c1c1c]",
+  variant = "dark",
 }: WireframeExampleNavProps) {
   const location = useLocation();
   const basePath = `/wireframes/examples/${version}`;
@@ -35,25 +35,27 @@ export function WireframeExampleNav({
     return location.pathname === pagePath;
   };
 
+  const isDark = variant === "dark";
+
   return (
-    <div className={`sticky top-0 z-[100] ${bgColor} border-b border-white/10 px-4 py-2`}>
+    <div className={`sticky top-0 z-[100] ${isDark ? "bg-[#1c1c1c] border-white/10" : "bg-muted border-border"} border-b px-4 py-2`}>
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link to="/wireframes">
             <Button 
               variant="ghost" 
               size="sm" 
-              className="gap-2 text-white/70 hover:text-white hover:bg-white/10"
+              className={`gap-2 ${isDark ? "text-white/70 hover:text-white hover:bg-white/10" : "text-muted-foreground hover:text-foreground"}`}
             >
               <ArrowLeft className="h-4 w-4" />
               Gallery
             </Button>
           </Link>
           <div className="hidden sm:flex items-center gap-2">
-            <Badge variant="outline" className="text-white/60 border-white/20 text-xs">
+            <Badge variant="outline" className={`text-xs ${isDark ? "text-white/60 border-white/20" : "text-muted-foreground border-border"}`}>
               v{version}
             </Badge>
-            <span className="text-sm text-white/50">{title}</span>
+            <span className={`text-sm ${isDark ? "text-white/50" : "text-muted-foreground"}`}>{title}</span>
           </div>
         </div>
 
@@ -66,7 +68,9 @@ export function WireframeExampleNav({
                 className={
                   isActive(page)
                     ? `${accentColor} text-white hover:opacity-90`
-                    : "text-white/70 hover:text-white hover:bg-white/10"
+                    : isDark 
+                      ? "text-white/70 hover:text-white hover:bg-white/10"
+                      : "text-muted-foreground hover:text-foreground"
                 }
               >
                 {page}
@@ -83,7 +87,7 @@ export function WireframeExampleNav({
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="gap-2 text-white/70 hover:text-white hover:bg-white/10"
+                className={`gap-2 ${isDark ? "text-white/70 hover:text-white hover:bg-white/10" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {referenceName}
                 <ExternalLink className="h-3 w-3" />

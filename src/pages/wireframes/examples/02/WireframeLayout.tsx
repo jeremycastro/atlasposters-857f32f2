@@ -10,7 +10,7 @@ export function WireframeLayout() {
         referenceUrl="https://theposterclub.com"
         referenceName="The Poster Club"
         accentColor="bg-emerald-600"
-        bgColor="bg-muted"
+        variant="light"
       />
       <div className="flex-1">
         <Outlet />

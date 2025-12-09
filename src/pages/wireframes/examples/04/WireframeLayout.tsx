@@ -10,7 +10,7 @@ export function WireframeLayout() {
         referenceUrl="https://sticknobillsonline.com"
         referenceName="Stick No Bills"
         accentColor="bg-amber-700"
-        bgColor="bg-[#1a2332]"
+        variant="dark"
       />
       <div className="flex-1">
         <Outlet />

@@ -10,7 +10,7 @@ export function WireframeLayout() {
         referenceUrl="https://www.desenio.com"
         referenceName="Desenio"
         accentColor="bg-rose-500"
-        bgColor="bg-[#1a1a1a]"
+        variant="dark"
       />
       <div className="flex-1">
         <Outlet />
