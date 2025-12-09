@@ -74,6 +74,11 @@ import { WireframeHome as WireframeHome03 } from "./pages/wireframes-03/Wirefram
 import { WireframeProduct as WireframeProduct03 } from "./pages/wireframes-03/WireframeProduct";
 import { WireframeCollection as WireframeCollection03 } from "./pages/wireframes-03/WireframeCollection";
 import { WireframeLayout as WireframeLayout03 } from "./pages/wireframes-03/WireframeLayout";
+import { WireframeIndex as WireframeIndex04 } from "./pages/wireframes-04/index";
+import { WireframeHome as WireframeHome04 } from "./pages/wireframes-04/WireframeHome";
+import { WireframeProduct as WireframeProduct04 } from "./pages/wireframes-04/WireframeProduct";
+import { WireframeCollection as WireframeCollection04 } from "./pages/wireframes-04/WireframeCollection";
+import { WireframeLayout as WireframeLayout04 } from "./pages/wireframes-04/WireframeLayout";
 
 const queryClient = new QueryClient();
 
