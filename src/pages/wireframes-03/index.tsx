@@ -9,7 +9,7 @@ const wireframes = [
     title: "Homepage",
     description: "Promotional hero with countdown timer, product sliders, and curated category banners",
     href: "/wireframes-03/home",
-    image: "https://images.unsplash.com/photo-1513519245088-0e12902e35a6?w=600&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop",
     features: ["Countdown sale timer", "Horizontal product slider", "Category banner grid", "Trust bar messaging"],
   },
   {
@@ -23,7 +23,7 @@ const wireframes = [
     title: "Collection Page",
     description: "Category-focused grid with filter sidebar and promotional banners",
     href: "/wireframes-03/collection",
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop",
     features: ["Left sidebar filters", "Product grid with sale tags", "Category header banner", "Load more pagination"],
   },
 ];

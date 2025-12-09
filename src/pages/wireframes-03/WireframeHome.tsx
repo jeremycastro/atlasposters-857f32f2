@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 const categories = [
-  { name: "Posters & Prints", image: "https://images.unsplash.com/photo-1513519245088-0e12902e35a6?w=400&h=500&fit=crop" },
-  { name: "Canvas Art", image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400&h=500&fit=crop" },
+  { name: "Posters & Prints", image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400&h=500&fit=crop" },
+  { name: "Canvas Art", image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=500&fit=crop" },
   { name: "Picture Frames", image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=500&fit=crop" },
   { name: "Gallery Walls", image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=500&fit=crop" },
 ];
@@ -135,7 +135,7 @@ export function WireframeHome() {
           </div>
           <div className="hidden lg:block">
             <img
-              src="https://images.unsplash.com/photo-1513519245088-0e12902e35a6?w=800&h=800&fit=crop"
+              src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&h=800&fit=crop"
               alt="Featured art"
               className="w-full h-full object-cover"
             />
