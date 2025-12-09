@@ -163,6 +163,58 @@ const wireframeVersions = [
       overallScore: { ux: 7, seo: 6 },
     },
   },
+  {
+    version: "04",
+    title: "Stick No Bills Inspired",
+    reference: "sticknobillsonline.com",
+    referenceUrl: "https://www.sticknobillsonline.com",
+    status: "In Review",
+    description: "Bold travel-inspired aesthetic with dark navy backgrounds, destination-focused imagery, and premium vintage poster presentation.",
+    designNotes: [
+      { icon: Type, label: "Typography", value: "Playfair Display + Inter" },
+      { icon: Palette, label: "Colors", value: "Navy blue with warm accents" },
+      { icon: Layout, label: "Layout", value: "Premium, destination-focused" },
+    ],
+    pages: [
+      { name: "Home", path: "/wireframes-04/home" },
+      { name: "Product", path: "/wireframes-04/product" },
+      { name: "Collection", path: "/wireframes-04/collection" },
+    ],
+    analysis: {
+      uxStrengths: [
+        "Strong destination-based navigation creates intuitive browsing experience",
+        "Trust bar with licensing/quality badges builds immediate credibility",
+        "Full-bleed hero slider creates immersive first impression",
+        "Clear framing options on product pages simplify purchase decisions",
+      ],
+      uxWeaknesses: [
+        "Dark theme may reduce readability in bright environments",
+        "Hero slider auto-rotation can be disorienting for some users",
+        "Limited category visibility in initial navigation view",
+        "Frame selection could benefit from visual preview",
+      ],
+      seoStrengths: [
+        "Destination-based taxonomy creates strong topical clusters",
+        "Product pages include detailed specifications and artist info",
+        "Clear heading hierarchy with H1-H3 structure",
+        "Image alt text includes destination and artist keywords",
+      ],
+      seoWeaknesses: [
+        "Limited text content on homepage for search crawlers",
+        "Category landing pages need more descriptive content",
+        "Missing FAQ sections for long-tail keyword targeting",
+        "Blog or editorial content not prominently featured",
+      ],
+      recommendations: [
+        "Add destination guides to capture travel-related search traffic",
+        "Implement product schema markup for rich snippets",
+        "Create artist profile pages for additional SEO value",
+        "Add customer review sections for fresh content signals",
+        "Consider adding a vintage poster history section for content marketing",
+      ],
+      overallScore: { ux: 8, seo: 6 },
+    },
+  },
 ];
 
 const ScoreIndicator = ({ label, score }: { label: string; score: number }) => {
