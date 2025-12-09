@@ -62,6 +62,25 @@ const wireframeVersions = [
       { name: "Collection", path: "/wireframes-03/collection" },
     ],
   },
+  {
+    version: "04",
+    title: "Stick No Bills Inspired",
+    reference: "sticknobillsonline.com",
+    referenceUrl: "https://www.sticknobillsonline.com",
+    status: "In Review",
+    statusVariant: "secondary" as const,
+    description: "Bold travel-inspired aesthetic with dark navy backgrounds, destination-focused imagery, and premium vintage poster presentation.",
+    designNotes: [
+      { icon: Type, label: "Typography", value: "Playfair Display + Inter" },
+      { icon: Palette, label: "Colors", value: "Navy blue with warm accents" },
+      { icon: Layout, label: "Layout", value: "Premium, destination-focused" },
+    ],
+    pages: [
+      { name: "Home", path: "/wireframes-04/home" },
+      { name: "Product", path: "/wireframes-04/product" },
+      { name: "Collection", path: "/wireframes-04/collection" },
+    ],
+  },
 ];
 
 const WireframeDashboard = () => {
@@ -159,7 +178,7 @@ const WireframeDashboard = () => {
           <CardTitle className="text-lg">Design Direction Comparison</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
               <h4 className="font-medium">Version 01 - Editorial</h4>
               <ul className="text-sm text-muted-foreground space-y-1">
@@ -185,6 +204,15 @@ const WireframeDashboard = () => {
                 <li>• Clean system typography</li>
                 <li>• Grid-heavy product layouts</li>
                 <li>• Urgency-driven design elements</li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium">Version 04 - Travel Premium</h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Dark navy, premium aesthetic</li>
+                <li>• Destination-focused navigation</li>
+                <li>• Vintage travel poster showcase</li>
+                <li>• Trust badges prominent</li>
               </ul>
             </div>
           </div>

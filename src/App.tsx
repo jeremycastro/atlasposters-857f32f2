@@ -124,6 +124,14 @@ const App = () => (
               <Route path="collection" element={<WireframeCollection03 />} />
             </Route>
             
+            {/* Wireframe Routes - Version 04 (Stick No Bills) */}
+            <Route path="/wireframes-04" element={<WireframeLayout04 />}>
+              <Route index element={<WireframeIndex04 />} />
+              <Route path="home" element={<WireframeHome04 />} />
+              <Route path="product" element={<WireframeProduct04 />} />
+              <Route path="collection" element={<WireframeCollection04 />} />
+            </Route>
+            
             {/* Auth routes */}
             <Route path="/auth" element={<Auth />} />
             <Route path="/partner/auth" element={<PartnerAuth />} />
