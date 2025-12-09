@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
-
+import { Navigation } from "@/components/Navigation";
 const wireframeVersions = [
   {
     version: "01",
@@ -375,22 +375,8 @@ const AnalysisSection = ({
 const Wireframes = () => {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link to="/" className="font-bold text-xl tracking-tight">
-              ATLAS
-            </Link>
-            <Badge variant="outline" className="font-mono text-xs">
-              Wireframes
-            </Badge>
-          </div>
-          <p className="text-sm text-muted-foreground hidden sm:block">
-            Storefront Design Explorations
-          </p>
-        </div>
-      </header>
+      {/* Standard Navigation */}
+      <Navigation />
 
       {/* Hero */}
       <section className="container mx-auto px-4 py-12 md:py-16">
