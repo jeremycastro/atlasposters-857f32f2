@@ -20,9 +20,9 @@ const wireframeVersions = [
       { icon: Layout, label: "Layout", value: "Editorial, gallery-focused" },
     ],
     pages: [
-      { name: "Home", path: "/wireframes-01/home" },
-      { name: "Product", path: "/wireframes-01/product" },
-      { name: "Collection", path: "/wireframes-01/collection" },
+      { name: "Home", path: "/wireframes/examples/01/home" },
+      { name: "Product", path: "/wireframes/examples/01/product" },
+      { name: "Collection", path: "/wireframes/examples/01/collection" },
     ],
     analysis: {
       uxStrengths: [
@@ -72,9 +72,9 @@ const wireframeVersions = [
       { icon: Layout, label: "Layout", value: "Minimal, Scandinavian" },
     ],
     pages: [
-      { name: "Home", path: "/wireframes-02/home" },
-      { name: "Product", path: "/wireframes-02/product" },
-      { name: "Collection", path: "/wireframes-02/collection" },
+      { name: "Home", path: "/wireframes/examples/02/home" },
+      { name: "Product", path: "/wireframes/examples/02/product" },
+      { name: "Collection", path: "/wireframes/examples/02/collection" },
     ],
     analysis: {
       uxStrengths: [
@@ -124,9 +124,9 @@ const wireframeVersions = [
       { icon: Layout, label: "Layout", value: "Promotional, grid-heavy" },
     ],
     pages: [
-      { name: "Home", path: "/wireframes-03/home" },
-      { name: "Product", path: "/wireframes-03/product" },
-      { name: "Collection", path: "/wireframes-03/collection" },
+      { name: "Home", path: "/wireframes/examples/03/home" },
+      { name: "Product", path: "/wireframes/examples/03/product" },
+      { name: "Collection", path: "/wireframes/examples/03/collection" },
     ],
     analysis: {
       uxStrengths: [
@@ -176,9 +176,9 @@ const wireframeVersions = [
       { icon: Layout, label: "Layout", value: "Premium, destination-focused" },
     ],
     pages: [
-      { name: "Home", path: "/wireframes-04/home" },
-      { name: "Product", path: "/wireframes-04/product" },
-      { name: "Collection", path: "/wireframes-04/collection" },
+      { name: "Home", path: "/wireframes/examples/04/home" },
+      { name: "Product", path: "/wireframes/examples/04/product" },
+      { name: "Collection", path: "/wireframes/examples/04/collection" },
     ],
     analysis: {
       uxStrengths: [
@@ -228,9 +228,9 @@ const wireframeVersions = [
       { icon: Layout, label: "Layout", value: "Balanced, purposeful" },
     ],
     pages: [
-      { name: "Home", path: "/wireframes-05/home" },
-      { name: "Product", path: "/wireframes-05/product" },
-      { name: "Collection", path: "/wireframes-05/collection" },
+      { name: "Home", path: "/wireframes/examples/05/home" },
+      { name: "Product", path: "/wireframes/examples/05/product" },
+      { name: "Collection", path: "/wireframes/examples/05/collection" },
     ],
     analysis: {
       uxStrengths: [
@@ -488,7 +488,7 @@ const Wireframes = () => {
 
                 {/* View Full Set */}
                 <Button asChild className="w-full">
-                  <Link to={`/wireframes-${wireframe.version}`}>
+                  <Link to={`/wireframes/examples/${wireframe.version}`}>
                     View Full Wireframe Set
                   </Link>
                 </Button>

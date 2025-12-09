@@ -58,32 +58,44 @@ import ProductManagement from "./pages/admin/ProductManagement";
 import ProductTypeDetail from "./pages/admin/ProductTypeDetail";
 import VariantGroupDetail from "./pages/admin/VariantGroupDetail";
 import WireframeDashboard from "./pages/admin/WireframeDashboard";
-import Wireframes from "./pages/Wireframes";
-import WireframeIndex01 from "./pages/wireframes-01/index";
-import WireframeHome01 from "./pages/wireframes-01/WireframeHome";
-import WireframeProduct01 from "./pages/wireframes-01/WireframeProduct";
-import WireframeCollection01 from "./pages/wireframes-01/WireframeCollection";
-import { WireframeLayout as WireframeLayout01 } from "./pages/wireframes-01/WireframeLayout";
-import { WireframeIndex as WireframeIndex02 } from "./pages/wireframes-02/index";
-import { WireframeHome as WireframeHome02 } from "./pages/wireframes-02/WireframeHome";
-import { WireframeProduct as WireframeProduct02 } from "./pages/wireframes-02/WireframeProduct";
-import { WireframeCollection as WireframeCollection02 } from "./pages/wireframes-02/WireframeCollection";
-import { WireframeLayout as WireframeLayout02 } from "./pages/wireframes-02/WireframeLayout";
-import { WireframeIndex as WireframeIndex03 } from "./pages/wireframes-03/index";
-import { WireframeHome as WireframeHome03 } from "./pages/wireframes-03/WireframeHome";
-import { WireframeProduct as WireframeProduct03 } from "./pages/wireframes-03/WireframeProduct";
-import { WireframeCollection as WireframeCollection03 } from "./pages/wireframes-03/WireframeCollection";
-import { WireframeLayout as WireframeLayout03 } from "./pages/wireframes-03/WireframeLayout";
-import { WireframeIndex as WireframeIndex04 } from "./pages/wireframes-04/index";
-import { WireframeHome as WireframeHome04 } from "./pages/wireframes-04/WireframeHome";
-import { WireframeProduct as WireframeProduct04 } from "./pages/wireframes-04/WireframeProduct";
-import { WireframeCollection as WireframeCollection04 } from "./pages/wireframes-04/WireframeCollection";
-import { WireframeLayout as WireframeLayout04 } from "./pages/wireframes-04/WireframeLayout";
-import WireframeIndex05 from "./pages/wireframes-05/index";
-import WireframeHome05 from "./pages/wireframes-05/WireframeHome";
-import WireframeProduct05 from "./pages/wireframes-05/WireframeProduct";
-import WireframeCollection05 from "./pages/wireframes-05/WireframeCollection";
-import { WireframeLayout as WireframeLayout05 } from "./pages/wireframes-05/WireframeLayout";
+
+// Wireframes Gallery
+import WireframesGallery from "./pages/wireframes/index";
+
+// Wireframe Examples - Version 01
+import WireframeIndex01 from "./pages/wireframes/examples/01/index";
+import WireframeHome01 from "./pages/wireframes/examples/01/WireframeHome";
+import WireframeProduct01 from "./pages/wireframes/examples/01/WireframeProduct";
+import WireframeCollection01 from "./pages/wireframes/examples/01/WireframeCollection";
+import { WireframeLayout as WireframeLayout01 } from "./pages/wireframes/examples/01/WireframeLayout";
+
+// Wireframe Examples - Version 02
+import { WireframeIndex as WireframeIndex02 } from "./pages/wireframes/examples/02/index";
+import { WireframeHome as WireframeHome02 } from "./pages/wireframes/examples/02/WireframeHome";
+import { WireframeProduct as WireframeProduct02 } from "./pages/wireframes/examples/02/WireframeProduct";
+import { WireframeCollection as WireframeCollection02 } from "./pages/wireframes/examples/02/WireframeCollection";
+import { WireframeLayout as WireframeLayout02 } from "./pages/wireframes/examples/02/WireframeLayout";
+
+// Wireframe Examples - Version 03
+import { WireframeIndex as WireframeIndex03 } from "./pages/wireframes/examples/03/index";
+import { WireframeHome as WireframeHome03 } from "./pages/wireframes/examples/03/WireframeHome";
+import { WireframeProduct as WireframeProduct03 } from "./pages/wireframes/examples/03/WireframeProduct";
+import { WireframeCollection as WireframeCollection03 } from "./pages/wireframes/examples/03/WireframeCollection";
+import { WireframeLayout as WireframeLayout03 } from "./pages/wireframes/examples/03/WireframeLayout";
+
+// Wireframe Examples - Version 04
+import { WireframeIndex as WireframeIndex04 } from "./pages/wireframes/examples/04/index";
+import { WireframeHome as WireframeHome04 } from "./pages/wireframes/examples/04/WireframeHome";
+import { WireframeProduct as WireframeProduct04 } from "./pages/wireframes/examples/04/WireframeProduct";
+import { WireframeCollection as WireframeCollection04 } from "./pages/wireframes/examples/04/WireframeCollection";
+import { WireframeLayout as WireframeLayout04 } from "./pages/wireframes/examples/04/WireframeLayout";
+
+// Wireframe Examples - Version 05
+import WireframeIndex05 from "./pages/wireframes/examples/05/index";
+import WireframeHome05 from "./pages/wireframes/examples/05/WireframeHome";
+import WireframeProduct05 from "./pages/wireframes/examples/05/WireframeProduct";
+import WireframeCollection05 from "./pages/wireframes/examples/05/WireframeCollection";
+import { WireframeLayout as WireframeLayout05 } from "./pages/wireframes/examples/05/WireframeLayout";
 
 const queryClient = new QueryClient();
 
@@ -103,42 +115,42 @@ const App = () => (
             <Route path="/product/:handle" element={<ProductDetail />} />
             <Route path="/collections/:handle" element={<Collection />} />
             <Route path="/about" element={<About />} />
-            <Route path="/wireframes" element={<Wireframes />} />
+            <Route path="/wireframes" element={<WireframesGallery />} />
             
-            {/* Wireframe Routes - Version 01 */}
-            <Route path="/wireframes-01" element={<WireframeLayout01 />}>
+            {/* Wireframe Examples - Version 01 */}
+            <Route path="/wireframes/examples/01" element={<WireframeLayout01 />}>
               <Route index element={<WireframeIndex01 />} />
               <Route path="home" element={<WireframeHome01 />} />
               <Route path="product" element={<WireframeProduct01 />} />
               <Route path="collection" element={<WireframeCollection01 />} />
             </Route>
             
-            {/* Wireframe Routes - Version 02 (The Poster Club) */}
-            <Route path="/wireframes-02" element={<WireframeLayout02 />}>
+            {/* Wireframe Examples - Version 02 */}
+            <Route path="/wireframes/examples/02" element={<WireframeLayout02 />}>
               <Route index element={<WireframeIndex02 />} />
               <Route path="home" element={<WireframeHome02 />} />
               <Route path="product" element={<WireframeProduct02 />} />
               <Route path="collection" element={<WireframeCollection02 />} />
             </Route>
             
-            {/* Wireframe Routes - Version 03 (Desenio) */}
-            <Route path="/wireframes-03" element={<WireframeLayout03 />}>
+            {/* Wireframe Examples - Version 03 */}
+            <Route path="/wireframes/examples/03" element={<WireframeLayout03 />}>
               <Route index element={<WireframeIndex03 />} />
               <Route path="home" element={<WireframeHome03 />} />
               <Route path="product" element={<WireframeProduct03 />} />
               <Route path="collection" element={<WireframeCollection03 />} />
             </Route>
             
-            {/* Wireframe Routes - Version 04 (Travel Premium) */}
-            <Route path="/wireframes-04" element={<WireframeLayout04 />}>
+            {/* Wireframe Examples - Version 04 */}
+            <Route path="/wireframes/examples/04" element={<WireframeLayout04 />}>
               <Route index element={<WireframeIndex04 />} />
               <Route path="home" element={<WireframeHome04 />} />
               <Route path="product" element={<WireframeProduct04 />} />
               <Route path="collection" element={<WireframeCollection04 />} />
             </Route>
             
-            {/* Wireframe Routes - Version 05 (Best Practices) */}
-            <Route path="/wireframes-05" element={<WireframeLayout05 />}>
+            {/* Wireframe Examples - Version 05 */}
+            <Route path="/wireframes/examples/05" element={<WireframeLayout05 />}>
               <Route index element={<WireframeIndex05 />} />
               <Route path="home" element={<WireframeHome05 />} />
               <Route path="product" element={<WireframeProduct05 />} />
