@@ -64,9 +64,9 @@ const wireframeVersions = [
   },
   {
     version: "04",
-    title: "Stick No Bills Inspired",
-    reference: "sticknobillsonline.com",
-    referenceUrl: "https://www.sticknobillsonline.com",
+    title: "Travel Premium Style",
+    reference: null,
+    referenceUrl: null,
     status: "In Review",
     statusVariant: "secondary" as const,
     description: "Bold travel-inspired aesthetic with dark navy backgrounds, destination-focused imagery, and premium vintage poster presentation.",
@@ -79,6 +79,25 @@ const wireframeVersions = [
       { name: "Home", path: "/wireframes-04/home" },
       { name: "Product", path: "/wireframes-04/product" },
       { name: "Collection", path: "/wireframes-04/collection" },
+    ],
+  },
+  {
+    version: "05",
+    title: "Best Practices Synthesis",
+    reference: null,
+    referenceUrl: null,
+    status: "New",
+    statusVariant: "default" as const,
+    description: "A synthesis of proven patterns: minimal navigation, editorial depth, museum sophistication, and premium presentation unified in one cohesive system.",
+    designNotes: [
+      { icon: Type, label: "Typography", value: "System + Light weights" },
+      { icon: Palette, label: "Colors", value: "Warm neutral with amber accents" },
+      { icon: Layout, label: "Layout", value: "Balanced, purposeful" },
+    ],
+    pages: [
+      { name: "Home", path: "/wireframes-05/home" },
+      { name: "Product", path: "/wireframes-05/product" },
+      { name: "Collection", path: "/wireframes-05/collection" },
     ],
   },
 ];

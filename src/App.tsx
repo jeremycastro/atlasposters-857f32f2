@@ -79,6 +79,11 @@ import { WireframeHome as WireframeHome04 } from "./pages/wireframes-04/Wirefram
 import { WireframeProduct as WireframeProduct04 } from "./pages/wireframes-04/WireframeProduct";
 import { WireframeCollection as WireframeCollection04 } from "./pages/wireframes-04/WireframeCollection";
 import { WireframeLayout as WireframeLayout04 } from "./pages/wireframes-04/WireframeLayout";
+import WireframeIndex05 from "./pages/wireframes-05/index";
+import WireframeHome05 from "./pages/wireframes-05/WireframeHome";
+import WireframeProduct05 from "./pages/wireframes-05/WireframeProduct";
+import WireframeCollection05 from "./pages/wireframes-05/WireframeCollection";
+import { WireframeLayout as WireframeLayout05 } from "./pages/wireframes-05/WireframeLayout";
 
 const queryClient = new QueryClient();
 
@@ -124,12 +129,20 @@ const App = () => (
               <Route path="collection" element={<WireframeCollection03 />} />
             </Route>
             
-            {/* Wireframe Routes - Version 04 (Stick No Bills) */}
+            {/* Wireframe Routes - Version 04 (Travel Premium) */}
             <Route path="/wireframes-04" element={<WireframeLayout04 />}>
               <Route index element={<WireframeIndex04 />} />
               <Route path="home" element={<WireframeHome04 />} />
               <Route path="product" element={<WireframeProduct04 />} />
               <Route path="collection" element={<WireframeCollection04 />} />
+            </Route>
+            
+            {/* Wireframe Routes - Version 05 (Best Practices) */}
+            <Route path="/wireframes-05" element={<WireframeLayout05 />}>
+              <Route index element={<WireframeIndex05 />} />
+              <Route path="home" element={<WireframeHome05 />} />
+              <Route path="product" element={<WireframeProduct05 />} />
+              <Route path="collection" element={<WireframeCollection05 />} />
             </Route>
             
             {/* Auth routes */}
