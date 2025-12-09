@@ -43,6 +43,25 @@ const wireframeVersions = [
       { name: "Collection", path: "/wireframes-02/collection" },
     ],
   },
+  {
+    version: "03",
+    title: "Desenio Inspired",
+    reference: "desenio.com",
+    referenceUrl: "https://www.desenio.com",
+    status: "In Review",
+    statusVariant: "secondary" as const,
+    description: "Contemporary Nordic style with promotional hero banners, countdown timers, category navigation, and conversion-focused product displays.",
+    designNotes: [
+      { icon: Type, label: "Typography", value: "DM Sans + System" },
+      { icon: Palette, label: "Colors", value: "Clean white with bold accents" },
+      { icon: Layout, label: "Layout", value: "Promotional, grid-heavy" },
+    ],
+    pages: [
+      { name: "Home", path: "/wireframes-03/home" },
+      { name: "Product", path: "/wireframes-03/product" },
+      { name: "Collection", path: "/wireframes-03/collection" },
+    ],
+  },
 ];
 
 const WireframeDashboard = () => {
@@ -125,7 +144,7 @@ const WireframeDashboard = () => {
 
               {/* View Gallery Link */}
               <Button asChild className="w-full" variant="secondary">
-                <Link to={`/wireframes-0${wireframe.version}`}>
+                <Link to={`/wireframes-${wireframe.version}`}>
                   View Full Wireframe Set
                 </Link>
               </Button>
@@ -140,7 +159,7 @@ const WireframeDashboard = () => {
           <CardTitle className="text-lg">Design Direction Comparison</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <h4 className="font-medium">Version 01 - Editorial</h4>
               <ul className="text-sm text-muted-foreground space-y-1">
@@ -157,6 +176,15 @@ const WireframeDashboard = () => {
                 <li>• Elegant serif typography</li>
                 <li>• Minimal, clean layouts</li>
                 <li>• Focus on artwork presentation</li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium">Version 03 - Contemporary</h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Promotional, conversion-focused</li>
+                <li>• Clean system typography</li>
+                <li>• Grid-heavy product layouts</li>
+                <li>• Urgency-driven design elements</li>
               </ul>
             </div>
           </div>

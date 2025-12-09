@@ -111,6 +111,58 @@ const wireframeVersions = [
       overallScore: { ux: 8, seo: 5 },
     },
   },
+  {
+    version: "03",
+    title: "Desenio Inspired",
+    reference: "desenio.com",
+    referenceUrl: "https://www.desenio.com",
+    status: "In Review",
+    description: "Contemporary Nordic style with promotional hero banners, countdown timers, category navigation, and conversion-focused product displays.",
+    designNotes: [
+      { icon: Type, label: "Typography", value: "DM Sans + System" },
+      { icon: Palette, label: "Colors", value: "Clean white with bold accents" },
+      { icon: Layout, label: "Layout", value: "Promotional, grid-heavy" },
+    ],
+    pages: [
+      { name: "Home", path: "/wireframes-03/home" },
+      { name: "Product", path: "/wireframes-03/product" },
+      { name: "Collection", path: "/wireframes-03/collection" },
+    ],
+    analysis: {
+      uxStrengths: [
+        "Prominent promotional banners with countdown timers create urgency",
+        "Clear category navigation with visual thumbnails aids discovery",
+        "Product cards show frame/size options inline for faster decisions",
+        "Sticky add-to-cart on product pages improves conversion flow",
+      ],
+      uxWeaknesses: [
+        "Heavy promotional focus may feel aggressive to some users",
+        "Multiple banner rotations can cause decision fatigue",
+        "Dense product grids may overwhelm on mobile viewports",
+        "Sale messaging dominates, potentially devaluing brand perception",
+      ],
+      seoStrengths: [
+        "Category-focused navigation supports topical clustering",
+        "Product pages include detailed specifications for long-tail keywords",
+        "Breadcrumb navigation visible on collection pages",
+        "Clear heading hierarchy throughout pages",
+      ],
+      seoWeaknesses: [
+        "Promotional/sale content may lack evergreen SEO value",
+        "Category pages light on descriptive text content",
+        "Limited blog or content marketing integration visible",
+        "Product descriptions could be more unique and detailed",
+      ],
+      recommendations: [
+        "Balance promotional content with evergreen category descriptions",
+        "Add room inspiration galleries to increase time on site",
+        "Implement product schema markup for rich snippets",
+        "Create buying guides for frame sizes to capture long-tail traffic",
+        "Add customer reviews section for social proof and fresh content",
+      ],
+      overallScore: { ux: 7, seo: 6 },
+    },
+  },
 ];
 
 const ScoreIndicator = ({ label, score }: { label: string; score: number }) => {
