@@ -97,6 +97,13 @@ import WireframeProduct05 from "./pages/wireframes/examples/05/WireframeProduct"
 import WireframeCollection05 from "./pages/wireframes/examples/05/WireframeCollection";
 import { WireframeLayout as WireframeLayout05 } from "./pages/wireframes/examples/05/WireframeLayout";
 
+// Wireframe Examples - Version 06
+import WireframeIndex06 from "./pages/wireframes/examples/06/index";
+import WireframeHome06 from "./pages/wireframes/examples/06/WireframeHome";
+import WireframeProduct06 from "./pages/wireframes/examples/06/WireframeProduct";
+import WireframeCollection06 from "./pages/wireframes/examples/06/WireframeCollection";
+import { WireframeLayout as WireframeLayout06 } from "./pages/wireframes/examples/06/WireframeLayout";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -155,6 +162,14 @@ const App = () => (
               <Route path="home" element={<WireframeHome05 />} />
               <Route path="product" element={<WireframeProduct05 />} />
               <Route path="collection" element={<WireframeCollection05 />} />
+            </Route>
+            
+            {/* Wireframe Examples - Version 06 */}
+            <Route path="/wireframes/examples/06" element={<WireframeLayout06 />}>
+              <Route index element={<WireframeIndex06 />} />
+              <Route path="home" element={<WireframeHome06 />} />
+              <Route path="product" element={<WireframeProduct06 />} />
+              <Route path="collection" element={<WireframeCollection06 />} />
             </Route>
             
             {/* Auth routes */}
