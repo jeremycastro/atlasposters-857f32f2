@@ -267,6 +267,58 @@ const wireframeVersions = [
       overallScore: { ux: 8, seo: 7 },
     },
   },
+  {
+    version: "06",
+    title: "FramedArt.com Inspired",
+    reference: "framedart.com",
+    referenceUrl: "https://www.framedart.com",
+    status: "New",
+    description: "Classic e-commerce aesthetic with red accents, category-focused navigation, trust badges, and a warm, approachable design that appeals to mainstream art buyers.",
+    designNotes: [
+      { icon: Type, label: "Typography", value: "Clean sans-serif headings" },
+      { icon: Palette, label: "Colors", value: "White with red accents" },
+      { icon: Layout, label: "Layout", value: "Traditional e-commerce grid" },
+    ],
+    pages: [
+      { name: "Home", path: "/wireframes/examples/06/home" },
+      { name: "Product", path: "/wireframes/examples/06/product" },
+      { name: "Collection", path: "/wireframes/examples/06/collection" },
+    ],
+    analysis: {
+      uxStrengths: [
+        "Strong trust signals with customer reviews and ratings prominently displayed",
+        "Category cards with images enable intuitive browsing by style or room",
+        "Clear pricing and frame customization options reduce purchase friction",
+        "Traditional layout familiar to mainstream e-commerce shoppers",
+      ],
+      uxWeaknesses: [
+        "Dense category grid may overwhelm new visitors",
+        "Classic design may feel dated compared to modern competitors",
+        "Hero carousel auto-rotation can be distracting",
+        "Mobile navigation could be more streamlined",
+      ],
+      seoStrengths: [
+        "Category-focused structure creates strong topical clusters",
+        "Customer reviews provide fresh, unique content",
+        "Clear heading hierarchy and breadcrumbs aid crawlability",
+        "Product specifications support long-tail keywords",
+      ],
+      seoWeaknesses: [
+        "Homepage is image-heavy with limited crawlable text",
+        "Category descriptions could be more detailed",
+        "Missing FAQ sections for common queries",
+        "Blog or editorial content not prominently featured",
+      ],
+      recommendations: [
+        "Add product schema markup for rich snippets in search",
+        "Include more text content in category header sections",
+        "Create room inspiration guides for content marketing",
+        "Add customer photos and reviews for social proof",
+        "Implement lazy loading for improved Core Web Vitals",
+      ],
+      overallScore: { ux: 7, seo: 6 },
+    },
+  },
 ];
 
 const ScoreIndicator = ({ label, score }: { label: string; score: number }) => {
