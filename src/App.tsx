@@ -58,7 +58,7 @@ import ArchiveManager from "./pages/admin/ArchiveManager";
 import ProductManagement from "./pages/admin/ProductManagement";
 import ProductTypeDetail from "./pages/admin/ProductTypeDetail";
 import VariantGroupDetail from "./pages/admin/VariantGroupDetail";
-import WireframeDashboard from "./pages/admin/WireframeDashboard";
+
 
 // Wireframes Gallery
 import WireframesGallery from "./pages/wireframes/index";
@@ -226,7 +226,7 @@ const App = () => (
               <Route path="products/types/:typeId" element={<ProductTypeDetail />} />
               <Route path="products/groups/:groupId" element={<VariantGroupDetail />} />
               <Route path="knowledge/archive-manager" element={<ArchiveManager />} />
-              <Route path="wireframes" element={<WireframeDashboard />} />
+              <Route path="wireframes" element={<WireframesGallery />} />
             </Route>
             
             {/* Partner routes */}
