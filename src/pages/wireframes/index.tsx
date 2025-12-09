@@ -165,9 +165,9 @@ const wireframeVersions = [
   },
   {
     version: "04",
-    title: "Travel Premium Style",
-    reference: null,
-    referenceUrl: null,
+    title: "Stick No Bills Inspired",
+    reference: "sticknobills.com",
+    referenceUrl: "https://www.sticknobills.com",
     status: "In Review",
     description: "Bold travel-inspired aesthetic with dark navy backgrounds, destination-focused imagery, and premium vintage poster presentation.",
     designNotes: [
