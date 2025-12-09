@@ -73,7 +73,7 @@ export function WireframeHome() {
                 <Menu className="h-5 w-5" />
               </Button>
               <Link to="/wireframes-04" className="text-2xl font-serif text-white tracking-wide">
-                STICK NO BILLS®
+                ATLAS POSTERS
               </Link>
             </div>
 
@@ -314,7 +314,7 @@ export function WireframeHome() {
             </div>
           </div>
           <div className="border-t border-white/10 mt-12 pt-8 text-center text-sm text-white/40">
-            © 2024 Atlas Posters. Wireframe concept inspired by Stick No Bills.
+            © 2024 Atlas Posters. All rights reserved.
           </div>
         </div>
       </footer>
