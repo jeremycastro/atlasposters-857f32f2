@@ -20,9 +20,9 @@ const wireframeVersions = [
       { icon: Layout, label: "Layout", value: "Editorial, gallery-focused" },
     ],
     pages: [
-      { name: "Home", path: "/wireframes/examples/01/home" },
-      { name: "Product", path: "/wireframes/examples/01/product" },
-      { name: "Collection", path: "/wireframes/examples/01/collection" },
+      { name: "Home", path: "/admin/wireframes/examples/01/home" },
+      { name: "Product", path: "/admin/wireframes/examples/01/product" },
+      { name: "Collection", path: "/admin/wireframes/examples/01/collection" },
     ],
     analysis: {
       uxStrengths: [
@@ -72,9 +72,9 @@ const wireframeVersions = [
       { icon: Layout, label: "Layout", value: "Minimal, Scandinavian" },
     ],
     pages: [
-      { name: "Home", path: "/wireframes/examples/02/home" },
-      { name: "Product", path: "/wireframes/examples/02/product" },
-      { name: "Collection", path: "/wireframes/examples/02/collection" },
+      { name: "Home", path: "/admin/wireframes/examples/02/home" },
+      { name: "Product", path: "/admin/wireframes/examples/02/product" },
+      { name: "Collection", path: "/admin/wireframes/examples/02/collection" },
     ],
     analysis: {
       uxStrengths: [
@@ -124,9 +124,9 @@ const wireframeVersions = [
       { icon: Layout, label: "Layout", value: "Promotional, grid-heavy" },
     ],
     pages: [
-      { name: "Home", path: "/wireframes/examples/03/home" },
-      { name: "Product", path: "/wireframes/examples/03/product" },
-      { name: "Collection", path: "/wireframes/examples/03/collection" },
+      { name: "Home", path: "/admin/wireframes/examples/03/home" },
+      { name: "Product", path: "/admin/wireframes/examples/03/product" },
+      { name: "Collection", path: "/admin/wireframes/examples/03/collection" },
     ],
     analysis: {
       uxStrengths: [
@@ -176,9 +176,9 @@ const wireframeVersions = [
       { icon: Layout, label: "Layout", value: "Premium, destination-focused" },
     ],
     pages: [
-      { name: "Home", path: "/wireframes/examples/04/home" },
-      { name: "Product", path: "/wireframes/examples/04/product" },
-      { name: "Collection", path: "/wireframes/examples/04/collection" },
+      { name: "Home", path: "/admin/wireframes/examples/04/home" },
+      { name: "Product", path: "/admin/wireframes/examples/04/product" },
+      { name: "Collection", path: "/admin/wireframes/examples/04/collection" },
     ],
     analysis: {
       uxStrengths: [
@@ -228,9 +228,9 @@ const wireframeVersions = [
       { icon: Layout, label: "Layout", value: "Balanced, purposeful" },
     ],
     pages: [
-      { name: "Home", path: "/wireframes/examples/05/home" },
-      { name: "Product", path: "/wireframes/examples/05/product" },
-      { name: "Collection", path: "/wireframes/examples/05/collection" },
+      { name: "Home", path: "/admin/wireframes/examples/05/home" },
+      { name: "Product", path: "/admin/wireframes/examples/05/product" },
+      { name: "Collection", path: "/admin/wireframes/examples/05/collection" },
     ],
     analysis: {
       uxStrengths: [
@@ -280,9 +280,9 @@ const wireframeVersions = [
       { icon: Layout, label: "Layout", value: "Traditional e-commerce grid" },
     ],
     pages: [
-      { name: "Home", path: "/wireframes/examples/06/home" },
-      { name: "Product", path: "/wireframes/examples/06/product" },
-      { name: "Collection", path: "/wireframes/examples/06/collection" },
+      { name: "Home", path: "/admin/wireframes/examples/06/home" },
+      { name: "Product", path: "/admin/wireframes/examples/06/product" },
+      { name: "Collection", path: "/admin/wireframes/examples/06/collection" },
     ],
     analysis: {
       uxStrengths: [
@@ -584,7 +584,7 @@ const Wireframes = () => {
               {/* View Full Set - Always at bottom */}
               <div className="p-4 pt-0 mt-auto">
                 <Button asChild size="sm" className="w-full">
-                  <Link to={`/wireframes/examples/${wireframe.version}`}>
+                  <Link to={`/admin/wireframes/examples/${wireframe.version}`}>
                     View Full Wireframe
                   </Link>
                 </Button>

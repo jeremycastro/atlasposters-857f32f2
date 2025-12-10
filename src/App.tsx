@@ -124,56 +124,6 @@ const App = () => (
             <Route path="/product/:handle" element={<ProductDetail />} />
             <Route path="/collections/:handle" element={<Collection />} />
             <Route path="/about" element={<About />} />
-            <Route path="/wireframes" element={<WireframesGallery />} />
-            
-            {/* Wireframe Examples - Version 01 */}
-            <Route path="/wireframes/examples/01" element={<WireframeLayout01 />}>
-              <Route index element={<WireframeIndex01 />} />
-              <Route path="home" element={<WireframeHome01 />} />
-              <Route path="product" element={<WireframeProduct01 />} />
-              <Route path="collection" element={<WireframeCollection01 />} />
-            </Route>
-            
-            {/* Wireframe Examples - Version 02 */}
-            <Route path="/wireframes/examples/02" element={<WireframeLayout02 />}>
-              <Route index element={<WireframeIndex02 />} />
-              <Route path="home" element={<WireframeHome02 />} />
-              <Route path="product" element={<WireframeProduct02 />} />
-              <Route path="collection" element={<WireframeCollection02 />} />
-            </Route>
-            
-            {/* Wireframe Examples - Version 03 */}
-            <Route path="/wireframes/examples/03" element={<WireframeLayout03 />}>
-              <Route index element={<WireframeIndex03 />} />
-              <Route path="home" element={<WireframeHome03 />} />
-              <Route path="product" element={<WireframeProduct03 />} />
-              <Route path="collection" element={<WireframeCollection03 />} />
-            </Route>
-            
-            {/* Wireframe Examples - Version 04 */}
-            <Route path="/wireframes/examples/04" element={<WireframeLayout04 />}>
-              <Route index element={<WireframeIndex04 />} />
-              <Route path="home" element={<WireframeHome04 />} />
-              <Route path="product" element={<WireframeProduct04 />} />
-              <Route path="collection" element={<WireframeCollection04 />} />
-            </Route>
-            
-            {/* Wireframe Examples - Version 05 */}
-            <Route path="/wireframes/examples/05" element={<WireframeLayout05 />}>
-              <Route index element={<WireframeIndex05 />} />
-              <Route path="home" element={<WireframeHome05 />} />
-              <Route path="product" element={<WireframeProduct05 />} />
-              <Route path="collection" element={<WireframeCollection05 />} />
-            </Route>
-            
-            {/* Wireframe Examples - Version 06 */}
-            <Route path="/wireframes/examples/06" element={<WireframeLayout06 />}>
-              <Route index element={<WireframeIndex06 />} />
-              <Route path="home" element={<WireframeHome06 />} />
-              <Route path="product" element={<WireframeProduct06 />} />
-              <Route path="collection" element={<WireframeCollection06 />} />
-            </Route>
-            
             {/* Auth routes */}
             <Route path="/auth" element={<Auth />} />
             <Route path="/partner/auth" element={<PartnerAuth />} />
@@ -227,6 +177,54 @@ const App = () => (
               <Route path="products/groups/:groupId" element={<VariantGroupDetail />} />
               <Route path="knowledge/archive-manager" element={<ArchiveManager />} />
               <Route path="wireframes" element={<WireframesGallery />} />
+              
+              {/* Wireframe Examples - Version 01 */}
+              <Route path="wireframes/examples/01" element={<WireframeLayout01 />}>
+                <Route index element={<WireframeIndex01 />} />
+                <Route path="home" element={<WireframeHome01 />} />
+                <Route path="product" element={<WireframeProduct01 />} />
+                <Route path="collection" element={<WireframeCollection01 />} />
+              </Route>
+              
+              {/* Wireframe Examples - Version 02 */}
+              <Route path="wireframes/examples/02" element={<WireframeLayout02 />}>
+                <Route index element={<WireframeIndex02 />} />
+                <Route path="home" element={<WireframeHome02 />} />
+                <Route path="product" element={<WireframeProduct02 />} />
+                <Route path="collection" element={<WireframeCollection02 />} />
+              </Route>
+              
+              {/* Wireframe Examples - Version 03 */}
+              <Route path="wireframes/examples/03" element={<WireframeLayout03 />}>
+                <Route index element={<WireframeIndex03 />} />
+                <Route path="home" element={<WireframeHome03 />} />
+                <Route path="product" element={<WireframeProduct03 />} />
+                <Route path="collection" element={<WireframeCollection03 />} />
+              </Route>
+              
+              {/* Wireframe Examples - Version 04 */}
+              <Route path="wireframes/examples/04" element={<WireframeLayout04 />}>
+                <Route index element={<WireframeIndex04 />} />
+                <Route path="home" element={<WireframeHome04 />} />
+                <Route path="product" element={<WireframeProduct04 />} />
+                <Route path="collection" element={<WireframeCollection04 />} />
+              </Route>
+              
+              {/* Wireframe Examples - Version 05 */}
+              <Route path="wireframes/examples/05" element={<WireframeLayout05 />}>
+                <Route index element={<WireframeIndex05 />} />
+                <Route path="home" element={<WireframeHome05 />} />
+                <Route path="product" element={<WireframeProduct05 />} />
+                <Route path="collection" element={<WireframeCollection05 />} />
+              </Route>
+              
+              {/* Wireframe Examples - Version 06 */}
+              <Route path="wireframes/examples/06" element={<WireframeLayout06 />}>
+                <Route index element={<WireframeIndex06 />} />
+                <Route path="home" element={<WireframeHome06 />} />
+                <Route path="product" element={<WireframeProduct06 />} />
+                <Route path="collection" element={<WireframeCollection06 />} />
+              </Route>
             </Route>
             
             {/* Partner routes */}
