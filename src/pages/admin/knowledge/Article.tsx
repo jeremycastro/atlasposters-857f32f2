@@ -46,6 +46,7 @@ const staticArticleComponents: Record<string, React.LazyExoticComponent<React.Co
   "readymades-framing": lazy(() => import("./ReadymadesFraming")),
   "brand-story-exhibition-guide": lazy(() => import("./BrandStoryExhibitionGuide")),
   "knowledge-base-architecture": lazy(() => import("./KnowledgeBaseArchitecture")),
+  "mobile-view-methodology": lazy(() => import("./MobileViewMethodology")),
 };
 
 function ArticleLoadingSkeleton() {

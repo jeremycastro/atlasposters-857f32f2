@@ -42,6 +42,7 @@ const staticArticleSlugs = new Set([
   "prodigi-api",
   "product-importing",
   "readymades-framing",
+  "mobile-view-methodology",
 ]);
 
 interface UnifiedArticle {
