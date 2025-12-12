@@ -33,6 +33,13 @@ export default function WireframePreview() {
   // Build the preview URL - use full origin URL to force fresh page load in iframe
   const pagePath = currentPage !== "index" ? `/${currentPage}` : "";
   const previewUrl = `${window.location.origin}/wireframes/examples/${version}${pagePath}`;
+  
+  // Debug logging
+  console.log('[WireframePreview] version:', version);
+  console.log('[WireframePreview] currentPage:', currentPage);
+  console.log('[WireframePreview] pagePath:', pagePath);
+  console.log('[WireframePreview] previewUrl:', previewUrl);
+  console.log('[WireframePreview] window.location.origin:', window.location.origin);
 
   const handleVersionChange = (newVersion: string) => {
     navigate(`/admin/wireframes/preview/${newVersion}${currentPage !== "index" ? `/${currentPage}` : ""}`);
