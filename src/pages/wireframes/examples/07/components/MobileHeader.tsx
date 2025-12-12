@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Menu, Search, Heart, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -8,39 +7,8 @@ interface MobileHeaderProps {
 }
 
 export function MobileHeader({ onMenuOpen, onSearchOpen }: MobileHeaderProps) {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Determine if scrolled past threshold
-      setIsScrolled(currentScrollY > 50);
-      
-      // Show/hide based on scroll direction
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
-
   return (
-    <header 
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? "bg-background/95 backdrop-blur-sm shadow-sm" 
-          : "bg-background"
-      } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
-    >
+    <header className="bg-background border-b border-border/50">
       <div className="flex items-center justify-between px-4 py-3">
         {/* Left: Menu + Search */}
         <div className="flex items-center gap-1">
