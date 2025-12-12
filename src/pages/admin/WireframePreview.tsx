@@ -21,19 +21,25 @@ const pages = [
 ];
 
 export default function WireframePreview() {
-  const { version = "07", page = "index" } = useParams();
+  const { version = "07", page } = useParams();
   const navigate = useNavigate();
   const [device, setDevice] = useState<DeviceType>("iphone-14");
 
+  // Default to "index" if no page specified
+  const currentPage = page || "index";
+
   const wireframe = wireframeVersions.find((w) => w.version === version);
-  const previewUrl = `/wireframes/examples/${version}${page && page !== "index" ? `/${page}` : ""}`;
+  
+  // Build the preview URL - use absolute URL for iframe to avoid routing issues
+  const pagePath = currentPage !== "index" ? `/${currentPage}` : "";
+  const previewUrl = `${window.location.origin}/wireframes/examples/${version}${pagePath}`;
 
   const handleVersionChange = (newVersion: string) => {
-    navigate(`/admin/wireframes/preview/${newVersion}/${page}`);
+    navigate(`/admin/wireframes/preview/${newVersion}${currentPage !== "index" ? `/${currentPage}` : ""}`);
   };
 
   const handlePageChange = (newPage: string) => {
-    navigate(`/admin/wireframes/preview/${version}/${newPage}`);
+    navigate(`/admin/wireframes/preview/${version}${newPage !== "index" ? `/${newPage}` : ""}`);
   };
 
   return (
@@ -65,7 +71,7 @@ export default function WireframePreview() {
                   </SelectContent>
                 </Select>
 
-                <Select value={page} onValueChange={handlePageChange}>
+                <Select value={currentPage} onValueChange={handlePageChange}>
                   <SelectTrigger className="w-[140px]">
                     <SelectValue placeholder="Select page" />
                   </SelectTrigger>
