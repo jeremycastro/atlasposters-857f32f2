@@ -26,9 +26,9 @@ export const Navigation = () => {
       editor: '/admin/dashboard',
       viewer: '/admin/dashboard',
       partner: '/partner/dashboard',
-      customer: '/customer/dashboard'
+      customer: '/account'
     };
-    return activeRole ? roleRoutes[activeRole] || '/auth' : '/auth';
+    return activeRole ? roleRoutes[activeRole] || '/account' : '/login';
   };
 
   const getInitials = () => {
@@ -111,7 +111,7 @@ export const Navigation = () => {
             </DropdownMenu>
           ) : (
             <Button variant="ghost" size="sm" asChild>
-              <Link to="/auth" className="flex items-center gap-2">
+              <Link to="/login" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 <span className="hidden sm:inline">Sign In</span>
               </Link>
@@ -176,7 +176,7 @@ export const Navigation = () => {
               </>
             ) : (
               <Link
-                to="/auth"
+                to="/login"
                 className="text-sm font-medium hover:text-accent transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
