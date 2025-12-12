@@ -9,7 +9,7 @@ interface MobileHeaderProps {
 export function MobileHeader({ onMenuOpen, onSearchOpen }: MobileHeaderProps) {
   return (
     <header className="bg-background border-b border-border/50">
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between px-4 py-2">
         {/* Left: Menu + Search */}
         <div className="flex items-center gap-1">
           <Button 
