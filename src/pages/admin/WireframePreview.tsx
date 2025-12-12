@@ -14,19 +14,19 @@ import {
 } from "@/components/ui/select";
 
 const pages = [
-  { value: "", label: "Index" },
+  { value: "index", label: "Index" },
   { value: "home", label: "Home" },
   { value: "product", label: "Product" },
   { value: "collection", label: "Collection" },
 ];
 
 export default function WireframePreview() {
-  const { version = "07", page = "" } = useParams();
+  const { version = "07", page = "index" } = useParams();
   const navigate = useNavigate();
   const [device, setDevice] = useState<DeviceType>("iphone-14");
 
   const wireframe = wireframeVersions.find((w) => w.version === version);
-  const previewUrl = `/wireframes/${version}${page ? `/${page}` : ""}`;
+  const previewUrl = `/wireframes/${version}${page && page !== "index" ? `/${page}` : ""}`;
 
   const handleVersionChange = (newVersion: string) => {
     navigate(`/admin/wireframes/preview/${newVersion}/${page}`);
