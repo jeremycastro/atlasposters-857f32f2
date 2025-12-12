@@ -1,26 +1,26 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Smartphone, Layout, Palette, Search, Mail, Navigation } from "lucide-react";
 
-const wireframes = [
+const wireframePages = [
   {
     title: "Homepage",
     description: "Mobile-first homepage with sticky header, hero section, 2x2 discovery cards, curated collections, artist spotlight, and full-screen search.",
-    href: "/admin/wireframes/examples/07/home",
+    path: "home",
     features: ["Sticky Header", "Discovery Cards", "Email Modal", "Full-Screen Search", "Artist Carousel"],
   },
   {
     title: "Product Page",
     description: "Touch-optimized product detail with size/frame selectors, sticky add-to-cart, and expandable product information.",
-    href: "/admin/wireframes/examples/07/product",
+    path: "product",
     features: ["Size Selector", "Frame Options", "Sticky CTA", "Accordion Details"],
   },
   {
     title: "Collection Page",
     description: "Filterable collection with slide-out filters, sort options, and toggle between grid and list views.",
-    href: "/admin/wireframes/examples/07/collection",
+    path: "collection",
     features: ["Slide-out Filters", "Sort Sheet", "Grid/List Toggle", "Sticky Toolbar"],
   },
 ];
@@ -59,6 +59,11 @@ const designNotes = [
 ];
 
 export default function WireframeIndex() {
+  const location = useLocation();
+  // Determine base path based on current context
+  const isAdmin = location.pathname.startsWith("/admin");
+  const basePath = isAdmin ? "/admin/wireframes/examples/07" : "/wireframes/examples/07";
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -86,7 +91,7 @@ export default function WireframeIndex() {
       <div className="container mx-auto px-4 py-12">
         <h2 className="text-2xl font-semibold mb-6">Page Wireframes</h2>
         <div className="grid md:grid-cols-3 gap-6 mb-16">
-          {wireframes.map((wireframe) => (
+          {wireframePages.map((wireframe) => (
             <Card key={wireframe.title} className="group overflow-hidden">
               <div className="aspect-video overflow-hidden bg-muted flex items-center justify-center">
                 <div className="text-center p-4">
@@ -109,7 +114,7 @@ export default function WireframeIndex() {
                     </Badge>
                   ))}
                 </div>
-                <Link to={wireframe.href}>
+                <Link to={`${basePath}/${wireframe.path}`}>
                   <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white">
                     View Wireframe
                   </Button>
