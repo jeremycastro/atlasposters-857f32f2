@@ -26,7 +26,7 @@ export default function WireframePreview() {
   const [device, setDevice] = useState<DeviceType>("iphone-14");
 
   const wireframe = wireframeVersions.find((w) => w.version === version);
-  const previewUrl = `/wireframes/${version}${page && page !== "index" ? `/${page}` : ""}`;
+  const previewUrl = `/wireframes/examples/${version}${page && page !== "index" ? `/${page}` : ""}`;
 
   const handleVersionChange = (newVersion: string) => {
     navigate(`/admin/wireframes/preview/${newVersion}/${page}`);
