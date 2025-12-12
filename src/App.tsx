@@ -225,6 +225,14 @@ const App = () => (
                 <Route path="product" element={<WireframeProduct06 />} />
                 <Route path="collection" element={<WireframeCollection06 />} />
               </Route>
+              
+              {/* Wireframe Examples - Version 07 */}
+              <Route path="wireframes/examples/07" element={<WireframeLayout07 />}>
+                <Route index element={<WireframeIndex07 />} />
+                <Route path="home" element={<WireframeHome07 />} />
+                <Route path="product" element={<WireframeProduct07 />} />
+                <Route path="collection" element={<WireframeCollection07 />} />
+              </Route>
             </Route>
             
             {/* Partner routes */}

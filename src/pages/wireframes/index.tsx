@@ -319,6 +319,58 @@ const wireframeVersions = [
       overallScore: { ux: 7, seo: 6 },
     },
   },
+  {
+    version: "07",
+    title: "Mobile-First Atlas",
+    reference: null,
+    referenceUrl: null,
+    status: "New",
+    description: "Mobile-first design with sticky header, 2x2 discovery cards, full-screen search overlay, email capture modal, and touch-optimized interactions.",
+    designNotes: [
+      { icon: Type, label: "Typography", value: "System fonts, bold headings" },
+      { icon: Palette, label: "Colors", value: "White with amber/gold accents" },
+      { icon: Layout, label: "Layout", value: "Phone-first, touch-optimized" },
+    ],
+    pages: [
+      { name: "Home", path: "/admin/wireframes/examples/07/home" },
+      { name: "Product", path: "/admin/wireframes/examples/07/product" },
+      { name: "Collection", path: "/admin/wireframes/examples/07/collection" },
+    ],
+    analysis: {
+      uxStrengths: [
+        "Mobile-first approach ensures optimal phone experience",
+        "Sticky header with smart hide/show reduces navigation friction",
+        "Full-screen search overlay with trending terms aids discovery",
+        "2x2 discovery cards provide quick category access with minimal scrolling",
+      ],
+      uxWeaknesses: [
+        "Email popup may feel intrusive to some users",
+        "Wireframe placeholders need real imagery to evaluate visual impact",
+        "Desktop adaptation needs refinement for larger screens",
+        "Limited product information visible in grid view",
+      ],
+      seoStrengths: [
+        "Semantic HTML structure with proper heading hierarchy",
+        "Mobile-first design aligns with Google's mobile-first indexing",
+        "Clear category taxonomy supports topical clustering",
+        "Product pages include detailed specifications",
+      ],
+      seoWeaknesses: [
+        "Image placeholders reduce crawlable visual content",
+        "Limited text content on homepage sections",
+        "Missing structured data markup for products",
+        "Blog or editorial content not integrated",
+      ],
+      recommendations: [
+        "Add product schema markup for rich snippets",
+        "Include more descriptive text in category sections",
+        "Implement lazy loading for product images",
+        "Add customer reviews for social proof and SEO value",
+        "Create buying guides for frame sizes and care instructions",
+      ],
+      overallScore: { ux: 8, seo: 6 },
+    },
+  },
 ];
 
 const ScoreIndicator = ({ label, score }: { label: string; score: number }) => {
