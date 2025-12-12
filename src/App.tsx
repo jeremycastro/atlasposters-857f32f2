@@ -184,6 +184,16 @@ const App = () => (
             <Route path="/partner/auth" element={<PartnerAuth />} />
             <Route path="/customer/auth" element={<CustomerAuth />} />
             
+            {/* Wireframe Preview - standalone route (no AdminLayout wrapper) */}
+            <Route 
+              path="/admin/wireframes/preview/:version?/:page?" 
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'editor', 'viewer']}>
+                  <WireframePreview />
+                </ProtectedRoute>
+              }
+            />
+            
             {/* Admin routes */}
             <Route 
               path="/admin" 
@@ -233,7 +243,6 @@ const App = () => (
               <Route path="products/groups/:groupId" element={<VariantGroupDetail />} />
               <Route path="knowledge/archive-manager" element={<ArchiveManager />} />
               <Route path="wireframes" element={<WireframesGallery />} />
-              <Route path="wireframes/preview/:version?/:page?" element={<WireframePreview />} />
               
               {/* Wireframe Examples - Version 01 */}
               <Route path="wireframes/examples/01" element={<WireframeLayout01 />}>
