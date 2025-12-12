@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -24,6 +25,7 @@ export function WireframeExampleNav({
 }: WireframeExampleNavProps) {
   const location = useLocation();
   const basePath = `/wireframes/examples/${version}`;
+  const [isHidden, setIsHidden] = useState(false);
 
   const getPagePath = (page: string) => {
     if (page === "Index") return basePath;
@@ -36,6 +38,19 @@ export function WireframeExampleNav({
   };
 
   const isDark = variant === "dark";
+
+  if (isHidden) {
+    return (
+      <button
+        onClick={() => setIsHidden(false)}
+        className={`fixed top-2 right-2 z-[100] p-2 rounded-full shadow-lg ${
+          isDark ? "bg-[#1c1c1c] text-white/70 hover:text-white" : "bg-background text-muted-foreground hover:text-foreground"
+        } border ${isDark ? "border-white/10" : "border-border"}`}
+      >
+        <ChevronDown className="h-4 w-4" />
+      </button>
+    );
+  }
 
   return (
     <div className={`sticky top-0 z-[100] ${isDark ? "bg-[#1c1c1c] border-white/10" : "bg-muted border-border"} border-b px-4 py-2`}>
@@ -94,6 +109,14 @@ export function WireframeExampleNav({
               </Button>
             </a>
           )}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsHidden(true)}
+            className={`h-8 w-8 ${isDark ? "text-white/70 hover:text-white hover:bg-white/10" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            <ChevronUp className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     </div>
