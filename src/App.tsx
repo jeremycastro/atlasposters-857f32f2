@@ -21,6 +21,7 @@ import BrandAssets from "./pages/admin/knowledge/BrandAssets";
 import TaskManagementKB from "./pages/admin/knowledge/TaskManagement";
 import ArtworkCatalogKB from "./pages/admin/knowledge/ArtworkCatalog";
 import AdminBrandGuide from "./pages/admin/knowledge/AdminBrandGuide";
+import MobileViewMethodology from "./pages/admin/knowledge/MobileViewMethodology";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import PartnerAuth from "./pages/PartnerAuth";
@@ -209,6 +210,7 @@ const App = () => (
               <Route path="knowledge/prodigi-api" element={<ProdigiAPI />} />
               <Route path="knowledge/product-importing" element={<ProductImporting />} />
               <Route path="knowledge/readymades-framing" element={<ReadymadesFraming />} />
+              <Route path="knowledge/mobile-view-methodology" element={<MobileViewMethodology />} />
               {/* Dynamic article route - must be after static routes */}
               <Route path="knowledge/article/:slug" element={<KnowledgeArticle />} />
               <Route path="knowledge/migrate" element={<ContentMigration />} />
