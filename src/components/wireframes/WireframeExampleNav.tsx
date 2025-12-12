@@ -59,17 +59,17 @@ export function WireframeExampleNav({
   }
 
   return (
-    <div className={`sticky top-0 z-[100] ${isDark ? "bg-[#1c1c1c] border-white/10" : "bg-muted border-border"} border-b px-4 py-2`}>
-      <div className="container mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <div className={`sticky top-0 z-[100] ${isDark ? "bg-[#1c1c1c] border-white/10" : "bg-muted border-border"} border-b px-2 sm:px-4 py-2 overflow-hidden`}>
+      <div className="container mx-auto flex items-center justify-between gap-2 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <Link to={galleryPath}>
             <Button 
               variant="ghost" 
               size="sm" 
-              className={`gap-2 ${isDark ? "text-white/70 hover:text-white hover:bg-white/10" : "text-muted-foreground hover:text-foreground"}`}
+              className={`gap-1 sm:gap-2 px-2 sm:px-3 ${isDark ? "text-white/70 hover:text-white hover:bg-white/10" : "text-muted-foreground hover:text-foreground"}`}
             >
               <ArrowLeft className="h-4 w-4" />
-              Gallery
+              <span className="hidden sm:inline">Gallery</span>
             </Button>
           </Link>
           <div className="hidden sm:flex items-center gap-2">
@@ -80,19 +80,19 @@ export function WireframeExampleNav({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide min-w-0">
           {pages.map((page) => (
-            <Link key={page} to={getPagePath(page)}>
+            <Link key={page} to={getPagePath(page)} className="shrink-0">
               <Button
                 variant={isActive(page) ? "secondary" : "ghost"}
                 size="sm"
-                className={
+                className={`px-2 sm:px-3 text-xs sm:text-sm ${
                   isActive(page)
                     ? `${accentColor} text-white hover:opacity-90`
                     : isDark 
                       ? "text-white/70 hover:text-white hover:bg-white/10"
                       : "text-muted-foreground hover:text-foreground"
-                }
+                }`}
               >
                 {page}
               </Button>
@@ -103,7 +103,7 @@ export function WireframeExampleNav({
               href={referenceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden md:block"
+              className="hidden md:block shrink-0"
             >
               <Button 
                 variant="ghost" 
@@ -119,7 +119,7 @@ export function WireframeExampleNav({
             variant="ghost"
             size="icon"
             onClick={() => setIsHidden(true)}
-            className={`h-8 w-8 ${isDark ? "text-white/70 hover:text-white hover:bg-white/10" : "text-muted-foreground hover:text-foreground"}`}
+            className={`h-8 w-8 shrink-0 ${isDark ? "text-white/70 hover:text-white hover:bg-white/10" : "text-muted-foreground hover:text-foreground"}`}
           >
             <ChevronUp className="h-4 w-4" />
           </Button>
