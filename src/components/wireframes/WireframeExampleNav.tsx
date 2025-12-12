@@ -24,7 +24,7 @@ export function WireframeExampleNav({
   variant = "dark",
 }: WireframeExampleNavProps) {
   const location = useLocation();
-  const [isHidden, setIsHidden] = useState(false);
+  const [isHidden, setIsHidden] = useState(true);
 
   // Detect if we're in admin context based on current path
   const isAdmin = location.pathname.startsWith("/admin");
