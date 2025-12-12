@@ -38,10 +38,10 @@ function DiscoveryCard({ title, subButtons }: DiscoveryCardProps) {
 }
 
 const discoveryItems = [
-  { title: "Artist Collection", subButtons: ["Browse", "Popular", "New"] },
-  { title: "Travel Posters", subButtons: ["Browse", "Popular", "New"] },
-  { title: "Movie Posters", subButtons: ["Browse", "Popular", "New"] },
-  { title: "Botanical", subButtons: ["Browse", "Popular", "New"] },
+  { title: "Discover Destinations", subButtons: ["Europe", "Americas", "Asia"] },
+  { title: "Uncover Artists", subButtons: ["Featured", "Emerging", "All"] },
+  { title: "Search People", subButtons: ["Athletes", "Icons", "Legends"] },
+  { title: "Discover Places", subButtons: ["Cities", "Landmarks", "Nature"] },
 ];
 
 interface DiscoveryCardsProps {
@@ -66,7 +66,7 @@ export function DiscoveryCards({ onSearchClick }: DiscoveryCardsProps) {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search posters, artists..."
+            placeholder="Search people, places, sports, landmarks"
             className="pl-10 bg-muted border-0 h-12 cursor-pointer"
             readOnly
           />
