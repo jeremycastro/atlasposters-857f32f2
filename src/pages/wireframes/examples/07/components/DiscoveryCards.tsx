@@ -83,7 +83,7 @@ export function DiscoveryCards({ onSearchClick }: DiscoveryCardsProps) {
 
   return (
     <>
-      <section className="px-4 py-8">
+      <section className="px-4 pt-4 pb-8">
         {/* 2x2 Grid */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           {discoveryItems.map((item) => (
