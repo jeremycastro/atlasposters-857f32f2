@@ -12,6 +12,40 @@ interface ChangelogEntry {
 
 const changelogData: ChangelogEntry[] = [
   {
+    version: "0.5.3",
+    date: "2025-12-12",
+    changes: [
+      {
+        type: "added",
+        description: "Shared WireframeCard Component - Reusable component for admin and public wireframe galleries with conditional admin features (publish/unpublish toggle, UX/SEO analysis accordions, external link buttons)",
+      },
+      {
+        type: "added",
+        description: "Fixed Bottom Search Bar - Scroll-aware search bar fixed at bottom of viewport in Wireframe 07 hero section, fades out when user scrolls (based on Balsamiq mobile wireframe reference)",
+      },
+      {
+        type: "added",
+        description: "Knowledge Base Article: Mobile View Methodology - Comprehensive documentation covering mobile-first design philosophy, viewport breakpoints (Mobile/Tablet/Desktop), component architecture (MobileHeader, MobileNav, SearchOverlay, MobileFooter), touch interaction patterns, scroll behaviors, and design tokens",
+      },
+      {
+        type: "added",
+        description: "WireframeExampleNav Hide Feature - Collapsible wireframe navigation bar with toggle button to minimize and restore, maximizing content viewing area",
+      },
+      {
+        type: "changed",
+        description: "WireframeExampleNav Admin Context Detection - Navigation now correctly detects admin vs public context based on URL path, ensuring page links route to appropriate admin or public wireframe pages",
+      },
+      {
+        type: "changed",
+        description: "WireframeExampleNav Mobile Responsiveness - Fixed horizontal overflow issues on mobile with proper flex container constraints (overflow-hidden, min-w-0, shrink-0) and responsive padding/gaps",
+      },
+      {
+        type: "fixed",
+        description: "WireframeCard Height Consistency - Cards now stretch to fill grid cells (h-full) ensuring 'View Wireframe' button consistently appears at bottom regardless of content length",
+      },
+    ],
+  },
+  {
     version: "0.5.2",
     date: "2025-12-04",
     changes: [
