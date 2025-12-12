@@ -164,4 +164,14 @@ export const knowledgeArticles: KnowledgeArticle[] = [
     lastUpdated: "2025-12-06",
     tags: ["Knowledge Base", "Architecture", "Database", "Versioning", "GitHub", "Components"]
   },
+  {
+    id: "mobile-view-methodology",
+    title: "Mobile View Methodology",
+    description: "Mobile-first design philosophy covering viewport breakpoints, component architecture, touch interactions, scroll behaviors, and responsive design tokens",
+    category: "Developer Documentation",
+    route: "/admin/knowledge/article/mobile-view-methodology",
+    icon: "Smartphone",
+    lastUpdated: "2025-12-12",
+    tags: ["Mobile", "Responsive", "Wireframes", "Touch", "Components", "Design System"]
+  },
 ];
