@@ -45,7 +45,7 @@ export function CuratedCollections() {
     <section className="py-8">
       {/* Header */}
       <div className="flex items-center justify-between px-4 mb-4">
-        <h2 className="text-lg font-bold">Curated Collections</h2>
+        <h2 className="text-lg font-bold">Shop by Destination</h2>
         <div className="hidden sm:flex gap-1">
           <Button variant="ghost" size="icon" onClick={() => scroll("left")}>
             <ChevronLeft className="h-4 w-4" />

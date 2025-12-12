@@ -5,21 +5,20 @@ import { MobileNav } from "./components/MobileNav";
 import { SearchOverlay } from "./components/SearchOverlay";
 import { HeroSection } from "./components/HeroSection";
 import { DiscoveryCards } from "./components/DiscoveryCards";
+import { ShopByTheme } from "./components/ShopByTheme";
 import { CuratedCollections } from "./components/CuratedCollections";
-import { FramePrintQualitySection } from "./components/FramePrintQualitySection";
-import { FeaturedEdition } from "./components/FeaturedEdition";
-import { HowItWorks } from "./components/HowItWorks";
+import { TopCities } from "./components/TopCities";
 import { FeaturedArtist } from "./components/FeaturedArtist";
 import { ArtistSpotlight } from "./components/ArtistSpotlight";
 import { BestSellers } from "./components/BestSellers";
+import { NewArrivals } from "./components/NewArrivals";
+import { CuratedCollectionsGrid } from "./components/CuratedCollectionsGrid";
+import { FramePrintQualitySection } from "./components/FramePrintQualitySection";
 import { TestimonialsSection } from "./components/TestimonialsSection";
-import { PressLogos } from "./components/PressLogos";
-import { ShopByRoom } from "./components/ShopByRoom";
+import { InspirationStories } from "./components/InspirationStories";
+import { PromotionalBanner } from "./components/PromotionalBanner";
 import { TrustPropositions } from "./components/TrustPropositions";
 import { BrandStorySection } from "./components/BrandStorySection";
-import { RecentlyViewed } from "./components/RecentlyViewed";
-import { FAQSection } from "./components/FAQSection";
-import { InstagramFeed } from "./components/InstagramFeed";
 import { NewsletterSection } from "./components/NewsletterSection";
 import { MobileFooter } from "./components/MobileFooter";
 import { EmailSignupModal } from "./components/EmailSignupModal";
@@ -53,58 +52,55 @@ export default function WireframeHome() {
       
       {/* Main Content */}
       <main>
-        {/* Hero Section */}
+        {/* 1. Hero Section */}
         <HeroSection />
         
-        {/* Discovery Cards (2x2) + Search */}
+        {/* 2. Discovery Cards (2x2) + Search */}
         <DiscoveryCards onSearchClick={() => setIsSearchOpen(true)} />
         
-        {/* Curated Collections Slider */}
+        {/* 3. Shop by Theme - 16:9 vertical list */}
+        <ShopByTheme />
+        
+        {/* 4. Shop by Destination - horizontal scroll */}
         <CuratedCollections />
         
-        {/* Frames & Quality Section */}
-        <FramePrintQualitySection />
+        {/* 5. Top Cities - 3x3 grid */}
+        <TopCities />
         
-        {/* Featured Edition Block */}
-        <FeaturedEdition />
-        
-        {/* How It Works */}
-        <HowItWorks />
-        
-        {/* Featured Artist (Full Block) */}
+        {/* 6. Featured Artist (Full Block) */}
         <FeaturedArtist />
         
-        {/* Artist Spotlight Carousel */}
+        {/* 7. Artist Spotlight Carousel */}
         <ArtistSpotlight />
         
-        {/* Best Sellers Grid */}
+        {/* 8. Best Sellers Grid */}
         <BestSellers />
         
-        {/* Testimonials */}
+        {/* 9. New Arrivals Grid */}
+        <NewArrivals />
+        
+        {/* 10. Curated Collections - 16:9 vertical list */}
+        <CuratedCollectionsGrid />
+        
+        {/* 11. Frame & Print Quality */}
+        <FramePrintQualitySection />
+        
+        {/* 12. Testimonials */}
         <TestimonialsSection />
         
-        {/* Press Logos */}
-        <PressLogos />
+        {/* 13. Inspiration & Stories */}
+        <InspirationStories />
         
-        {/* Shop by Room */}
-        <ShopByRoom />
+        {/* 14. Promotional Banner */}
+        <PromotionalBanner />
         
-        {/* Trust Propositions */}
+        {/* 15. Trust Propositions (delivery icons) */}
         <TrustPropositions />
         
-        {/* Brand Story Section */}
+        {/* 16. Brand Story Section */}
         <BrandStorySection />
         
-        {/* Recently Viewed */}
-        <RecentlyViewed />
-        
-        {/* FAQ Section */}
-        <FAQSection />
-        
-        {/* Instagram Feed */}
-        <InstagramFeed />
-        
-        {/* Newsletter Section */}
+        {/* 17. Newsletter Section */}
         <NewsletterSection />
       </main>
       
