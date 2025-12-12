@@ -31,6 +31,7 @@ export function DevicePreview({ src, device, className }: DevicePreviewProps) {
     return (
       <div className={cn("w-full h-full", className)}>
         <iframe
+          key={src}
           src={src}
           className="w-full h-full border-0"
           title="Wireframe Preview"
@@ -73,6 +74,7 @@ export function DevicePreview({ src, device, className }: DevicePreviewProps) {
 
           {/* Content iframe */}
           <iframe
+            key={src}
             src={src}
             className="w-full h-full border-0"
             style={{
