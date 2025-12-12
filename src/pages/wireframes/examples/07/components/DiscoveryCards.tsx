@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { WireframePlaceholder } from "./WireframePlaceholder";
+import { cn } from "@/lib/utils";
 
 interface DiscoveryCardProps {
   title: string;
@@ -51,28 +52,66 @@ interface DiscoveryCardsProps {
 
 export function DiscoveryCards({ onSearchClick }: DiscoveryCardsProps) {
   const [searchValue, setSearchValue] = useState("");
+  const [isInline, setIsInline] = useState(false);
+  const searchAnchorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (searchAnchorRef.current) {
+        const rect = searchAnchorRef.current.getBoundingClientRect();
+        // When anchor scrolls into view (bottom of viewport), switch to inline
+        setIsInline(rect.top < window.innerHeight - 80);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // Check initial state
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const searchBar = (
+    <div className="relative">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <Input
+        placeholder="Search people, places, sports, landmarks"
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value)}
+        className="pl-10 bg-muted border-0 h-12 rounded-full shadow-lg"
+      />
+    </div>
+  );
 
   return (
-    <section className="px-4 py-8">
-      {/* 2x2 Grid */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        {discoveryItems.map((item) => (
-          <DiscoveryCard key={item.title} {...item} />
-        ))}
-      </div>
-
-      {/* Sticky Search Bar */}
-      <div className="sticky top-[88px] z-40 -mx-4 px-4 py-3 bg-background/95 backdrop-blur-sm border-b border-border/30">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search people, places, sports, landmarks"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            className="pl-10 bg-muted border-0 h-12"
-          />
+    <>
+      <section className="px-4 py-8">
+        {/* 2x2 Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {discoveryItems.map((item) => (
+            <DiscoveryCard key={item.title} {...item} />
+          ))}
         </div>
+
+        {/* Anchor point for inline search */}
+        <div ref={searchAnchorRef}>
+          {isInline && (
+            <div className="py-2">
+              {searchBar}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Fixed bottom search bar - visible until scrolled */}
+      <div 
+        className={cn(
+          "fixed bottom-6 left-4 right-4 z-50 transition-all duration-300",
+          isInline 
+            ? "opacity-0 translate-y-4 pointer-events-none" 
+            : "opacity-100 translate-y-0"
+        )}
+      >
+        {searchBar}
       </div>
-    </section>
+    </>
   );
 }
