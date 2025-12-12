@@ -258,11 +258,20 @@ const Wireframes = () => {
 
                 {/* Actions */}
                 <div className="p-4 pt-0 mt-auto space-y-2">
-                  <Button asChild size="sm" className="w-full">
-                    <Link to={`/admin/wireframes/examples/${wireframe.version}`}>
-                      View Full Wireframe
-                    </Link>
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button asChild size="sm" className="flex-1">
+                      <Link to={`/admin/wireframes/examples/${wireframe.version}`}>
+                        View Wireframe
+                      </Link>
+                    </Button>
+                    {isPublished && (
+                      <Button asChild variant="outline" size="sm">
+                        <Link to={`/wireframes/examples/${wireframe.version}`} target="_blank">
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
                   <Button
                     variant={isPublished ? "outline" : "secondary"}
                     size="sm"
