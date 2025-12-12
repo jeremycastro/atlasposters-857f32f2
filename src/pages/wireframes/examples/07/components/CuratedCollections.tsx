@@ -1,7 +1,8 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { WireframePlaceholder } from "./WireframePlaceholder";
+import { cn } from "@/lib/utils";
 
 const collections = [
   { title: "National Parks", count: 42 },
@@ -13,6 +14,23 @@ const collections = [
 
 export function CuratedCollections() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isAtStart, setIsAtStart] = useState(true);
+  const [isAtEnd, setIsAtEnd] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const handleScroll = () => {
+      const threshold = 10;
+      setIsAtStart(el.scrollLeft < threshold);
+      setIsAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - threshold);
+    };
+
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Check initial state
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -41,12 +59,16 @@ export function CuratedCollections() {
       {/* Horizontal Scroll */}
       <div
         ref={scrollRef}
-        className="flex gap-3 overflow-x-auto scrollbar-hide px-4 pb-2 snap-x snap-mandatory"
+        className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory"
       >
-        {collections.map((collection) => (
+        {collections.map((collection, index) => (
           <div
             key={collection.title}
-            className="flex-shrink-0 w-[140px] sm:w-[180px] snap-start"
+            className={cn(
+              "flex-shrink-0 w-[140px] sm:w-[180px] snap-start transition-all duration-200",
+              index === 0 && isAtStart && "ml-4",
+              index === collections.length - 1 && isAtEnd && "mr-4"
+            )}
           >
             <WireframePlaceholder 
               aspectRatio="portrait" 
