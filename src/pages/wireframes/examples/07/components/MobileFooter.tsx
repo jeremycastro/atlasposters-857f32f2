@@ -114,7 +114,7 @@ export function MobileFooter() {
       {/* Bottom Bar */}
       <div className="border-t border-background/20 px-4 py-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-background/50">
-          <p>© 2024 Atlas Posters. All rights reserved.</p>
+          <p>© 2026 Atlas Posters. All rights reserved.</p>
           <div className="flex gap-4">
             <a href="#" className="hover:text-background">Privacy</a>
             <a href="#" className="hover:text-background">Terms</a>
