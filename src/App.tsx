@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { DomainProvider } from "@/contexts/DomainContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
@@ -23,12 +24,11 @@ import ArtworkCatalogKB from "./pages/admin/knowledge/ArtworkCatalog";
 import AdminBrandGuide from "./pages/admin/knowledge/AdminBrandGuide";
 import MobileViewMethodology from "./pages/admin/knowledge/MobileViewMethodology";
 import NotFound from "./pages/NotFound";
-import Auth from "./pages/Auth";
-import PartnerAuth from "./pages/PartnerAuth";
-import CustomerAuth from "./pages/CustomerAuth";
+import Login from "./pages/Login";
+import PartnerApply from "./pages/partner/Apply";
 import AdminLayout from "./layouts/AdminLayout";
 import PartnerLayout from "./layouts/PartnerLayout";
-import CustomerLayout from "./layouts/CustomerLayout";
+import CustomerAccountLayout from "./layouts/CustomerAccountLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import TaskManager from "./pages/admin/TaskManager";
@@ -41,7 +41,6 @@ import PartnerDetail from "./pages/admin/PartnerDetail";
 import ArtworkDetail from "./pages/admin/ArtworkDetail";
 import BrandTagManagement from "./pages/admin/BrandTagManagement";
 import Payouts from "./pages/admin/Payouts";
-import CustomerDashboard from "./pages/customer/Dashboard";
 import BrandStory from "./pages/admin/knowledge/BrandStory";
 import ProdigiAPI from "./pages/admin/knowledge/ProdigiAPI";
 import ProductImporting from "./pages/admin/knowledge/ProductImporting";
@@ -60,6 +59,12 @@ import ProductManagement from "./pages/admin/ProductManagement";
 import ProductTypeDetail from "./pages/admin/ProductTypeDetail";
 import VariantGroupDetail from "./pages/admin/VariantGroupDetail";
 import WireframePreview from "./pages/admin/WireframePreview";
+
+// Account pages
+import AccountDashboard from "./pages/account/Dashboard";
+import AccountOrders from "./pages/account/Orders";
+import AccountSettings from "./pages/account/Settings";
+import AccountWishlist from "./pages/account/Wishlist";
 
 // Wireframes Gallery
 import WireframesGallery from "./pages/wireframes/index";
@@ -120,220 +125,228 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <Toaster />
-        <Sonner />
         <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/pitch01" element={<Pitch01 />} />
-            <Route path="/poster-history" element={<PosterHistory />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/product/:handle" element={<ProductDetail />} />
-            <Route path="/collections/:handle" element={<Collection />} />
-            <Route path="/about" element={<About />} />
-            
-            {/* Public Wireframes (published only) */}
-            <Route path="/wireframes" element={<PublicWireframesGallery />} />
-            <Route path="/wireframes/examples/01" element={<WireframeLayout01 />}>
-              <Route index element={<WireframeIndex01 />} />
-              <Route path="home" element={<WireframeHome01 />} />
-              <Route path="product" element={<WireframeProduct01 />} />
-              <Route path="collection" element={<WireframeCollection01 />} />
-            </Route>
-            <Route path="/wireframes/examples/02" element={<WireframeLayout02 />}>
-              <Route index element={<WireframeIndex02 />} />
-              <Route path="home" element={<WireframeHome02 />} />
-              <Route path="product" element={<WireframeProduct02 />} />
-              <Route path="collection" element={<WireframeCollection02 />} />
-            </Route>
-            <Route path="/wireframes/examples/03" element={<WireframeLayout03 />}>
-              <Route index element={<WireframeIndex03 />} />
-              <Route path="home" element={<WireframeHome03 />} />
-              <Route path="product" element={<WireframeProduct03 />} />
-              <Route path="collection" element={<WireframeCollection03 />} />
-            </Route>
-            <Route path="/wireframes/examples/04" element={<WireframeLayout04 />}>
-              <Route index element={<WireframeIndex04 />} />
-              <Route path="home" element={<WireframeHome04 />} />
-              <Route path="product" element={<WireframeProduct04 />} />
-              <Route path="collection" element={<WireframeCollection04 />} />
-            </Route>
-            <Route path="/wireframes/examples/05" element={<WireframeLayout05 />}>
-              <Route index element={<WireframeIndex05 />} />
-              <Route path="home" element={<WireframeHome05 />} />
-              <Route path="product" element={<WireframeProduct05 />} />
-              <Route path="collection" element={<WireframeCollection05 />} />
-            </Route>
-            <Route path="/wireframes/examples/06" element={<WireframeLayout06 />}>
-              <Route index element={<WireframeIndex06 />} />
-              <Route path="home" element={<WireframeHome06 />} />
-              <Route path="product" element={<WireframeProduct06 />} />
-              <Route path="collection" element={<WireframeCollection06 />} />
-            </Route>
-            <Route path="/wireframes/examples/07" element={<WireframeLayout07 />}>
-              <Route index element={<WireframeIndex07 />} />
-              <Route path="home" element={<WireframeHome07 />} />
-              <Route path="product" element={<WireframeProduct07 />} />
-              <Route path="collection" element={<WireframeCollection07 />} />
-            </Route>
-            
-            {/* Auth routes */}
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/partner/auth" element={<PartnerAuth />} />
-            <Route path="/customer/auth" element={<CustomerAuth />} />
-            
-            {/* Wireframe Preview - standalone route (no AdminLayout wrapper) */}
-            <Route 
-              path="/admin/wireframes/preview/:version?/:page?" 
-              element={
-                <ProtectedRoute allowedRoles={['admin', 'editor', 'viewer']}>
-                  <WireframePreview />
-                </ProtectedRoute>
-              }
-            />
-            
-            {/* Admin routes */}
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedRoute allowedRoles={['admin', 'editor', 'viewer']}>
-                  <AdminLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to="/admin/dashboard" replace />} />
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="tasks" element={<TaskManager />} />
-              <Route path="roadmap" element={<RoadmapManager />} />
-              <Route path="changelog" element={<Changelog />} />
-              <Route path="techstack" element={<TechStack />} />
-              <Route path="knowledge" element={<KnowledgeBase />} />
-              <Route path="knowledge/sku-methodology" element={<SKUMethodology />} />
-              <Route path="knowledge/partner-management" element={<PartnerManagementKB />} />
-              <Route path="knowledge/brand-assets" element={<BrandAssets />} />
-              <Route path="knowledge/task-management" element={<TaskManagementKB />} />
-              <Route path="knowledge/artwork-catalog" element={<ArtworkCatalogKB />} />
-              <Route path="knowledge/admin-brand-guide" element={<AdminBrandGuide />} />
-              <Route path="knowledge/brand-story" element={<BrandStory />} />
-              <Route path="knowledge/prodigi-api" element={<ProdigiAPI />} />
-              <Route path="knowledge/product-importing" element={<ProductImporting />} />
-              <Route path="knowledge/readymades-framing" element={<ReadymadesFraming />} />
-              <Route path="knowledge/mobile-view-methodology" element={<MobileViewMethodology />} />
-              {/* Dynamic article route - must be after static routes */}
-              <Route path="knowledge/article/:slug" element={<KnowledgeArticle />} />
-              <Route path="knowledge/migrate" element={<ContentMigration />} />
-              <Route path="brand-story" element={<BrandStoryDashboard />} />
-              <Route path="brand-story/timeline" element={<BrandTimeline />} />
-              <Route path="brand-story/poster-history" element={<PosterHistoryExhibition />} />
-              <Route path="artworks" element={<ArtworkCatalog />} />
-              <Route path="artworks/:artworkId" element={<ArtworkDetail />} />
-              <Route path="users" element={<UserManagement />} />
-              <Route path="navigation" element={<NavigationManager />} />
-              <Route path="partners" element={<PartnerManagement />} />
-              <Route path="partners/:partnerId" element={<PartnerDetail />} />
-              <Route path="partners/:partnerId/brands/:brandId/tags" element={<BrandTagManagement />} />
-              <Route path="payouts" element={<Payouts />} />
-              <Route path="tag-management" element={<TagManagement />} />
-              <Route path="syncio-import" element={<SyncioImport />} />
-              <Route path="import-queue" element={<ImportQueue />} />
-              <Route path="products" element={<ProductManagement />} />
-              <Route path="products/types/:typeId" element={<ProductTypeDetail />} />
-              <Route path="products/groups/:groupId" element={<VariantGroupDetail />} />
-              <Route path="knowledge/archive-manager" element={<ArchiveManager />} />
-              <Route path="wireframes" element={<WireframesGallery />} />
+          <DomainProvider>
+            <ScrollToTop />
+            <Toaster />
+            <Sonner />
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Index />} />
+              <Route path="/pitch01" element={<Pitch01 />} />
+              <Route path="/poster-history" element={<PosterHistory />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/product/:handle" element={<ProductDetail />} />
+              <Route path="/collections/:handle" element={<Collection />} />
+              <Route path="/about" element={<About />} />
               
-              {/* Wireframe Examples - Version 01 */}
-              <Route path="wireframes/examples/01" element={<WireframeLayout01 />}>
+              {/* Public Wireframes (published only) */}
+              <Route path="/wireframes" element={<PublicWireframesGallery />} />
+              <Route path="/wireframes/examples/01" element={<WireframeLayout01 />}>
                 <Route index element={<WireframeIndex01 />} />
                 <Route path="home" element={<WireframeHome01 />} />
                 <Route path="product" element={<WireframeProduct01 />} />
                 <Route path="collection" element={<WireframeCollection01 />} />
               </Route>
-              
-              {/* Wireframe Examples - Version 02 */}
-              <Route path="wireframes/examples/02" element={<WireframeLayout02 />}>
+              <Route path="/wireframes/examples/02" element={<WireframeLayout02 />}>
                 <Route index element={<WireframeIndex02 />} />
                 <Route path="home" element={<WireframeHome02 />} />
                 <Route path="product" element={<WireframeProduct02 />} />
                 <Route path="collection" element={<WireframeCollection02 />} />
               </Route>
-              
-              {/* Wireframe Examples - Version 03 */}
-              <Route path="wireframes/examples/03" element={<WireframeLayout03 />}>
+              <Route path="/wireframes/examples/03" element={<WireframeLayout03 />}>
                 <Route index element={<WireframeIndex03 />} />
                 <Route path="home" element={<WireframeHome03 />} />
                 <Route path="product" element={<WireframeProduct03 />} />
                 <Route path="collection" element={<WireframeCollection03 />} />
               </Route>
-              
-              {/* Wireframe Examples - Version 04 */}
-              <Route path="wireframes/examples/04" element={<WireframeLayout04 />}>
+              <Route path="/wireframes/examples/04" element={<WireframeLayout04 />}>
                 <Route index element={<WireframeIndex04 />} />
                 <Route path="home" element={<WireframeHome04 />} />
                 <Route path="product" element={<WireframeProduct04 />} />
                 <Route path="collection" element={<WireframeCollection04 />} />
               </Route>
-              
-              {/* Wireframe Examples - Version 05 */}
-              <Route path="wireframes/examples/05" element={<WireframeLayout05 />}>
+              <Route path="/wireframes/examples/05" element={<WireframeLayout05 />}>
                 <Route index element={<WireframeIndex05 />} />
                 <Route path="home" element={<WireframeHome05 />} />
                 <Route path="product" element={<WireframeProduct05 />} />
                 <Route path="collection" element={<WireframeCollection05 />} />
               </Route>
-              
-              {/* Wireframe Examples - Version 06 */}
-              <Route path="wireframes/examples/06" element={<WireframeLayout06 />}>
+              <Route path="/wireframes/examples/06" element={<WireframeLayout06 />}>
                 <Route index element={<WireframeIndex06 />} />
                 <Route path="home" element={<WireframeHome06 />} />
                 <Route path="product" element={<WireframeProduct06 />} />
                 <Route path="collection" element={<WireframeCollection06 />} />
               </Route>
-              
-              {/* Wireframe Examples - Version 07 */}
-              <Route path="wireframes/examples/07" element={<WireframeLayout07 />}>
+              <Route path="/wireframes/examples/07" element={<WireframeLayout07 />}>
                 <Route index element={<WireframeIndex07 />} />
                 <Route path="home" element={<WireframeHome07 />} />
                 <Route path="product" element={<WireframeProduct07 />} />
                 <Route path="collection" element={<WireframeCollection07 />} />
               </Route>
-            </Route>
-            
-            {/* Partner routes */}
-            <Route 
-              path="/partner" 
-              element={
-                <ProtectedRoute allowedRoles={['partner']}>
-                  <PartnerLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to="/partner/dashboard" replace />} />
-              <Route path="dashboard" element={<PartnerDashboard />} />
-              <Route path="artworks" element={<ArtworkCatalog />} />
-            </Route>
-            
-            {/* Customer routes */}
-            <Route 
-              path="/customer" 
-              element={
-                <ProtectedRoute allowedRoles={['customer']}>
-                  <CustomerLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to="/customer/dashboard" replace />} />
-              <Route path="dashboard" element={<CustomerDashboard />} />
-              <Route path="orders" element={<div className="p-8"><h1 className="text-3xl font-bold">Orders</h1><p className="text-muted-foreground">Coming in Phase 1.3</p></div>} />
-              <Route path="favorites" element={<div className="p-8"><h1 className="text-3xl font-bold">Favorites</h1><p className="text-muted-foreground">Coming in Phase 1.3</p></div>} />
-              <Route path="profile" element={<div className="p-8"><h1 className="text-3xl font-bold">Profile</h1><p className="text-muted-foreground">Coming in Phase 1.3</p></div>} />
-            </Route>
-            
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              
+              {/* Unified Login */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/partner/apply" element={<PartnerApply />} />
+              
+              {/* Legacy auth redirects */}
+              <Route path="/auth" element={<Navigate to="/login" replace />} />
+              <Route path="/partner/auth" element={<Navigate to="/partner/apply" replace />} />
+              <Route path="/customer/auth" element={<Navigate to="/login" replace />} />
+              
+              {/* Customer Account routes */}
+              <Route 
+                path="/account" 
+                element={
+                  <ProtectedRoute>
+                    <CustomerAccountLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<AccountDashboard />} />
+                <Route path="orders" element={<AccountOrders />} />
+                <Route path="settings" element={<AccountSettings />} />
+                <Route path="wishlist" element={<AccountWishlist />} />
+              </Route>
+              
+              {/* Legacy customer routes redirect to new account routes */}
+              <Route path="/customer/*" element={<Navigate to="/account" replace />} />
+              
+              {/* Wireframe Preview - standalone route (no AdminLayout wrapper) */}
+              <Route 
+                path="/admin/wireframes/preview/:version?/:page?" 
+                element={
+                  <ProtectedRoute allowedRoles={['admin', 'editor', 'viewer']}>
+                    <WireframePreview />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Admin routes */}
+              <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute allowedRoles={['admin', 'editor', 'viewer']}>
+                    <AdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="tasks" element={<TaskManager />} />
+                <Route path="roadmap" element={<RoadmapManager />} />
+                <Route path="changelog" element={<Changelog />} />
+                <Route path="techstack" element={<TechStack />} />
+                <Route path="knowledge" element={<KnowledgeBase />} />
+                <Route path="knowledge/sku-methodology" element={<SKUMethodology />} />
+                <Route path="knowledge/partner-management" element={<PartnerManagementKB />} />
+                <Route path="knowledge/brand-assets" element={<BrandAssets />} />
+                <Route path="knowledge/task-management" element={<TaskManagementKB />} />
+                <Route path="knowledge/artwork-catalog" element={<ArtworkCatalogKB />} />
+                <Route path="knowledge/admin-brand-guide" element={<AdminBrandGuide />} />
+                <Route path="knowledge/brand-story" element={<BrandStory />} />
+                <Route path="knowledge/prodigi-api" element={<ProdigiAPI />} />
+                <Route path="knowledge/product-importing" element={<ProductImporting />} />
+                <Route path="knowledge/readymades-framing" element={<ReadymadesFraming />} />
+                <Route path="knowledge/mobile-view-methodology" element={<MobileViewMethodology />} />
+                {/* Dynamic article route - must be after static routes */}
+                <Route path="knowledge/article/:slug" element={<KnowledgeArticle />} />
+                <Route path="knowledge/migrate" element={<ContentMigration />} />
+                <Route path="brand-story" element={<BrandStoryDashboard />} />
+                <Route path="brand-story/timeline" element={<BrandTimeline />} />
+                <Route path="brand-story/poster-history" element={<PosterHistoryExhibition />} />
+                <Route path="artworks" element={<ArtworkCatalog />} />
+                <Route path="artworks/:artworkId" element={<ArtworkDetail />} />
+                <Route path="users" element={<UserManagement />} />
+                <Route path="navigation" element={<NavigationManager />} />
+                <Route path="partners" element={<PartnerManagement />} />
+                <Route path="partners/:partnerId" element={<PartnerDetail />} />
+                <Route path="partners/:partnerId/brands/:brandId/tags" element={<BrandTagManagement />} />
+                <Route path="payouts" element={<Payouts />} />
+                <Route path="tag-management" element={<TagManagement />} />
+                <Route path="syncio-import" element={<SyncioImport />} />
+                <Route path="import-queue" element={<ImportQueue />} />
+                <Route path="products" element={<ProductManagement />} />
+                <Route path="products/types/:typeId" element={<ProductTypeDetail />} />
+                <Route path="products/groups/:groupId" element={<VariantGroupDetail />} />
+                <Route path="knowledge/archive-manager" element={<ArchiveManager />} />
+                <Route path="wireframes" element={<WireframesGallery />} />
+                
+                {/* Wireframe Examples - Version 01 */}
+                <Route path="wireframes/examples/01" element={<WireframeLayout01 />}>
+                  <Route index element={<WireframeIndex01 />} />
+                  <Route path="home" element={<WireframeHome01 />} />
+                  <Route path="product" element={<WireframeProduct01 />} />
+                  <Route path="collection" element={<WireframeCollection01 />} />
+                </Route>
+                
+                {/* Wireframe Examples - Version 02 */}
+                <Route path="wireframes/examples/02" element={<WireframeLayout02 />}>
+                  <Route index element={<WireframeIndex02 />} />
+                  <Route path="home" element={<WireframeHome02 />} />
+                  <Route path="product" element={<WireframeProduct02 />} />
+                  <Route path="collection" element={<WireframeCollection02 />} />
+                </Route>
+                
+                {/* Wireframe Examples - Version 03 */}
+                <Route path="wireframes/examples/03" element={<WireframeLayout03 />}>
+                  <Route index element={<WireframeIndex03 />} />
+                  <Route path="home" element={<WireframeHome03 />} />
+                  <Route path="product" element={<WireframeProduct03 />} />
+                  <Route path="collection" element={<WireframeCollection03 />} />
+                </Route>
+                
+                {/* Wireframe Examples - Version 04 */}
+                <Route path="wireframes/examples/04" element={<WireframeLayout04 />}>
+                  <Route index element={<WireframeIndex04 />} />
+                  <Route path="home" element={<WireframeHome04 />} />
+                  <Route path="product" element={<WireframeProduct04 />} />
+                  <Route path="collection" element={<WireframeCollection04 />} />
+                </Route>
+                
+                {/* Wireframe Examples - Version 05 */}
+                <Route path="wireframes/examples/05" element={<WireframeLayout05 />}>
+                  <Route index element={<WireframeIndex05 />} />
+                  <Route path="home" element={<WireframeHome05 />} />
+                  <Route path="product" element={<WireframeProduct05 />} />
+                  <Route path="collection" element={<WireframeCollection05 />} />
+                </Route>
+                
+                {/* Wireframe Examples - Version 06 */}
+                <Route path="wireframes/examples/06" element={<WireframeLayout06 />}>
+                  <Route index element={<WireframeIndex06 />} />
+                  <Route path="home" element={<WireframeHome06 />} />
+                  <Route path="product" element={<WireframeProduct06 />} />
+                  <Route path="collection" element={<WireframeCollection06 />} />
+                </Route>
+                
+                {/* Wireframe Examples - Version 07 */}
+                <Route path="wireframes/examples/07" element={<WireframeLayout07 />}>
+                  <Route index element={<WireframeIndex07 />} />
+                  <Route path="home" element={<WireframeHome07 />} />
+                  <Route path="product" element={<WireframeProduct07 />} />
+                  <Route path="collection" element={<WireframeCollection07 />} />
+                </Route>
+              </Route>
+              
+              {/* Partner routes */}
+              <Route 
+                path="/partner" 
+                element={
+                  <ProtectedRoute allowedRoles={['partner']}>
+                    <PartnerLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate to="/partner/dashboard" replace />} />
+                <Route path="dashboard" element={<PartnerDashboard />} />
+                <Route path="artworks" element={<ArtworkCatalog />} />
+              </Route>
+              
+              {/* Catch-all route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </DomainProvider>
         </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>

@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Database } from '@/integrations/supabase/types';
 
@@ -16,6 +16,7 @@ export const ProtectedRoute = ({
   requireAuth = true 
 }: ProtectedRouteProps) => {
   const { user, activeRole, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -27,7 +28,9 @@ export const ProtectedRoute = ({
 
   // Check if authentication is required
   if (requireAuth && !user) {
-    return <Navigate to="/auth" replace />;
+    // Redirect to login with return URL
+    const returnUrl = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/login?returnUrl=${returnUrl}`} replace />;
   }
 
   // Check if user has required role

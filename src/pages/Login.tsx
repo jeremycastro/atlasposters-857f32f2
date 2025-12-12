@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useDomain } from '@/contexts/DomainContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,28 +13,38 @@ import { Loader2 } from 'lucide-react';
 const emailSchema = z.string().email('Invalid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
 
-export default function CustomerAuth() {
-  const [mode, setMode] = useState<'login' | 'signup'>('signup');
+export default function Login() {
+  const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, activeRole, availableRoles, loading: authLoading } = useAuth();
+  const { isAdminDomain, getPostLoginRoute } = useDomain();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
 
+  const returnUrl = searchParams.get('returnUrl');
+
   useEffect(() => {
-    if (user) {
-      const returnTo = searchParams.get('returnTo') || '/customer/dashboard';
-      navigate(returnTo);
+    if (!authLoading && user && activeRole) {
+      // If there's a specific return URL, use it
+      if (returnUrl) {
+        navigate(returnUrl);
+        return;
+      }
+      // Otherwise use domain-based routing
+      const route = getPostLoginRoute(availableRoles, activeRole);
+      navigate(route);
     }
-  }, [user, navigate, searchParams]);
+  }, [user, activeRole, availableRoles, authLoading, navigate, returnUrl, getPostLoginRoute]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
+    // Validate email
     const emailValidation = emailSchema.safeParse(email);
     if (!emailValidation.success) {
       toast({
@@ -45,6 +56,7 @@ export default function CustomerAuth() {
       return;
     }
 
+    // Validate password
     const passwordValidation = passwordSchema.safeParse(password);
     if (!passwordValidation.success) {
       toast({
@@ -67,7 +79,7 @@ export default function CustomerAuth() {
       } else {
         toast({
           title: 'Account created',
-          description: 'Welcome! You can now start shopping.'
+          description: 'Welcome to Atlas Posters!'
         });
       }
     } else {
@@ -84,16 +96,20 @@ export default function CustomerAuth() {
     setLoading(false);
   };
 
+  const title = isAdminDomain 
+    ? (mode === 'login' ? 'Admin Portal' : 'Create Account')
+    : (mode === 'login' ? 'Welcome Back' : 'Create Account');
+
+  const description = isAdminDomain
+    ? (mode === 'login' ? 'Sign in to Atlas Admin Portal' : 'Create your Atlas account')
+    : (mode === 'login' ? 'Sign in to your Atlas Posters account' : 'Join Atlas Posters today');
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>{mode === 'login' ? 'Customer Login' : 'Create Customer Account'}</CardTitle>
-          <CardDescription>
-            {mode === 'login' 
-              ? 'Sign in to view your orders and favorites' 
-              : 'Join to track orders and save favorites'}
-          </CardDescription>
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -137,19 +153,19 @@ export default function CustomerAuth() {
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {mode === 'login' ? 'Sign In' : 'Create Account'}
+              {mode === 'login' ? 'Sign In' : 'Sign Up'}
             </Button>
 
-            <div className="text-center text-sm">
+            <div className="text-center text-sm space-y-2">
               {mode === 'login' ? (
                 <p>
-                  New customer?{' '}
+                  Don't have an account?{' '}
                   <button
                     type="button"
                     onClick={() => setMode('signup')}
                     className="text-primary hover:underline"
                   >
-                    Create account
+                    Sign up
                   </button>
                 </p>
               ) : (
@@ -162,6 +178,15 @@ export default function CustomerAuth() {
                   >
                     Sign in
                   </button>
+                </p>
+              )}
+              
+              {isAdminDomain && (
+                <p className="pt-2 border-t">
+                  Want to become a partner?{' '}
+                  <Link to="/partner/apply" className="text-primary hover:underline">
+                    Apply here
+                  </Link>
                 </p>
               )}
             </div>
