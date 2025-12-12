@@ -22,14 +22,14 @@ export default function WireframeHome() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Announcement Bar */}
-      <AnnouncementBar />
-      
-      {/* Sticky Header */}
-      <MobileHeader 
-        onMenuOpen={() => setIsNavOpen(true)}
-        onSearchOpen={() => setIsSearchOpen(true)}
-      />
+      {/* Sticky Header Group */}
+      <div className="sticky top-0 z-50">
+        <AnnouncementBar />
+        <MobileHeader 
+          onMenuOpen={() => setIsNavOpen(true)}
+          onSearchOpen={() => setIsSearchOpen(true)}
+        />
+      </div>
       
       {/* Mobile Navigation Drawer */}
       <MobileNav 

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { WireframePlaceholder } from "./WireframePlaceholder";
@@ -45,10 +46,12 @@ const discoveryItems = [
 ];
 
 interface DiscoveryCardsProps {
-  onSearchClick: () => void;
+  onSearchClick?: () => void;
 }
 
 export function DiscoveryCards({ onSearchClick }: DiscoveryCardsProps) {
+  const [searchValue, setSearchValue] = useState("");
+
   return (
     <section className="px-4 py-8">
       {/* 2x2 Grid */}
@@ -58,20 +61,18 @@ export function DiscoveryCards({ onSearchClick }: DiscoveryCardsProps) {
         ))}
       </div>
 
-      {/* Search Bar */}
-      <button 
-        onClick={onSearchClick}
-        className="w-full"
-      >
+      {/* Sticky Search Bar */}
+      <div className="sticky top-[88px] z-40 -mx-4 px-4 py-3 bg-background/95 backdrop-blur-sm border-b border-border/30">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search people, places, sports, landmarks"
-            className="pl-10 bg-muted border-0 h-12 cursor-pointer"
-            readOnly
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="pl-10 bg-muted border-0 h-12"
           />
         </div>
-      </button>
+      </div>
     </section>
   );
 }
