@@ -24,7 +24,7 @@ export function WireframeCard({
     : `/wireframes/examples/${wireframe.version}`;
 
   return (
-    <Card className="overflow-hidden flex flex-col">
+    <Card className="overflow-hidden flex flex-col h-full">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded">

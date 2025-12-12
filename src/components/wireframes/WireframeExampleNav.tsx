@@ -24,8 +24,14 @@ export function WireframeExampleNav({
   variant = "dark",
 }: WireframeExampleNavProps) {
   const location = useLocation();
-  const basePath = `/wireframes/examples/${version}`;
   const [isHidden, setIsHidden] = useState(false);
+
+  // Detect if we're in admin context based on current path
+  const isAdmin = location.pathname.startsWith("/admin");
+  const basePath = isAdmin 
+    ? `/admin/wireframes/examples/${version}` 
+    : `/wireframes/examples/${version}`;
+  const galleryPath = isAdmin ? "/admin/wireframes" : "/wireframes";
 
   const getPagePath = (page: string) => {
     if (page === "Index") return basePath;
@@ -56,7 +62,7 @@ export function WireframeExampleNav({
     <div className={`sticky top-0 z-[100] ${isDark ? "bg-[#1c1c1c] border-white/10" : "bg-muted border-border"} border-b px-4 py-2`}>
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link to="/wireframes">
+          <Link to={galleryPath}>
             <Button 
               variant="ghost" 
               size="sm" 
