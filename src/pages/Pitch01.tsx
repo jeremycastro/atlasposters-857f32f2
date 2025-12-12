@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Mountain, Palette, Users, Compass, ArrowRight, Sparkles, Target, TrendingUp } from "lucide-react";
 import { z } from "zod";
+import { logger } from "@/lib/logger";
 import heroImage from "@/assets/hero-001.jpg";
 
 const signupSchema = z.object({
@@ -73,7 +74,7 @@ const Pitch01 = () => {
         setName("");
       }
     } catch (error) {
-      console.error("Email signup error:", error);
+      logger.error("Email signup error:", error);
       toast({
         title: "Something went wrong",
         description: "Please try again later.",

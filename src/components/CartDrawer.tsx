@@ -12,6 +12,7 @@ import {
 import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
+import { logger } from "@/lib/logger";
 
 export const CartDrawer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +36,7 @@ export const CartDrawer = () => {
         setIsOpen(false);
       }
     } catch (error) {
-      console.error('Checkout failed:', error);
+      logger.error('Checkout failed:', error);
       toast.error("Failed to create checkout. Please try again.");
     }
   };

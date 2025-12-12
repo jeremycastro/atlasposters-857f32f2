@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 
 export interface ShopifyProduct {
   node: {
@@ -220,7 +221,7 @@ export async function createStorefrontCheckout(items: any[]): Promise<string> {
     url.searchParams.set('channel', 'online_store');
     return url.toString();
   } catch (error) {
-    console.error('Error creating storefront checkout:', error);
+    logger.error('Error creating storefront checkout:', error);
     throw error;
   }
 }

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { createStorefrontCheckout } from '@/lib/shopify';
 import type { ShopifyProduct } from '@/lib/shopify';
+import { logger } from '@/lib/logger';
 
 export interface CartItem {
   product: ShopifyProduct;
@@ -95,7 +96,7 @@ export const useCartStore = create<CartStore>()(
           const checkoutUrl = await createStorefrontCheckout(items);
           setCheckoutUrl(checkoutUrl);
         } catch (error) {
-          console.error('Failed to create checkout:', error);
+          logger.error('Failed to create checkout:', error);
         } finally {
           setLoading(false);
         }
