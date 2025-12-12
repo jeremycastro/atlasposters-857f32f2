@@ -5,7 +5,7 @@ export function HeroSection() {
   return (
     <section className="relative">
       {/* Hero Image Placeholder */}
-      <div className="relative aspect-[3/4] sm:aspect-[16/10] lg:aspect-[21/9]">
+      <div className="relative aspect-[4/5] sm:aspect-[16/10] lg:aspect-[21/9]">
         <WireframePlaceholder 
           aspectRatio="portrait" 
           className="absolute inset-0 aspect-auto h-full w-full" 
