@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ import { Loader2 } from 'lucide-react';
 const emailSchema = z.string().email('Invalid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
 
-export default function PartnerAuth() {
+export default function PartnerApply() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -115,7 +115,7 @@ export default function PartnerAuth() {
         <CardHeader>
           <CardTitle>Partner Application</CardTitle>
           <CardDescription>
-            Join Atlas Catalog as a partner artist, photographer, or brand
+            Join Atlas Posters as a partner artist, photographer, or brand
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -202,13 +202,9 @@ export default function PartnerAuth() {
             <div className="text-center text-sm">
               <p>
                 Already a partner?{' '}
-                <button
-                  type="button"
-                  onClick={() => navigate('/auth')}
-                  className="text-primary hover:underline"
-                >
+                <Link to="/login" className="text-primary hover:underline">
                   Sign in
-                </button>
+                </Link>
               </p>
             </div>
           </form>
