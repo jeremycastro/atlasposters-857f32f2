@@ -30,7 +30,7 @@ export default function WireframePreview() {
 
   const wireframe = wireframeVersions.find((w) => w.version === version);
   
-  // Build the preview URL - use absolute URL for iframe to avoid routing issues
+  // Build the preview URL - use full origin URL to force fresh page load in iframe
   const pagePath = currentPage !== "index" ? `/${currentPage}` : "";
   const previewUrl = `${window.location.origin}/wireframes/examples/${version}${pagePath}`;
 
