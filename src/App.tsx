@@ -59,7 +59,7 @@ import ArchiveManager from "./pages/admin/ArchiveManager";
 import ProductManagement from "./pages/admin/ProductManagement";
 import ProductTypeDetail from "./pages/admin/ProductTypeDetail";
 import VariantGroupDetail from "./pages/admin/VariantGroupDetail";
-
+import WireframePreview from "./pages/admin/WireframePreview";
 
 // Wireframes Gallery
 import WireframesGallery from "./pages/wireframes/index";
@@ -233,6 +233,7 @@ const App = () => (
               <Route path="products/groups/:groupId" element={<VariantGroupDetail />} />
               <Route path="knowledge/archive-manager" element={<ArchiveManager />} />
               <Route path="wireframes" element={<WireframesGallery />} />
+              <Route path="wireframes/preview/:version?/:page?" element={<WireframePreview />} />
               
               {/* Wireframe Examples - Version 01 */}
               <Route path="wireframes/examples/01" element={<WireframeLayout01 />}>

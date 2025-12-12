@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ExternalLink, Eye, CheckCircle, AlertCircle, TrendingUp, Users, Search, Globe, GlobeLock } from "lucide-react";
+import { ExternalLink, Eye, CheckCircle, AlertCircle, TrendingUp, Users, Search, Globe, GlobeLock, Smartphone } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -225,6 +225,13 @@ export function WireframeCard({
               View Wireframe
             </Link>
           </Button>
+          {isAdmin && (
+            <Button asChild variant="outline" size="sm" title="Mobile Preview">
+              <Link to={`/admin/wireframes/preview/${wireframe.version}`}>
+                <Smartphone className="h-3.5 w-3.5" />
+              </Link>
+            </Button>
+          )}
           {isAdmin && isPublished && (
             <Button asChild variant="outline" size="sm" title="Open public link">
               <a href={`${window.location.origin}/wireframes/examples/${wireframe.version}`} target="_blank" rel="noopener noreferrer">
