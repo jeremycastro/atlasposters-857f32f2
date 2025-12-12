@@ -105,6 +105,13 @@ import WireframeProduct06 from "./pages/wireframes/examples/06/WireframeProduct"
 import WireframeCollection06 from "./pages/wireframes/examples/06/WireframeCollection";
 import { WireframeLayout as WireframeLayout06 } from "./pages/wireframes/examples/06/WireframeLayout";
 
+// Wireframe Examples - Version 07
+import WireframeIndex07 from "./pages/wireframes/examples/07/index";
+import WireframeHome07 from "./pages/wireframes/examples/07/WireframeHome";
+import WireframeProduct07 from "./pages/wireframes/examples/07/WireframeProduct";
+import WireframeCollection07 from "./pages/wireframes/examples/07/WireframeCollection";
+import { WireframeLayout as WireframeLayout07 } from "./pages/wireframes/examples/07/WireframeLayout";
+
 const queryClient = new QueryClient();
 
 const App = () => (
