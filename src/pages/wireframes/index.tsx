@@ -265,10 +265,10 @@ const Wireframes = () => {
                       </Link>
                     </Button>
                     {isPublished && (
-                      <Button asChild variant="outline" size="sm">
-                        <Link to={`/wireframes/examples/${wireframe.version}`} target="_blank">
+                      <Button asChild variant="outline" size="sm" title="Open public link">
+                        <a href={`${window.location.origin}/wireframes/examples/${wireframe.version}`} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-3.5 w-3.5" />
-                        </Link>
+                        </a>
                       </Button>
                     )}
                   </div>
