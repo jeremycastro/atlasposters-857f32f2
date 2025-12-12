@@ -65,11 +65,11 @@ export function EmailSignupModal({ triggerAfterMs = 5000, onClose }: EmailSignup
           </div>
           
           <h2 className="text-xl sm:text-2xl font-bold mb-2">
-            Get £20 off your first order
+            Get £20 off your first artwork
           </h2>
           
           <p className="text-sm text-muted-foreground mb-6">
-            Join our community and be the first to hear about new arrivals, exclusive offers, and artist stories.
+            Join the Atlas community for early access to new collections and limited editions.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-3">

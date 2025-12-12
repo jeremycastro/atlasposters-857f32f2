@@ -46,7 +46,7 @@ export default function WireframeHome() {
       {/* Main Content */}
       <main>
         {/* Hero Section */}
-        <HeroSection onSearchClick={() => setIsSearchOpen(true)} />
+        <HeroSection />
         
         {/* Discovery Cards (2x2) + Search */}
         <DiscoveryCards onSearchClick={() => setIsSearchOpen(true)} />
