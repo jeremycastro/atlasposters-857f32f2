@@ -45,7 +45,7 @@ interface OverrideResult {
 }
 
 export function formatVersion(major: number, minor: number, patch: number): string {
-  return `v${major}.${minor}.${patch.toString().padStart(2, '0')}`;
+  return `${major}.${minor}.${patch.toString().padStart(2, '0')}`;
 }
 
 export function useProjectVersion() {
@@ -68,7 +68,7 @@ export function useProjectVersion() {
 export function useCurrentVersion() {
   const { data: version, isLoading } = useProjectVersion();
   const currentVersion = version 
-    ? formatVersion(version.major, version.minor, version.patch)
+    ? `v${formatVersion(version.major, version.minor, version.patch)}`
     : 'v0.0.00';
   return { currentVersion, isLoading };
 }
