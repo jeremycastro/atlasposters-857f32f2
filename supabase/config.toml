@@ -1,1 +1,4 @@
 project_id = "pdpjucgfhzwhdehdoiaq"
+
+[functions.finalize-daily-changelog]
+verify_jwt = false

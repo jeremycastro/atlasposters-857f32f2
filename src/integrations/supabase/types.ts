@@ -731,6 +731,82 @@ export type Database = {
           },
         ]
       }
+      dev_changelog: {
+        Row: {
+          changelog_date: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_auto_generated: boolean | null
+          major: number
+          minor: number
+          patch: number
+        }
+        Insert: {
+          changelog_date: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_auto_generated?: boolean | null
+          major: number
+          minor: number
+          patch: number
+        }
+        Update: {
+          changelog_date?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_auto_generated?: boolean | null
+          major?: number
+          minor?: number
+          patch?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dev_changelog_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dev_changelog_entries: {
+        Row: {
+          changelog_id: string | null
+          created_at: string | null
+          description: string
+          entry_date: string
+          entry_type: Database["public"]["Enums"]["changelog_entry_type"]
+          id: string
+        }
+        Insert: {
+          changelog_id?: string | null
+          created_at?: string | null
+          description: string
+          entry_date?: string
+          entry_type: Database["public"]["Enums"]["changelog_entry_type"]
+          id?: string
+        }
+        Update: {
+          changelog_id?: string | null
+          created_at?: string | null
+          description?: string
+          entry_date?: string
+          entry_type?: Database["public"]["Enums"]["changelog_entry_type"]
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dev_changelog_entries_changelog_id_fkey"
+            columns: ["changelog_id"]
+            isOneToOne: false
+            referencedRelation: "dev_changelog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_signups: {
         Row: {
           created_at: string | null
@@ -2110,6 +2186,41 @@ export type Database = {
           },
         ]
       }
+      project_version: {
+        Row: {
+          id: string
+          major: number
+          minor: number
+          patch: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          major?: number
+          minor?: number
+          patch?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          major?: number
+          minor?: number
+          patch?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_version_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       roadmap_milestones: {
         Row: {
           completed_date: string | null
@@ -3210,6 +3321,7 @@ export type Database = {
         Args: { p_new_file_data: Json; p_original_file_id: string }
         Returns: string
       }
+      finalize_daily_changelog: { Args: { for_date?: string }; Returns: Json }
       generate_next_asc: { Args: never; Returns: string }
       generate_task_reference: { Args: never; Returns: string }
       get_active_role: {
@@ -3251,6 +3363,18 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_version: {
+        Args: never
+        Returns: {
+          new_major: number
+          new_minor: number
+          new_patch: number
+        }[]
+      }
+      override_version: {
+        Args: { new_major: number; new_minor: number; new_patch: number }
+        Returns: Json
       }
       restore_article_version: {
         Args: { p_version_id: string }
@@ -3309,6 +3433,7 @@ export type Database = {
         | "persona_sheet"
       brand_story_scope: "brand" | "atlas_global"
       brand_story_status: "draft" | "in_review" | "approved" | "archived"
+      changelog_entry_type: "added" | "changed" | "fixed" | "removed"
       import_method: "csv" | "syncio" | "api" | "manual"
       import_status: "pending" | "mapped" | "imported" | "error" | "skipped"
       payment_model:
@@ -3508,6 +3633,7 @@ export const Constants = {
       ],
       brand_story_scope: ["brand", "atlas_global"],
       brand_story_status: ["draft", "in_review", "approved", "archived"],
+      changelog_entry_type: ["added", "changed", "fixed", "removed"],
       import_method: ["csv", "syncio", "api", "manual"],
       import_status: ["pending", "mapped", "imported", "error", "skipped"],
       payment_model: [
