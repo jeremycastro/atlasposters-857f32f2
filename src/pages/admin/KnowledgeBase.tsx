@@ -9,7 +9,7 @@ import { BookOpen, Search, Filter, Calendar, ArrowRight, ArrowUpDown, ArrowUp, A
 import * as LucideIcons from "lucide-react";
 import { useKnowledgeArticles, useKnowledgeCategories } from "@/hooks/useKnowledgeBase";
 import { knowledgeArticles as staticArticles } from "@/types/knowledge";
-import { changelogData } from "@/pages/admin/Changelog";
+import { useCurrentVersion } from "@/hooks/useChangelog";
 import { format } from "date-fns";
 import {
   Select,
@@ -67,6 +67,7 @@ const KnowledgeBase = () => {
 
   const { data: dbArticles = [], isLoading: articlesLoading } = useKnowledgeArticles();
   const { data: categories = [], isLoading: categoriesLoading } = useKnowledgeCategories();
+  const { currentVersion } = useCurrentVersion();
 
   const isLoading = articlesLoading || categoriesLoading;
 
@@ -420,7 +421,7 @@ const KnowledgeBase = () => {
         {/* Footer */}
         <div className="mt-12 p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground text-center">
-            <strong>Knowledge Base v{changelogData[0].version}</strong> - Documentation continuously updated to reflect current methodologies and best practices
+            <strong>Knowledge Base {currentVersion}</strong> - Documentation continuously updated to reflect current methodologies and best practices
           </p>
         </div>
       </main>

@@ -1,6 +1,7 @@
 import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigation } from '@/hooks/useNavigation';
+import { useCurrentVersion } from '@/hooks/useChangelog';
 import { Button } from '@/components/ui/button';
 import { RoleSwitcher } from '@/components/RoleSwitcher';
 import { LogOut } from 'lucide-react';
@@ -8,11 +9,11 @@ import * as LucideIcons from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import { changelogData } from '@/pages/admin/Changelog';
 
 export default function AdminLayout() {
   const { profile, activeRole, signOut } = useAuth();
   const { data: navData, isLoading } = useNavigation(activeRole);
+  const { currentVersion } = useCurrentVersion();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
   const toggleGroup = (group: string) => {
@@ -26,7 +27,7 @@ export default function AdminLayout() {
         <div className="p-6 border-b">
           <h2 className="text-lg font-bold">Atlas Admin</h2>
           <p className="text-sm text-muted-foreground">Role: {activeRole}</p>
-          <p className="text-xs text-muted-foreground italic">v{changelogData[0].version}</p>
+          <p className="text-xs text-muted-foreground italic">{currentVersion}</p>
         </div>
 
         <RoleSwitcher className="mx-4 my-4" />
