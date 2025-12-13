@@ -1,352 +1,51 @@
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { GitBranch } from "lucide-react";
-
-interface ChangelogEntry {
-  version: string;
-  date: string;
-  changes: {
-    type: "added" | "changed" | "fixed" | "removed";
-    description: string;
-  }[];
-}
-
-const changelogData: ChangelogEntry[] = [
-  {
-    version: "0.5.3",
-    date: "2025-12-12",
-    changes: [
-      {
-        type: "added",
-        description: "Shared WireframeCard Component - Reusable component for admin and public wireframe galleries with conditional admin features (publish/unpublish toggle, UX/SEO analysis accordions, external link buttons)",
-      },
-      {
-        type: "added",
-        description: "Fixed Bottom Search Bar - Scroll-aware search bar fixed at bottom of viewport in Wireframe 07 hero section, fades out when user scrolls (based on Balsamiq mobile wireframe reference)",
-      },
-      {
-        type: "added",
-        description: "Knowledge Base Article: Mobile View Methodology - Comprehensive documentation covering mobile-first design philosophy, viewport breakpoints (Mobile/Tablet/Desktop), component architecture (MobileHeader, MobileNav, SearchOverlay, MobileFooter), touch interaction patterns, scroll behaviors, and design tokens",
-      },
-      {
-        type: "added",
-        description: "WireframeExampleNav Hide Feature - Collapsible wireframe navigation bar with toggle button to minimize and restore, maximizing content viewing area",
-      },
-      {
-        type: "changed",
-        description: "WireframeExampleNav Admin Context Detection - Navigation now correctly detects admin vs public context based on URL path, ensuring page links route to appropriate admin or public wireframe pages",
-      },
-      {
-        type: "changed",
-        description: "WireframeExampleNav Mobile Responsiveness - Fixed horizontal overflow issues on mobile with proper flex container constraints (overflow-hidden, min-w-0, shrink-0) and responsive padding/gaps",
-      },
-      {
-        type: "fixed",
-        description: "WireframeCard Height Consistency - Cards now stretch to fill grid cells (h-full) ensuring 'View Wireframe' button consistently appears at bottom regardless of content length",
-      },
-    ],
-  },
-  {
-    version: "0.5.2",
-    date: "2025-12-04",
-    changes: [
-      {
-        type: "changed",
-        description: "SKU Methodology - Added Universal Size Codes section (00=XS through 05=2XL) with metric/imperial mapping and Prodigi SKU translation",
-      },
-      {
-        type: "changed",
-        description: "SKU Methodology - Added Product-Type VAR Assignment section documenting VAR1/VAR2 meaning by product type (Posters: Size→Edition, Apparel: Color→Size)",
-      },
-      {
-        type: "changed",
-        description: "Knowledge Base - Converted to sortable table with column sorting by Title, Category, and Last Updated date",
-      },
-    ],
-  },
-  {
-    version: "0.5.1",
-    date: "2025-12-04",
-    changes: [
-      {
-        type: "added",
-        description: "Knowledge Base Article: Prodigi API Discovery - Complete documentation of Prodigi print-on-demand API, product SKU structure, geographic routing, attributes system, and Atlas integration strategy",
-      },
-      {
-        type: "added",
-        description: "Knowledge Base Article: Product Importing - Shopify/Syncio workflow documentation covering partner product ingestion, bi-directional data flow, artwork mapping, and proposed database schema for partner_products and sku_crosswalk tables",
-      },
-      {
-        type: "added",
-        description: "Knowledge Base Article: Readymades.co Framing Discovery - Comprehensive framing catalog documentation including frame collections (Classic, Premium, Contemporary), mount options, glaze types, SKU decoding, and A-E price band system",
-      },
-      {
-        type: "changed",
-        description: "SKU Methodology - Added Framing Configuration Architecture section describing hybrid SKU approach with frame configuration IDs for complex product variants exceeding VAR1-VAR2-VAR3 structure",
-      },
-      {
-        type: "added",
-        description: "Tech Stack - Added Prodigi (global print-on-demand fulfillment network) and Readymades.co (premium framing partner via Prodigi) with integration details and purposes",
-      },
-    ],
-  },
-  {
-    version: "0.5.0",
-    date: "2025-11-14",
-    changes: [
-      {
-        type: "added",
-        description: "3-Variant SKU Architecture - Complete implementation of VAR1/VAR2/VAR3 system supporting up to 3 variant dimensions (color, size, finish) with 20-character SKU limit",
-      },
-      {
-        type: "added",
-        description: "Variant Hierarchy Configuration - Visual interface to define which variant dimension maps to VAR1, VAR2, VAR3 based on product type, with drag-and-drop reordering",
-      },
-      {
-        type: "added",
-        description: "Print File Auto-Assignment - Intelligent hierarchical SKU matching system that parses print file names (e.g., 11K001-UTS-01_print.png) and suggests assignments with confidence scores",
-      },
-      {
-        type: "added",
-        description: "Variant Builder Component - Structured variant creation UI with dropdown selectors for VAR1/VAR2/VAR3, automatic SKU generation, and real-time preview",
-      },
-      {
-        type: "added",
-        description: "Products Tab on Artwork Detail - Comprehensive product and variant management with tabs for variants, print file assignment, and configuration",
-      },
-      {
-        type: "added",
-        description: "Database Functions - parse_sku_from_filename() for intelligent SKU extraction from filenames with match level detection (exact, hierarchical, product-level)",
-      },
-      {
-        type: "changed",
-        description: "SKU Length Constraint - Increased from 16 to 20 characters to support 3D variant SKUs (e.g., 11K001-PST-00-02-01 = 19 chars)",
-      },
-      {
-        type: "changed",
-        description: "build_full_sku Function - Updated to accept VAR1, VAR2, VAR3 parameters with default '99' (N/A) for missing dimensions",
-      },
-      {
-        type: "changed",
-        description: "Print File Suggestions - Replaced tag-based matching with hierarchical SKU parsing for accurate file-to-variant assignments",
-      },
-      {
-        type: "changed",
-        description: "Variant Code Validation - Added database constraint restricting variant_codes to 00-98 range (99 reserved as N/A placeholder)",
-      },
-      {
-        type: "added",
-        description: "Variant Validation Utilities - Client-side validation helpers for SKU format, variant codes, and SKU parsing with user-friendly error messages",
-      },
-      {
-        type: "added",
-        description: "SKU Documentation Updates - Complete refresh of SKU Methodology page with VAR1/VAR2/VAR3 architecture, print file matching rules, and real-world examples",
-      },
-    ],
-  },
-  {
-    version: "0.4.1",
-    date: "2024-11-12",
-    changes: [
-      {
-        type: "added",
-        description: "Partner Pricing & Payment Models - Comprehensive partner agreement system with multiple payment models (royalty, commission, flat fee, advance), marketing attribution caps, and flexible payment terms",
-      },
-      {
-        type: "changed",
-        description: "Roadmap UI Refinement - Removed progress bars from milestone cards to reduce visual clutter and emphasize minimalist design",
-      },
-      {
-        type: "changed",
-        description: "Enhanced Status Badges - Made milestone status badges larger and more prominent with integrated progress information (e.g., 'In Progress • 5/10 tasks')",
-      },
-      {
-        type: "changed",
-        description: "Improved Status Indicators - Status icons and color-coded badges now serve as primary visual indicators instead of progress bars",
-      },
-    ],
-  },
-  {
-    version: "0.4.0",
-    date: "2024-11-10",
-    changes: [
-      {
-        type: "added",
-        description: "Atlas Artwork Catalog - Complete artwork management system with image upload, metadata tracking, ASC code generation, and full CRUD operations",
-      },
-      {
-        type: "added",
-        description: "Partner Management System - Comprehensive partner database with contacts, addresses, and agreements tracking",
-      },
-      {
-        type: "added",
-        description: "Enhanced Brand Management - Logos, colors (primary/secondary/accent), taglines, brand stories, and social media links",
-      },
-      {
-        type: "added",
-        description: "Bulk Logo Upload - Drag-and-drop interface for uploading multiple brand logos with gallery view and asset management",
-      },
-      {
-        type: "added",
-        description: "Brand Assets Storage - Secure 'brand-assets' bucket with RLS policies for partner and admin access (5MB limit, supports JPG/PNG/WEBP/SVG)",
-      },
-      {
-        type: "added",
-        description: "Dynamic Brand Pages Foundation - Brand identity system designed for generating dynamic landing pages with logos, colors, and stories",
-      },
-      {
-        type: "added",
-        description: "Partner-Brand Artwork Linking - Database relationship structure to link artworks and products to specific partner brands",
-      },
-      {
-        type: "changed",
-        description: "Partner Modal UI - Redesigned with tabbed interface (Info/Brands/Agreements/Contacts/Addresses) and fixed-height layout to prevent tab-switching resizing",
-      },
-      {
-        type: "changed",
-        description: "Task Modal Tabs - Updated to match Partner modal styling with TabsList and TabsTrigger components for consistent design",
-      },
-      {
-        type: "changed",
-        description: "Sticky Action Buttons - Save/Cancel buttons now sticky at bottom of forms, matching Task detail dialog pattern for better UX",
-      },
-      {
-        type: "fixed",
-        description: "Modal Focus Issue - Resolved text input focus loss in Partner modal forms by extracting BrandForm as separate component",
-      },
-      {
-        type: "fixed",
-        description: "Always-Editable Status - Restored prominent Badge-style status dropdown in Task modal for quick updates without entering edit mode",
-      },
-      {
-        type: "changed",
-        description: "Logo Management - Moved logo upload section to bottom of brand forms for better visual hierarchy and workflow",
-      },
-    ],
-  },
-  {
-    version: "0.3.0",
-    date: "2024-11-01",
-    changes: [
-      {
-        type: "added",
-        description: "Roadmap Manager with semantic versioning (v1.0.0) and progress tracking",
-      },
-      {
-        type: "added",
-        description: "Task Management system with Kanban and Table views",
-      },
-      {
-        type: "added",
-        description: "Activity logging with human-readable change descriptions",
-      },
-      {
-        type: "added",
-        description: "Role-based access control with admin, editor, partner, viewer, and customer roles",
-      },
-      {
-        type: "added",
-        description: "User Management interface for role assignments",
-      },
-      {
-        type: "added",
-        description: "Admin Dashboard with statistics and insights",
-      },
-      {
-        type: "added",
-        description: "Task filtering, sorting, and search capabilities",
-      },
-      {
-        type: "added",
-        description: "Task comments and collaboration features",
-      },
-      {
-        type: "added",
-        description: "Milestone tracking with deliverables and success metrics",
-      },
-      {
-        type: "changed",
-        description: "Migrated to semantic versioning format (v1.0.0) for better version management",
-      },
-    ],
-  },
-  {
-    version: "0.2.0",
-    date: "2024-10-20",
-    changes: [
-      {
-        type: "added",
-        description: "Custom favicon with Atlas branding",
-      },
-      {
-        type: "changed",
-        description: "Social media preview metadata - Updated title to 'Atlas Posters' with brand tagline",
-      },
-      {
-        type: "added",
-        description: "Custom hero image for social sharing (og-image.webp)",
-      },
-      {
-        type: "added",
-        description: "Email signup functionality with form validation",
-      },
-      {
-        type: "added",
-        description: "Coming soon page with hero section and brand positioning",
-      },
-      {
-        type: "added",
-        description: "'Why Atlas Posters?' features grid showcasing value proposition",
-      },
-      {
-        type: "added",
-        description: "Partner CTA section inviting brand collaborations",
-      },
-      {
-        type: "fixed",
-        description: "Improved form validation and error handling for better UX",
-      },
-    ],
-  },
-  {
-    version: "0.1.0",
-    date: "2024-10-10",
-    changes: [
-      {
-        type: "added",
-        description: "Initial roadmap structure with comprehensive implementation plan",
-      },
-      {
-        type: "added",
-        description: "Foundation database architecture for Atlas Catalog",
-      },
-      {
-        type: "added",
-        description: "Phase 1: Atlas Catalog admin platform milestones (1.1 - 1.5)",
-      },
-      {
-        type: "added",
-        description: "Phase 2: atlasposters.com storefront milestones (2.1 - 2.5)",
-      },
-      {
-        type: "added",
-        description: "Phase 3: Integration & launch milestones",
-      },
-      {
-        type: "added",
-        description: "Project management structure with weekly rhythm",
-      },
-      {
-        type: "added",
-        description: "Decision checkpoints and success criteria",
-      },
-    ],
-  },
-];
-
-export { changelogData };
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  GitBranch, 
+  Plus, 
+  Trash2, 
+  Clock, 
+  RefreshCw, 
+  Settings2,
+  Calendar
+} from "lucide-react";
+import { 
+  useProjectVersion, 
+  useChangelogs, 
+  usePendingEntries,
+  useAddChangelogEntry,
+  useDeleteChangelogEntry,
+  useFinalizeChangelog,
+  useOverrideVersion,
+  formatVersion,
+  type Changelog
+} from "@/hooks/useChangelog";
 
 const Changelog = () => {
-  const getTypeBadgeVariant = (type: ChangelogEntry["changes"][0]["type"]) => {
+  const { data: version, isLoading: versionLoading } = useProjectVersion();
+  const { data: changelogs, isLoading: changelogsLoading } = useChangelogs();
+  const { data: pendingEntries, isLoading: pendingLoading } = usePendingEntries();
+  
+  const addEntry = useAddChangelogEntry();
+  const deleteEntry = useDeleteChangelogEntry();
+  const finalizeChangelog = useFinalizeChangelog();
+  const overrideVersion = useOverrideVersion();
+
+  const [newEntryType, setNewEntryType] = useState<'added' | 'changed' | 'fixed' | 'removed'>('added');
+  const [newEntryDescription, setNewEntryDescription] = useState('');
+  const [showOverrideDialog, setShowOverrideDialog] = useState(false);
+  const [overrideMajor, setOverrideMajor] = useState('0');
+  const [overrideMinor, setOverrideMinor] = useState('5');
+  const [overridePatch, setOverridePatch] = useState('3');
+
+  const getTypeBadgeVariant = (type: 'added' | 'changed' | 'fixed' | 'removed') => {
     switch (type) {
       case "added":
         return "default";
@@ -360,6 +59,51 @@ const Changelog = () => {
         return "secondary";
     }
   };
+
+  const handleAddEntry = () => {
+    if (!newEntryDescription.trim()) return;
+    addEntry.mutate({
+      entry_type: newEntryType,
+      description: newEntryDescription.trim(),
+    }, {
+      onSuccess: () => {
+        setNewEntryDescription('');
+      }
+    });
+  };
+
+  const handleFinalize = () => {
+    // Finalize today's entries (they will be grouped under today's date)
+    finalizeChangelog.mutate(new Date().toISOString().split('T')[0]);
+  };
+
+  const handleOverride = () => {
+    overrideVersion.mutate({
+      major: parseInt(overrideMajor),
+      minor: parseInt(overrideMinor),
+      patch: parseInt(overridePatch),
+    }, {
+      onSuccess: () => {
+        setShowOverrideDialog(false);
+      }
+    });
+  };
+
+  const nextVersion = version ? (() => {
+    let { major, minor, patch } = version;
+    if (patch === 99) {
+      patch = 0;
+      if (minor === 99) {
+        minor = 0;
+        major += 1;
+      } else {
+        minor += 1;
+      }
+    } else {
+      patch += 1;
+    }
+    return formatVersion(major, minor, patch);
+  })() : null;
 
   return (
     <div className="min-h-screen bg-background">      
@@ -375,36 +119,208 @@ const Changelog = () => {
           </p>
         </div>
 
+        {/* Version Control Panel */}
+        <Card className="mb-8">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Settings2 className="w-5 h-5" />
+              Version Control
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Current Version */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Current:</span>
+                {versionLoading ? (
+                  <Skeleton className="h-8 w-20" />
+                ) : version ? (
+                  <Badge variant="default" className="text-lg px-3 py-1">
+                    v{formatVersion(version.major, version.minor, version.patch)}
+                  </Badge>
+                ) : null}
+              </div>
+
+              {/* Next Version */}
+              {nextVersion && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Next:</span>
+                  <Badge variant="outline" className="text-sm">
+                    v{nextVersion}
+                  </Badge>
+                </div>
+              )}
+
+              {/* Auto-finalize info */}
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="w-4 h-4" />
+                <span>Auto-finalize: 3:00 AM PST daily</span>
+              </div>
+
+              <div className="flex-1" />
+
+              {/* Actions */}
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  if (version) {
+                    setOverrideMajor(version.major.toString());
+                    setOverrideMinor(version.minor.toString());
+                    setOverridePatch(version.patch.toString());
+                  }
+                  setShowOverrideDialog(true);
+                }}
+              >
+                Override Version
+              </Button>
+              <Button 
+                size="sm"
+                onClick={handleFinalize}
+                disabled={!pendingEntries?.length || finalizeChangelog.isPending}
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${finalizeChangelog.isPending ? 'animate-spin' : ''}`} />
+                Finalize Now
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Add Entry Form */}
+        <Card className="mb-8">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Plus className="w-5 h-5" />
+              Add Changelog Entry
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-3">
+                <Select 
+                  value={newEntryType} 
+                  onValueChange={(v) => setNewEntryType(v as typeof newEntryType)}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="added">Added</SelectItem>
+                    <SelectItem value="changed">Changed</SelectItem>
+                    <SelectItem value="fixed">Fixed</SelectItem>
+                    <SelectItem value="removed">Removed</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Textarea
+                  value={newEntryDescription}
+                  onChange={(e) => setNewEntryDescription(e.target.value)}
+                  placeholder="Describe the change..."
+                  className="flex-1 min-h-[80px]"
+                />
+              </div>
+              <div className="flex justify-end">
+                <Button 
+                  onClick={handleAddEntry}
+                  disabled={!newEntryDescription.trim() || addEntry.isPending}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Entry
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Pending Entries */}
+        {pendingLoading ? (
+          <Card className="mb-8">
+            <CardContent className="py-6">
+              <Skeleton className="h-20 w-full" />
+            </CardContent>
+          </Card>
+        ) : pendingEntries && pendingEntries.length > 0 && (
+          <Card className="mb-8 border-dashed border-2 border-primary/30 bg-primary/5">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Calendar className="w-5 h-5" />
+                Pending Entries ({pendingEntries.length})
+                <Badge variant="secondary" className="ml-2">Unfiled</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {pendingEntries.map((entry) => (
+                  <div key={entry.id} className="flex items-start gap-3 p-3 bg-background rounded-lg border">
+                    <Badge variant={getTypeBadgeVariant(entry.entry_type)} className="shrink-0 h-6">
+                      {entry.entry_type}
+                    </Badge>
+                    <p className="flex-1 text-sm text-foreground leading-relaxed">
+                      {entry.description}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0 h-8 w-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => deleteEntry.mutate(entry.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Changelog Entries */}
         <div className="space-y-8">
-          {changelogData.map((entry) => (
+          {changelogsLoading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <Card key={i}>
+                <CardContent className="py-6">
+                  <Skeleton className="h-8 w-32 mb-4" />
+                  <div className="space-y-3">
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-6 w-5/6" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : changelogs?.map((changelog: Changelog) => (
             <div
-              key={entry.version}
+              key={changelog.id}
               className="bg-card border border-border rounded-lg p-6"
             >
               {/* Version Header */}
               <div className="flex items-center gap-3 mb-4 pb-4 border-b border-border">
                 <h2 className="text-2xl font-bold text-foreground">
-                  v{entry.version}
+                  v{formatVersion(changelog.major, changelog.minor, changelog.patch)}
                 </h2>
-                <Badge variant="outline">{entry.date}</Badge>
+                <Badge variant="outline">{changelog.changelog_date}</Badge>
+                {changelog.is_auto_generated && (
+                  <Badge variant="secondary" className="text-xs">Auto</Badge>
+                )}
               </div>
 
               {/* Changes List */}
               <div className="space-y-3">
-                {entry.changes.map((change, idx) => (
-                  <div key={idx} className="flex gap-3">
+                {changelog.entries.map((entry) => (
+                  <div key={entry.id} className="flex gap-3">
                     <Badge
-                      variant={getTypeBadgeVariant(change.type)}
+                      variant={getTypeBadgeVariant(entry.entry_type)}
                       className="shrink-0 h-6"
                     >
-                      {change.type}
+                      {entry.entry_type}
                     </Badge>
                     <p className="text-sm text-foreground leading-relaxed">
-                      {change.description}
+                      {entry.description}
                     </p>
                   </div>
                 ))}
+                {changelog.entries.length === 0 && (
+                  <p className="text-sm text-muted-foreground italic">No entries recorded</p>
+                )}
               </div>
             </div>
           ))}
@@ -413,11 +329,64 @@ const Changelog = () => {
         {/* Footer Note */}
         <div className="mt-12 p-4 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground text-center">
-            Following semantic versioning: Major.Minor.Patch (v0.x.x). 
-            Pre-1.0 versions represent feature development toward MVP launch at v1.0.0.
+            Following semantic versioning: Major.Minor.Patch (v0.x.xx). 
+            Daily increments at 3:00 AM PST when changelog entries exist.
+            Version rolls over at .99 (e.g., 0.5.99 → 0.6.00).
           </p>
         </div>
       </main>
+
+      {/* Override Version Dialog */}
+      <Dialog open={showOverrideDialog} onOpenChange={setShowOverrideDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Override Version</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground mb-4">
+              Set a custom version number. Use this to skip to a new minor/major version.
+            </p>
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                min="0"
+                value={overrideMajor}
+                onChange={(e) => setOverrideMajor(e.target.value)}
+                className="w-20 text-center"
+              />
+              <span className="text-2xl">.</span>
+              <Input
+                type="number"
+                min="0"
+                max="99"
+                value={overrideMinor}
+                onChange={(e) => setOverrideMinor(e.target.value)}
+                className="w-20 text-center"
+              />
+              <span className="text-2xl">.</span>
+              <Input
+                type="number"
+                min="0"
+                max="99"
+                value={overridePatch}
+                onChange={(e) => setOverridePatch(e.target.value)}
+                className="w-20 text-center"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">
+              Preview: v{overrideMajor}.{overrideMinor}.{overridePatch.padStart(2, '0')}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowOverrideDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleOverride} disabled={overrideVersion.isPending}>
+              Set Version
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
