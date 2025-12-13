@@ -2315,9 +2315,40 @@ export type Database = {
           },
         ]
       }
+      shopify_store_credentials: {
+        Row: {
+          access_token_encrypted: string
+          created_at: string | null
+          id: string
+          shopify_store_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          access_token_encrypted: string
+          created_at?: string | null
+          id?: string
+          shopify_store_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          access_token_encrypted?: string
+          created_at?: string | null
+          id?: string
+          shopify_store_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_store_credentials_shopify_store_id_fkey"
+            columns: ["shopify_store_id"]
+            isOneToOne: true
+            referencedRelation: "shopify_stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shopify_stores: {
         Row: {
-          access_token_encrypted: string | null
           connected_at: string | null
           connected_by: string | null
           id: string
@@ -2332,7 +2363,6 @@ export type Database = {
           sync_settings: Json | null
         }
         Insert: {
-          access_token_encrypted?: string | null
           connected_at?: string | null
           connected_by?: string | null
           id?: string
@@ -2347,7 +2377,6 @@ export type Database = {
           sync_settings?: Json | null
         }
         Update: {
-          access_token_encrypted?: string | null
           connected_at?: string | null
           connected_by?: string | null
           id?: string
